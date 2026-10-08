@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "HakkinCatalogManifest",
+  "type": "object",
+  "required": ["version", "catalog_timestamp", "apps"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Versión del esquema de especificación del catálogo"
+    },
+    "catalog_timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "launcher_meta": {
+      "type": "object",
+      "properties": {
+        "latest_version": { "type": "string" },
+        "min_required_launcher_version": { "type": "string" },
+        "releases": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "required": ["url", "sha256"],
+            "properties": {
+              "url": { "type": "string", "format": "uri" },
+              "sha256": { "type": "string" },
+              "size_bytes": { "type": "integer" }
+            }
+          }
+        }
+      }
+    },
+    "apps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "category", "latest_version", "platforms"],
+        "properties": {
+          "id": { "type": "string" },
+          "slug": { "type": "string" },
+          "title": { "type": "string" },
+          "category": { "type": "string", "enum": ["game", "app", "tool"] },
+          "developer": { "type": "string" },
+          "summary": { "type": "string" },
+          "description_markdown": { "type": "string" },
+          "tags": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "assets": {
+            "type": "object",
+            "properties": {
+              "icon": { "type": "string" },
+              "poster": { "type": "string" },
+              "banner": { "type": "string" },
+              "screenshots": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          },
+          "latest_version": { "type": "string" },
+          "platforms": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "required": ["executable_relative_path", "full_package"],
+              "properties": {
+                "executable_relative_path": { "type": "string" },
+                "full_package": {
+                  "type": "object",
+                  "required": ["version", "url", "sha256"],
+                  "properties": {
+                    "version": { "type": "string" },
+                    "url": { "type": "string", "format": "uri" },
+                    "size_bytes": { "type": "integer" },
+                    "sha256": { "type": "string" }
+                  }
+                },
+                "delta_updates": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["from_version", "to_version", "patch_format", "url", "patch_sha256", "target_sha256"],
+                    "properties": {
+                      "from_version": { "type": "string" },
+                      "to_version": { "type": "string" },
+                      "patch_format": { "type": "string", "enum": ["hdiff", "bsdiff"] },
+                      "url": { "type": "string", "format": "uri" },
+                      "size_bytes": { "type": "integer" },
+                      "patch_sha256": { "type": "string" },
+                      "target_sha256": { "type": "string" }
+                    }
+                  }
+                },
+                "protected_user_paths": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
+                "scripts": {
+                  "type": "object",
+                  "properties": {
+                    "pre_install": { "type": ["string", "null"] },
+                    "post_install": { "type": ["string", "null"] }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

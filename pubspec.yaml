@@ -1,0 +1,56 @@
+name: hakkin_launcher
+description: "HakkinLauncher - Cliente universal de distribución, actualización diferencial y ejecución de software y videojuegos."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # UI e Iconos
+  cupertino_icons: ^1.0.8
+
+  # Gestión de Estado & Arquitectura
+  flutter_riverpod: ^2.6.1
+
+  # Enrutamiento y Navegación
+  go_router: ^14.8.0
+
+  # Networking y Descargas Resumibles
+  dio: ^5.8.0+1
+
+  # Criptografía e Integridad
+  crypto: ^3.0.6
+
+  # Almacenamiento Local y Rutas del Sistema
+  shared_preferences: ^2.5.2
+  path_provider: ^2.1.5
+  path: ^1.9.1
+
+  # Descompresión y Procesos
+  archive: ^4.0.2
+  process_run: ^1.1.1
+
+  # Integración de Escritorio (Window, Tray & Notifications)
+  window_manager: ^0.4.3
+  tray_manager: ^0.2.4
+  local_notifier: ^0.1.6
+
+  # Formato y Markdown
+  intl: ^0.20.2
+  flutter_markdown: ^0.7.6+1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - docs/catalog_example.json

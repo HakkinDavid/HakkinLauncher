@@ -1,0 +1,136 @@
+{
+  "version": "1.0.0",
+  "catalog_timestamp": "2026-10-07T23:00:00Z",
+  "launcher_meta": {
+    "latest_version": "1.0.0",
+    "min_required_launcher_version": "1.0.0",
+    "releases": {
+      "windows-x64": {
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/v1.0.0/HakkinLauncher-windows-x64.zip",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 45000000
+      },
+      "macos-arm64": {
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/v1.0.0/HakkinLauncher-macos-arm64.zip",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 48000000
+      }
+    }
+  },
+  "apps": [
+    {
+      "id": "com.hakkin.lunareclipse",
+      "slug": "lunar-eclipse",
+      "title": "Lunar Eclipse: Retribution",
+      "category": "game",
+      "developer": "Hakkin Games",
+      "summary": "Juego de acción y exploración espacial en perspectiva isométrica con estética oscura y combate dinámico.",
+      "description_markdown": "# Lunar Eclipse: Retribution\n\nAdéntrate en una base espacial abandonada en la luna Europa. Resuelve enigmas biomecánicos y enfréntate a inteligencias hostiles con un arsenal modular.\n\n### Características:\n- Iluminación volumétrica y atmósfera oscura.\n- 60+ armas y módulos de energía.\n- Partidas guardadas persistentes y soporte para mods locales.",
+      "tags": ["Action", "Sci-Fi", "Indie", "Isometric"],
+      "assets": {
+        "icon": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=256&q=80",
+        "poster": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&q=80",
+        "banner": "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=1600&q=80",
+        "screenshots": [
+          "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1280&q=80",
+          "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=1280&q=80"
+        ]
+      },
+      "latest_version": "1.2.0",
+      "platforms": {
+        "windows-x64": {
+          "executable_relative_path": "LunarEclipse.exe",
+          "full_package": {
+            "version": "1.2.0",
+            "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/mock/LunarEclipse-windows-v1.2.0.zip",
+            "size_bytes": 1450000000,
+            "sha256": "3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b"
+          },
+          "delta_updates": [
+            {
+              "from_version": "1.1.0",
+              "to_version": "1.2.0",
+              "patch_format": "hdiff",
+              "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/mock/LunarEclipse-patch-1.1.0-to-1.2.0.hdiff",
+              "size_bytes": 28400000,
+              "patch_sha256": "8f434346648f6b96df89dda901c5176b10f60753b8c61267097728a3a2333fe0",
+              "target_sha256": "3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b"
+            }
+          ],
+          "protected_user_paths": [
+            "saves/**",
+            "user_config.ini",
+            "screenshots/**"
+          ],
+          "scripts": {
+            "post_install": "scripts/setup.bat"
+          }
+        },
+        "macos-arm64": {
+          "executable_relative_path": "LunarEclipse.app/Contents/MacOS/LunarEclipse",
+          "full_package": {
+            "version": "1.2.0",
+            "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/mock/LunarEclipse-macos-arm64-v1.2.0.zip",
+            "size_bytes": 1380000000,
+            "sha256": "9b71d224bd62f3785d96d46ad3ea3d73319bfbc2890caadae2dff72519673ca7"
+          },
+          "delta_updates": [],
+          "protected_user_paths": [
+            "~/Library/Application Support/LunarEclipse/**"
+          ],
+          "scripts": {
+            "post_install": "chmod +x LunarEclipse.app/Contents/MacOS/LunarEclipse"
+          }
+        }
+      }
+    },
+    {
+      "id": "com.hakkin.pwms",
+      "slug": "platinum-world-management",
+      "title": "Platinum World Management System",
+      "category": "app",
+      "developer": "Hakkin Utilities",
+      "summary": "Herramienta avanzada de gestión de mundos y bases de datos para servidores de simulación.",
+      "description_markdown": "# Platinum World Management System\n\nPanel de control integral para monitorización en tiempo real, respaldo automático y despliegue de mundos persistentes.",
+      "tags": ["Utility", "Database", "Management", "Productivity"],
+      "assets": {
+        "icon": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=256&q=80",
+        "poster": "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&q=80",
+        "banner": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1600&q=80",
+        "screenshots": [
+          "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1280&q=80"
+        ]
+      },
+      "latest_version": "2.4.1",
+      "platforms": {
+        "windows-x64": {
+          "executable_relative_path": "PWMS.exe",
+          "full_package": {
+            "version": "2.4.1",
+            "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/mock/PWMS-windows-v2.4.1.zip",
+            "size_bytes": 65000000,
+            "sha256": "4c98fbc97de2612a8069ff32a39a7bbd17a32432ef17d4fdf80ce87399a9a3b2"
+          },
+          "delta_updates": [],
+          "protected_user_paths": [
+            "config/**",
+            "data/vault.db"
+          ]
+        },
+        "macos-arm64": {
+          "executable_relative_path": "PWMS.app/Contents/MacOS/PWMS",
+          "full_package": {
+            "version": "2.4.1",
+            "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/mock/PWMS-mac-arm64-v2.4.1.zip",
+            "size_bytes": 62000000,
+            "sha256": "1298fae97de2612a8069ff32a39a7bbd17a32432ef17d4fdf80ce87399a9a3b2"
+          },
+          "delta_updates": [],
+          "protected_user_paths": [
+            "~/Library/Application Support/PWMS/**"
+          ]
+        }
+      }
+    }
+  ]
+}
