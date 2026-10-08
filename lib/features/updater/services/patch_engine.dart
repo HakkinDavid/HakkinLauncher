@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import '../../../../core/crypto/hash_validator.dart';
 import '../../../../core/housekeeping/cleaner_service.dart';
+import '../../../../core/platform/notification_service.dart';
 import '../../../../core/platform/os_paths.dart';
 import '../../../../core/platform/process_launcher.dart';
 import '../../catalog/data/models/app_entry.dart';
@@ -16,10 +17,11 @@ enum UpdateStage {
   checking,
   downloading,
   verifyingChecksum,
+  runningPreScripts,
   applyingDelta,
   extractingFullPackage,
   preservingUserData,
-  runningScripts,
+  runningPostScripts,
   completed,
   failed,
 }
@@ -38,7 +40,7 @@ class UpdateStatus {
   });
 }
 
-/// Motor de instalación y actualización inteligente con soporte para Delta Patching y Fallback.
+/// Motor de instalación y actualización inteligente con soporte para Delta Patching, Fallback y Protección de Datos.
 class PatchEngine {
   final DownloaderService _downloader;
   final LibraryRepository _libraryRepository;
@@ -72,6 +74,7 @@ class PatchEngine {
     }
 
     final installed = await _libraryRepository.getInstalledApp(app.id);
+    final isAnUpdate = installed != null;
     final downloadsDir = await OsPaths.getDownloadsDirectory();
     final defaultAppsDir = await OsPaths.getDefaultAppsInstallDirectory();
     final targetInstallDir = Directory(
@@ -122,6 +125,20 @@ class PatchEngine {
             await HashValidator.verifySha256(patchFile, matchedDelta.patchSha256);
 
         if (patchValid) {
+          // Ejecutar scripts pre-instalación si existen
+          if (platformRelease.scripts.preInstall != null && await targetInstallDir.exists()) {
+            yield const UpdateStatus(
+              stage: UpdateStage.runningPreScripts,
+              message: 'Ejecutando script previo a la actualización...',
+              progress: 0.5,
+            );
+            final preScriptPath = p.join(targetInstallDir.path, platformRelease.scripts.preInstall);
+            await ProcessLauncher.runScript(
+              scriptPath: preScriptPath,
+              workingDirectory: targetInstallDir.path,
+            );
+          }
+
           yield const UpdateStatus(
             stage: UpdateStage.applyingDelta,
             message: 'Aplicando parche diferencial...',
@@ -133,6 +150,20 @@ class PatchEngine {
             targetDirectory: targetInstallDir,
             executableRelativePath: platformRelease.executableRelativePath,
           );
+
+          // Verificar hash del binario resultante post-patch
+          if (deltaSuccess && matchedDelta.targetSha256.isNotEmpty) {
+            final exeFile = File(p.join(targetInstallDir.path, platformRelease.executableRelativePath));
+            if (await exeFile.exists()) {
+              final hashMatch = await HashValidator.verifySha256(exeFile, matchedDelta.targetSha256);
+              if (!hashMatch) {
+                debugPrint('Aviso: Hash del binario tras parche no coincide. Descartando delta.');
+                deltaSuccess = false;
+              }
+            } else {
+              deltaSuccess = false;
+            }
+          }
         }
       } catch (e) {
         debugPrint('Fallo al aplicar parche delta: $e. Activando fallback.');
@@ -140,6 +171,15 @@ class PatchEngine {
       }
 
       if (deltaSuccess) {
+        // Ejecutar script post-instalación si existe
+        if (platformRelease.scripts.postInstall != null && await targetInstallDir.exists()) {
+          final postScriptPath = p.join(targetInstallDir.path, platformRelease.scripts.postInstall);
+          await ProcessLauncher.runScript(
+            scriptPath: postScriptPath,
+            workingDirectory: targetInstallDir.path,
+          );
+        }
+
         // Delta exitoso
         await _finalizeInstallation(
           app: app,
@@ -149,6 +189,9 @@ class PatchEngine {
         );
 
         await CleanerService.cleanTemporaryFiles();
+
+        // Notificación nativa
+        await NotificationService.notifyUpdateCompleted(app.title, app.latestVersion);
 
         yield const UpdateStatus(
           stage: UpdateStage.completed,
@@ -217,6 +260,20 @@ class PatchEngine {
         }
       }
 
+      // Ejecutar scripts pre-instalación si existen
+      if (platformRelease.scripts.preInstall != null && await targetInstallDir.exists()) {
+        yield const UpdateStatus(
+          stage: UpdateStage.runningPreScripts,
+          message: 'Ejecutando script pre-instalación...',
+          progress: 0.7,
+        );
+        final preScriptPath = p.join(targetInstallDir.path, platformRelease.scripts.preInstall);
+        await ProcessLauncher.runScript(
+          scriptPath: preScriptPath,
+          workingDirectory: targetInstallDir.path,
+        );
+      }
+
       // Extracción del paquete
       yield const UpdateStatus(
         stage: UpdateStage.extractingFullPackage,
@@ -244,7 +301,7 @@ class PatchEngine {
       // Ejecutar scripts post-instalación si existen
       if (platformRelease.scripts.postInstall != null) {
         yield const UpdateStatus(
-          stage: UpdateStage.runningScripts,
+          stage: UpdateStage.runningPostScripts,
           message: 'Ejecutando script post-instalación...',
           progress: 0.9,
         );
@@ -265,6 +322,13 @@ class PatchEngine {
 
       // Limpieza de temporales
       await CleanerService.cleanTemporaryFiles();
+
+      // Emitir notificación nativa
+      if (isAnUpdate) {
+        await NotificationService.notifyUpdateCompleted(app.title, app.latestVersion);
+      } else {
+        await NotificationService.notifyInstallCompleted(app.title);
+      }
 
       yield const UpdateStatus(
         stage: UpdateStage.completed,

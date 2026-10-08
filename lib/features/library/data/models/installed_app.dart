@@ -9,6 +9,7 @@ class InstalledApp {
   final DateTime? lastLaunchedAt;
   final int sizeBytes;
   final String platformKey;
+  final String? launchArguments;
 
   const InstalledApp({
     required this.id,
@@ -20,6 +21,7 @@ class InstalledApp {
     this.lastLaunchedAt,
     this.sizeBytes = 0,
     required this.platformKey,
+    this.launchArguments,
   });
 
   factory InstalledApp.fromJson(Map<String, dynamic> json) {
@@ -37,6 +39,7 @@ class InstalledApp {
           : null,
       sizeBytes: (json['size_bytes'] as num?)?.toInt() ?? 0,
       platformKey: json['platform_key'] as String? ?? '',
+      launchArguments: json['launch_arguments'] as String?,
     );
   }
 
@@ -51,12 +54,14 @@ class InstalledApp {
           'last_launched_at': lastLaunchedAt!.toIso8601String(),
         'size_bytes': sizeBytes,
         'platform_key': platformKey,
+        if (launchArguments != null) 'launch_arguments': launchArguments,
       };
 
   InstalledApp copyWith({
     String? installedVersion,
     DateTime? lastLaunchedAt,
     int? sizeBytes,
+    String? launchArguments,
   }) {
     return InstalledApp(
       id: id,
@@ -68,6 +73,7 @@ class InstalledApp {
       lastLaunchedAt: lastLaunchedAt ?? this.lastLaunchedAt,
       sizeBytes: sizeBytes ?? this.sizeBytes,
       platformKey: platformKey,
+      launchArguments: launchArguments ?? this.launchArguments,
     );
   }
 }

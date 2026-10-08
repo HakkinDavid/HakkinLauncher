@@ -1,7 +1,11 @@
 import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hakkin_launcher/core/constants/app_constants.dart';
 import 'package:hakkin_launcher/core/crypto/hash_validator.dart';
 import 'package:hakkin_launcher/features/catalog/data/models/app_entry.dart';
+import 'package:hakkin_launcher/features/library/data/models/installed_app.dart';
+import 'package:hakkin_launcher/features/self_update/services/self_update_service.dart';
+import 'package:hakkin_launcher/features/updater/services/downloader_service.dart';
 
 void main() {
   group('Catalog Manifest & Schema Tests', () {
@@ -11,7 +15,7 @@ void main() {
         "version": "1.0.0",
         "catalog_timestamp": "2026-10-07T23:00:00Z",
         "launcher_meta": {
-          "latest_version": "1.0.0",
+          "latest_version": "1.1.0",
           "releases": {
             "macos-arm64": {
               "url": "https://example.com/launcher.zip",
@@ -31,7 +35,8 @@ void main() {
             "tags": ["Indie", "Action"],
             "assets": {
               "icon": "https://example.com/icon.png",
-              "poster": "https://example.com/poster.jpg"
+              "poster": "https://example.com/poster.jpg",
+              "screenshots": ["https://example.com/s1.jpg", "https://example.com/s2.jpg"]
             },
             "latest_version": "1.2.0",
             "platforms": {
@@ -59,6 +64,7 @@ void main() {
                   "config.ini"
                 ],
                 "scripts": {
+                  "pre_install": "scripts/pre.sh",
                   "post_install": "scripts/setup.sh"
                 }
               }
@@ -72,12 +78,15 @@ void main() {
       final manifest = CatalogManifest.fromJson(decoded);
 
       expect(manifest.version, '1.0.0');
+      expect(manifest.launcherMeta, isNotNull);
+      expect(manifest.launcherMeta!.latestVersion, '1.1.0');
       expect(manifest.apps.length, 1);
 
       final app = manifest.apps.first;
       expect(app.id, 'com.hakkin.testgame');
       expect(app.title, 'Test Game');
       expect(app.category, 'game');
+      expect(app.assets.screenshots.length, 2);
       expect(app.supportsPlatform('macos-arm64'), isTrue);
       expect(app.supportsPlatform('windows-x64'), isFalse);
 
@@ -85,6 +94,7 @@ void main() {
       expect(release, isNotNull);
       expect(release!.executableRelativePath, 'TestGame.app/Contents/MacOS/TestGame');
       expect(release.protectedUserPaths, contains('saves/**'));
+      expect(release.scripts.preInstall, 'scripts/pre.sh');
       expect(release.scripts.postInstall, 'scripts/setup.sh');
 
       // Prueba de búsqueda de delta patch
@@ -93,6 +103,7 @@ void main() {
       expect(delta!.patchFormat, 'hdiff');
       expect(delta.sizeBytes, 50000);
       expect(delta.patchSha256, '55667788');
+      expect(delta.targetSha256, '11223344');
 
       // Prueba de delta inexistente
       final missingDelta = release.findDeltaFor('1.0.0', '1.2.0');
@@ -107,6 +118,66 @@ void main() {
 
       expect(hash, isNotEmpty);
       expect(hash.length, 64);
+    });
+  });
+
+  group('InstalledApp Model & Launch Arguments Tests', () {
+    test('Serializa y deserializa InstalledApp con argumentos de lanzamiento', () {
+      final app = InstalledApp(
+        id: 'com.hakkin.game1',
+        title: 'Eclipse',
+        installedVersion: '1.0.0',
+        executablePath: '/tmp/game',
+        installDirectory: '/tmp',
+        installedAt: DateTime(2026, 1, 1),
+        platformKey: 'macos-arm64',
+        launchArguments: '-windowed -novsync',
+      );
+
+      final json = app.toJson();
+      expect(json['launch_arguments'], '-windowed -novsync');
+
+      final reconstructed = InstalledApp.fromJson(json);
+      expect(reconstructed.id, app.id);
+      expect(reconstructed.launchArguments, '-windowed -novsync');
+
+      final modified = reconstructed.copyWith(launchArguments: '-fps 60');
+      expect(modified.launchArguments, '-fps 60');
+    });
+  });
+
+  group('SelfUpdateService Tests', () {
+    test('Detecta correctamente si hay actualización de HakkinLauncher', () {
+      final service = SelfUpdateService();
+
+      const metaWithNewer = LauncherMeta(
+        latestVersion: '2.0.0',
+        releases: {},
+      );
+      expect(service.isUpdateAvailable(metaWithNewer), isTrue);
+
+      const metaSame = LauncherMeta(
+        latestVersion: AppConstants.appVersion,
+        releases: {},
+      );
+      expect(service.isUpdateAvailable(metaSame), isFalse);
+
+      expect(service.isUpdateAvailable(null), isFalse);
+    });
+  });
+
+  group('DownloaderService & Metrics Tests', () {
+    test('Formatea correctamente las métricas de DownloadProgress', () {
+      const progress = DownloadProgress(
+        receivedBytes: 52428800, // 50 MB
+        totalBytes: 104857600, // 100 MB
+        progress: 0.5,
+        speedBytesPerSec: 10485760, // 10 MB/s
+        statusText: '50.0 MB de 100.0 MB',
+      );
+
+      expect(progress.percentageFormatted, '50.0%');
+      expect(progress.speedFormatted, '10.0 MB/s');
     });
   });
 }

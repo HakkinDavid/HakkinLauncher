@@ -236,6 +236,57 @@ class AppDetailScreen extends ConsumerWidget {
                   ),
                 ),
 
+              // Galería de Capturas de Pantalla
+              if (app.assets.screenshots.isNotEmpty)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Capturas de Pantalla',
+                          style: TextStyle(
+                            color: AppColors.platinum,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          height: 170,
+                          child: ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: app.assets.screenshots.length,
+                            separatorBuilder: (_, __) => const SizedBox(width: 14),
+                            itemBuilder: (context, idx) {
+                              final shotUrl = app.assets.screenshots[idx];
+                              return ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Container(
+                                  width: 300,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: AppColors.surfaceBorder),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Image.network(
+                                    shotUrl,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) => Container(
+                                      color: AppColors.surfaceElevated,
+                                      child: const Icon(Icons.image_not_supported, color: AppColors.surfaceBorder),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
               // Contenido: Markdown y Ficha Técnica
               SliverPadding(
                 padding: const EdgeInsets.all(32),

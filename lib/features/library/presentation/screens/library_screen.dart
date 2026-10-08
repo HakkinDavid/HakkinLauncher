@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/platform/shortcut_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/widgets/hakkin_button.dart';
 import '../../../../shared/widgets/status_badge.dart';
 import '../../../catalog/presentation/controllers/catalog_controller.dart';
+import '../../data/models/installed_app.dart';
 import '../controllers/library_controller.dart';
 
 class LibraryScreen extends ConsumerWidget {
@@ -168,6 +170,18 @@ class LibraryScreen extends ConsumerWidget {
                                       fontSize: 12,
                                     ),
                                   ),
+                                  if (installedApp.launchArguments != null &&
+                                      installedApp.launchArguments!.isNotEmpty) ...[
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      'Argumentos: ${installedApp.launchArguments}',
+                                      style: const TextStyle(
+                                        color: AppColors.celestialBlue,
+                                        fontSize: 11,
+                                        fontFamily: 'monospace',
+                                      ),
+                                    ),
+                                  ],
                                 ],
                               ),
                             ),
@@ -197,42 +211,100 @@ class LibraryScreen extends ConsumerWidget {
                             ),
                             const SizedBox(width: 10),
 
-                            IconButton(
-                              icon: const Icon(Icons.delete_outline, color: AppColors.error),
-                              tooltip: 'Desinstalar',
-                              onPressed: isRunning
-                                  ? null
-                                  : () async {
-                                      final confirm = await showDialog<bool>(
-                                        context: context,
-                                        builder: (ctx) => AlertDialog(
-                                          backgroundColor: AppColors.surface,
-                                          title: const Text('¿Desinstalar aplicación?'),
-                                          content: Text(
-                                            'Se eliminarán los archivos de ${installedApp.title}. Tus datos de partidas guardadas permanecerán protegidos.',
-                                          ),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () => Navigator.pop(ctx, false),
-                                              child: const Text('Cancelar'),
-                                            ),
-                                            TextButton(
-                                              onPressed: () => Navigator.pop(ctx, true),
-                                              child: const Text(
-                                                'Desinstalar',
-                                                style: TextStyle(color: AppColors.error),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-
-                                      if (confirm == true) {
-                                        await ref
-                                            .read(installedAppsProvider.notifier)
-                                            .uninstallApp(installedApp.id);
-                                      }
-                                    },
+                            // Menú de opciones avanzadas
+                            PopupMenuButton<String>(
+                              icon: const Icon(Icons.more_vert, color: AppColors.platinumMuted),
+                              color: AppColors.surfaceElevated,
+                              onSelected: (val) async {
+                                if (val == 'args') {
+                                  _showArgumentsDialog(context, ref, installedApp);
+                                } else if (val == 'shortcut') {
+                                  final ok = await ShortcutService.createDesktopShortcut(
+                                    appTitle: installedApp.title,
+                                    executablePath: installedApp.executablePath,
+                                  );
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(ok
+                                            ? 'Acceso directo en el Escritorio creado'
+                                            : 'No se pudo crear el acceso directo'),
+                                      ),
+                                    );
+                                  }
+                                } else if (val == 'startmenu') {
+                                  final ok = await ShortcutService.createStartMenuEntry(
+                                    appTitle: installedApp.title,
+                                    executablePath: installedApp.executablePath,
+                                  );
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(ok
+                                            ? 'Acceso añadido al Menú de Aplicaciones'
+                                            : 'No se pudo registrar en el Menú'),
+                                      ),
+                                    );
+                                  }
+                                } else if (val == 'verify') {
+                                  _runIntegrityVerification(context, ref, installedApp);
+                                } else if (val == 'uninstall') {
+                                  _confirmUninstall(context, ref, installedApp);
+                                }
+                              },
+                              itemBuilder: (ctx) => [
+                                const PopupMenuItem(
+                                  value: 'args',
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.tune, size: 18, color: AppColors.platinum),
+                                      SizedBox(width: 8),
+                                      Text('Argumentos de lanzamiento'),
+                                    ],
+                                  ),
+                                ),
+                                const PopupMenuItem(
+                                  value: 'shortcut',
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.desktop_windows, size: 18, color: AppColors.platinum),
+                                      SizedBox(width: 8),
+                                      Text('Crear acceso en Escritorio'),
+                                    ],
+                                  ),
+                                ),
+                                const PopupMenuItem(
+                                  value: 'startmenu',
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.apps, size: 18, color: AppColors.platinum),
+                                      SizedBox(width: 8),
+                                      Text('Añadir al Menú Inicio'),
+                                    ],
+                                  ),
+                                ),
+                                const PopupMenuItem(
+                                  value: 'verify',
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.verified_outlined, size: 18, color: AppColors.platinum),
+                                      SizedBox(width: 8),
+                                      Text('Verificar integridad de archivos'),
+                                    ],
+                                  ),
+                                ),
+                                const PopupMenuDivider(),
+                                const PopupMenuItem(
+                                  value: 'uninstall',
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.delete_outline, size: 18, color: AppColors.error),
+                                      SizedBox(width: 8),
+                                      Text('Desinstalar', style: TextStyle(color: AppColors.error)),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -246,5 +318,120 @@ class LibraryScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  void _showArgumentsDialog(BuildContext context, WidgetRef ref, InstalledApp app) {
+    final controller = TextEditingController(text: app.launchArguments ?? '');
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text('Argumentos para ${app.title}'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Parámetros o flags de línea de comandos al iniciar el juego/app:',
+              style: TextStyle(color: AppColors.platinumMuted, fontSize: 13),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: controller,
+              decoration: const InputDecoration(
+                hintText: 'ej. -windowed -novsync -fps 60',
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              ref
+                  .read(installedAppsProvider.notifier)
+                  .updateLaunchArguments(app.id, controller.text.trim());
+              Navigator.pop(ctx);
+            },
+            child: const Text('Guardar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _runIntegrityVerification(BuildContext context, WidgetRef ref, InstalledApp app) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(
+        child: CircularProgressIndicator(color: AppColors.platinum),
+      ),
+    );
+
+    final result = await ref.read(installedAppsProvider.notifier).verifyAppIntegrity(app.id);
+    if (context.mounted) {
+      Navigator.pop(context); // cerrar loader
+      final isValid = result['isValid'] == true;
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: AppColors.surface,
+          title: Row(
+            children: [
+              Icon(
+                isValid ? Icons.check_circle : Icons.warning_amber,
+                color: isValid ? AppColors.success : AppColors.error,
+              ),
+              const SizedBox(width: 8),
+              Text(isValid ? 'Integridad verificada' : 'Fallo de integridad'),
+            ],
+          ),
+          content: Text(
+            result['message'].toString(),
+            style: const TextStyle(color: AppColors.platinumMuted),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Entendido'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  void _confirmUninstall(BuildContext context, WidgetRef ref, InstalledApp app) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: const Text('¿Desinstalar aplicación?'),
+        content: Text(
+          'Se eliminarán los archivos de ${app.title}. Tus datos de partidas guardadas permanecerán protegidos.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text(
+              'Desinstalar',
+              style: TextStyle(color: AppColors.error),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      await ref.read(installedAppsProvider.notifier).uninstallApp(app.id);
+    }
   }
 }

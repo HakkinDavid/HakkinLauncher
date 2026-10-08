@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hakkin_launcher/core/constants/app_constants.dart';
+import 'package:hakkin_launcher/core/housekeeping/cleaner_service.dart';
+import 'package:hakkin_launcher/core/platform/background_check_service.dart';
+import 'package:hakkin_launcher/core/platform/os_paths.dart';
+import 'package:hakkin_launcher/core/platform/window_service.dart';
+import 'package:hakkin_launcher/core/theme/app_colors.dart';
+import 'package:hakkin_launcher/features/catalog/presentation/controllers/catalog_controller.dart';
+import 'package:hakkin_launcher/features/self_update/services/self_update_service.dart';
+import 'package:hakkin_launcher/shared/widgets/hakkin_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../../core/constants/app_constants.dart';
-import '../../../../core/housekeeping/cleaner_service.dart';
-import '../../../../core/platform/os_paths.dart';
-import '../../../../core/platform/window_service.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../shared/widgets/hakkin_button.dart';
-import '../../../catalog/presentation/controllers/catalog_controller.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -18,9 +20,13 @@ class SettingsScreen extends ConsumerStatefulWidget {
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   final _catalogUrlController = TextEditingController();
+  final _customInstallPathController = TextEditingController();
   bool _closeToTray = true;
   String _baseDir = '';
   int _deletedFiles = -1;
+  bool _isCheckingUpdates = false;
+  String? _selfUpdateStatusMessage;
+  bool _isSelfUpdating = false;
 
   @override
   void initState() {
@@ -32,11 +38,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final prefs = await SharedPreferences.getInstance();
     final url = prefs.getString(AppConstants.prefCatalogUrlKey) ??
         AppConstants.defaultCatalogUrl;
+    final customPath = prefs.getString(AppConstants.prefCustomInstallPathKey) ?? '';
     final closeToTray = prefs.getBool(AppConstants.prefCloseToTrayKey) ?? true;
     final baseDir = await OsPaths.getAppBaseDirectory();
+    final defaultAppsDir = await OsPaths.getDefaultAppsInstallDirectory();
 
     setState(() {
       _catalogUrlController.text = url;
+      _customInstallPathController.text = customPath.isNotEmpty ? customPath : defaultAppsDir.path;
       _closeToTray = closeToTray;
       _baseDir = baseDir.path;
     });
@@ -53,6 +62,47 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
   }
 
+  Future<void> _saveInstallPath() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      AppConstants.prefCustomInstallPathKey,
+      _customInstallPathController.text.trim(),
+    );
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Ruta de instalación guardada con éxito')),
+      );
+    }
+  }
+
+  Future<void> _checkForUpdatesNow() async {
+    setState(() => _isCheckingUpdates = true);
+    await BackgroundCheckService.instance.checkForUpdates(silent: false);
+    if (mounted) {
+      setState(() => _isCheckingUpdates = false);
+    }
+  }
+
+  Future<void> _triggerSelfUpdate() async {
+    final manifestAsync = ref.read(catalogManifestProvider);
+    final manifest = manifestAsync.value;
+    if (manifest == null || manifest.launcherMeta == null) return;
+
+    setState(() {
+      _isSelfUpdating = true;
+      _selfUpdateStatusMessage = 'Iniciando actualización del lanzador...';
+    });
+
+    final selfUpdateService = SelfUpdateService();
+    await for (final status in selfUpdateService.performSelfUpdate(manifest.launcherMeta!)) {
+      if (mounted) {
+        setState(() {
+          _selfUpdateStatusMessage = status.message;
+        });
+      }
+    }
+  }
+
   Future<void> _runHousekeeping() async {
     final count = await CleanerService.cleanTemporaryFiles();
     await CleanerService.rotateLogs();
@@ -61,6 +111,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final manifestAsync = ref.watch(catalogManifestProvider);
+    final launcherMeta = manifestAsync.value?.launcherMeta;
+    final hasLauncherUpdate = launcherMeta != null &&
+        launcherMeta.latestVersion != AppConstants.appVersion;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SingleChildScrollView(
@@ -86,6 +141,56 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ),
             ),
             const SizedBox(height: 28),
+
+            // Banner de actualización del lanzador si hay una nueva versión
+            if (hasLauncherUpdate) ...[
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.celestialBlue),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.system_update_alt, color: AppColors.celestialBlue, size: 36),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '¡Nueva versión de ${AppConstants.appName} disponible! (v${launcherMeta.latestVersion})',
+                            style: const TextStyle(
+                              color: AppColors.platinum,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _selfUpdateStatusMessage ??
+                                'Tu versión actual es v${AppConstants.appVersion}. Pulsa para actualizar y reiniciar automáticamente.',
+                            style: const TextStyle(color: AppColors.platinumMuted, fontSize: 13),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    HakkinButton(
+                      text: _isSelfUpdating ? 'Actualizando...' : 'Actualizar Lanzador',
+                      isLoading: _isSelfUpdating,
+                      icon: Icons.download_for_offline,
+                      variant: HakkinButtonVariant.primaryPlatinum,
+                      onPressed: _isSelfUpdating ? null : _triggerSelfUpdate,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
 
             // Sección 1: Catálogo Remoto
             _buildSection(
@@ -127,34 +232,93 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
             const SizedBox(height: 24),
 
-            // Sección 2: Comportamiento en Segundo Plano
+            // Sección 2: Directorio de Instalación de Aplicaciones
             _buildSection(
-              title: 'Comportamiento en Segundo Plano',
-              description: 'Opciones de bandeja de sistema y minimizado.',
-              child: SwitchListTile(
-                value: _closeToTray,
-                contentPadding: EdgeInsets.zero,
-                activeThumbColor: AppColors.celestialBlue,
-                title: const Text(
-                  'Minimizar a la bandeja al cerrar la ventana',
-                  style: TextStyle(color: AppColors.platinum, fontSize: 14),
-                ),
-                subtitle: const Text(
-                  'El lanzador permanecerá activo en la bandeja del sistema o barra de menú para verificar actualizaciones.',
-                  style: TextStyle(color: AppColors.platinumMuted, fontSize: 12),
-                ),
-                onChanged: (val) async {
-                  setState(() => _closeToTray = val);
-                  WindowService.instance.setCloseToTray(val);
-                  final prefs = await SharedPreferences.getInstance();
-                  await prefs.setBool(AppConstants.prefCloseToTrayKey, val);
-                },
+              title: 'Ruta de Instalación de Juegos y Software',
+              description:
+                  'Carpeta del sistema operativo donde se descargarán y extraerán los paquetes y binarios.',
+              child: Column(
+                children: [
+                  TextField(
+                    controller: _customInstallPathController,
+                    decoration: const InputDecoration(
+                      labelText: 'Directorio de Instalación',
+                      prefixIcon: Icon(Icons.folder_open),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      HakkinButton(
+                        text: 'Guardar Ruta',
+                        icon: Icons.save,
+                        variant: HakkinButtonVariant.secondary,
+                        onPressed: _saveInstallPath,
+                      ),
+                      const SizedBox(width: 12),
+                      HakkinButton(
+                        text: 'Restaurar Ruta por Defecto',
+                        variant: HakkinButtonVariant.secondary,
+                        onPressed: () async {
+                          final defaultDir = await OsPaths.getDefaultAppsInstallDirectory();
+                          _customInstallPathController.text = defaultDir.path;
+                          _saveInstallPath();
+                        },
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
 
             const SizedBox(height: 24),
 
-            // Sección 3: Housekeeping y Mantenimiento
+            // Sección 3: Segundo Plano y Comprobaciones
+            _buildSection(
+              title: 'Segundo Plano y Actualizaciones',
+              description: 'Opciones de bandeja de sistema y sondeo automático.',
+              child: Column(
+                children: [
+                  SwitchListTile(
+                    value: _closeToTray,
+                    contentPadding: EdgeInsets.zero,
+                    activeThumbColor: AppColors.celestialBlue,
+                    title: const Text(
+                      'Minimizar a la bandeja al cerrar la ventana',
+                      style: TextStyle(color: AppColors.platinum, fontSize: 14),
+                    ),
+                    subtitle: const Text(
+                      'El lanzador permanecerá activo en la bandeja del sistema o barra de menú para verificar actualizaciones.',
+                      style: TextStyle(color: AppColors.platinumMuted, fontSize: 12),
+                    ),
+                    onChanged: (val) async {
+                      setState(() => _closeToTray = val);
+                      WindowService.instance.setCloseToTray(val);
+                      final prefs = await SharedPreferences.getInstance();
+                      await prefs.setBool(AppConstants.prefCloseToTrayKey, val);
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      HakkinButton(
+                        text: _isCheckingUpdates
+                            ? 'Buscando actualizaciones...'
+                            : 'Buscar Actualizaciones Ahora',
+                        isLoading: _isCheckingUpdates,
+                        icon: Icons.sync,
+                        variant: HakkinButtonVariant.secondary,
+                        onPressed: _isCheckingUpdates ? null : _checkForUpdatesNow,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // Sección 4: Housekeeping y Mantenimiento
             _buildSection(
               title: 'Mantenimiento y Housekeeping',
               description:
@@ -181,7 +345,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
             const SizedBox(height: 24),
 
-            // Sección 4: Información de Rutas
+            // Sección 5: Información de Rutas
             _buildSection(
               title: 'Información del Sistema',
               description: 'Rutas locales utilizadas por HakkinLauncher.',
