@@ -1,0 +1,264 @@
+{
+  "Bonsanbec/tecate-simulator": {
+    "id": "com.bonsanbec.tecate-simulator",
+    "slug": "tecate-simulator",
+    "title": "Tecate Simulator",
+    "category": "game",
+    "developer": "Bonsanbec",
+    "summary": "El corazón de Baja California. Conducción y exploración interactiva de Tecate.",
+    "description_markdown": "# Tecate Simulator\n\nExplora la emblemática ciudad de Tecate, Baja California, en esta simulación inmersiva que recrea sus calles principales, puntos de referencia y entorno característico.\n\n### Aspectos Destacados:\n- Recreación ambiental y diseño urbano distintivo.\n- Modelo de físicas de vehículos adaptativo.\n- Disponible de forma nativa para Windows y macOS.",
+    "tags": ["Simulation", "Indie", "Driving", "Exploration", "3D"],
+    "assets": {
+      "icon": "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=256&q=80",
+      "poster": "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600&q=80",
+      "banner": "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1600&q=80",
+      "screenshots": [
+        "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1280&q=80",
+        "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1280&q=80"
+      ]
+    },
+    "platforms": {
+      "windows-x64": {
+        "executable_relative_path": "TecateSimulator.exe",
+        "asset_pattern": "tecate-windows.*\\.zip",
+        "protected_user_paths": []
+      },
+      "macos-arm64": {
+        "executable_relative_path": "TecateSimulator.app/Contents/MacOS/TecateSimulator",
+        "asset_pattern": "tecate-macos.*\\.zip",
+        "protected_user_paths": []
+      }
+    }
+  },
+  "Bonsanbec/fractochales": {
+    "id": "com.bonsanbec.fractochales",
+    "slug": "fractochales",
+    "title": "Fractochales",
+    "category": "game",
+    "developer": "Bonsanbec",
+    "summary": "Rayos y centellas, bateman. Juego de acción retro arcade con estética pixelada y ritmo vertiginoso.",
+    "description_markdown": "# Fractochales\n\nAdéntrate en el frenético universo de Fractochales. Supera oleadas de enemigos, desbloquea patrones fractales y alcanza la máxima puntuación en este título de acción intensa.\n\n### Características:\n- Jugabilidad arcade rápida y desafiante.\n- Banda sonora original chiptune / synthwave.\n- Rendimiento optimizado para Windows x64.",
+    "tags": ["Arcade", "Action", "Indie", "Retro", "Pixel Art"],
+    "assets": {
+      "icon": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=256&q=80",
+      "poster": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&q=80",
+      "banner": "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=1600&q=80",
+      "screenshots": [
+        "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1280&q=80",
+        "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=1280&q=80"
+      ]
+    },
+    "platforms": {
+      "windows-x64": {
+        "executable_relative_path": "fractochales.exe",
+        "asset_pattern": "fractochales-win.*\\.zip",
+        "protected_user_paths": []
+      }
+    }
+  },
+  "Bonsanbec/migrant-aid-map": {
+    "id": "com.bonsanbec.migrant-aid-map",
+    "slug": "migrant-aid-map",
+    "title": "Mapa de Ayuda Migrante",
+    "category": "app",
+    "developer": "Bonsanbec",
+    "summary": "México con los brazos abiertos. Red comunitaria de ayuda, centros de acogida y servicios de apoyo.",
+    "description_markdown": "# Mapa de Ayuda Migrante\n\nPlataforma humanitaria interactiva diseñada para conectar a personas en movilidad con albergues, comedores comunitarios, servicios médicos y centros de asistencia legal a lo largo de las principales rutas de tránsito en México.",
+    "tags": ["Humanitarian", "Community", "Maps", "Social Impact", "Mobile"],
+    "assets": {
+      "icon": "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=256&q=80",
+      "poster": "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600&q=80",
+      "banner": "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=1600&q=80",
+      "screenshots": [
+        "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1280&q=80"
+      ]
+    },
+    "platforms": {
+      "android": {
+        "executable_relative_path": "migrant-aid-map-android.apk",
+        "asset_pattern": ".*\\.apk",
+        "protected_user_paths": []
+      }
+    }
+  },
+  "HakkinDavid/firefighter-form": {
+    "id": "com.hakkin.firefighter-form",
+    "slug": "firefighter-form",
+    "title": "Formulario de Bomberos",
+    "category": "app",
+    "developer": "HakkinDavid",
+    "summary": "Sistema integral de partes de servicio, actas de rescate y control de intervenciones operativas.",
+    "description_markdown": "# Formulario de Bomberos\n\nHerramienta especializada para estaciones y cuerpos de bomberos, facilitando el llenado rápido, validación y sincronización de informes de incidentes, unidades desplegadas y tiempos de respuesta en campo.",
+    "tags": ["Productivity", "Emergency", "Forms", "Database", "Offline-First"],
+    "assets": {
+      "icon": "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=256&q=80",
+      "poster": "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&q=80",
+      "banner": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=1600&q=80",
+      "screenshots": [
+        "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1280&q=80"
+      ]
+    },
+    "platforms": {
+      "windows-x64": {
+        "executable_relative_path": "firefighter_form.exe",
+        "asset_pattern": "bomberos-windows.*\\.zip",
+        "protected_user_paths": []
+      },
+      "android": {
+        "executable_relative_path": "bomberos-android-release.apk",
+        "asset_pattern": "bomberos-android.*\\.apk",
+        "protected_user_paths": []
+      }
+    }
+  },
+  "HakkinDavid/PWMS": {
+    "id": "com.hakkin.pwms",
+    "slug": "platinum-world-management",
+    "title": "Platinum World Management System (PWMS)",
+    "category": "app",
+    "developer": "HakkinDavid",
+    "summary": "Panel avanzado de administración, persistencia y control de entornos de servidor y bases de datos.",
+    "description_markdown": "# Platinum World Management System (PWMS)\n\nSuite de administración y supervisión de infraestructuras de simulación persistente. Ofrece monitorización en tiempo real, respaldos automáticos y despliegue rápido de entornos virtuales.",
+    "tags": ["Utility", "Database", "Management", "Server", "Monitoring"],
+    "assets": {
+      "icon": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=256&q=80",
+      "poster": "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&q=80",
+      "banner": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1600&q=80",
+      "screenshots": [
+        "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1280&q=80"
+      ]
+    },
+    "platforms": {
+      "android": {
+        "executable_relative_path": "pwms-android-release.apk",
+        "asset_pattern": "pwms-android.*\\.apk",
+        "protected_user_paths": []
+      }
+    }
+  },
+  "HakkinDavid/smart-scheduler": {
+    "id": "com.hakkin.smart-scheduler",
+    "slug": "smart-scheduler",
+    "title": "Smart Scheduler",
+    "category": "app",
+    "developer": "HakkinDavid",
+    "summary": "No más dolores de cabeza organizando horarios. Planificación académica y laboral inteligente.",
+    "description_markdown": "# Smart Scheduler\n\nOptimiza la asignación de materias, turnos de trabajo y calendarios personales sin conflictos de solapamiento mediante algoritmos de resolución de restricciones.",
+    "tags": ["Productivity", "Calendar", "Education", "macOS", "Utility"],
+    "assets": {
+      "icon": "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=256&q=80",
+      "poster": "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=600&q=80",
+      "banner": "https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=1600&q=80",
+      "screenshots": [
+        "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=1280&q=80"
+      ]
+    },
+    "platforms": {
+      "macos-arm64": {
+        "executable_relative_path": "SmartScheduler.app/Contents/MacOS/SmartScheduler",
+        "asset_pattern": "smart-scheduler-macos.*\\.zip",
+        "protected_user_paths": []
+      }
+    }
+  },
+  "HakkinDavid/WiimoteUserlandDriver": {
+    "id": "com.hakkin.wiimote-userland-driver",
+    "slug": "wiimote-userland-driver",
+    "title": "Wiimote Userland Driver",
+    "category": "tool",
+    "developer": "HakkinDavid",
+    "summary": "Controlador en espacio de usuario para conectar Wiimotes y mapearlos a pulsaciones de teclado en macOS.",
+    "description_markdown": "# Wiimote Userland Driver\n\nDriver ligero en espacio de usuario para macOS (Apple Silicon y x86_64) que permite emparejar mandos Wiimote por Bluetooth y mapear sus botones y acelerómetros a teclas y eventos del sistema.",
+    "tags": ["Driver", "Hardware", "macOS", "Gaming", "Bluetooth"],
+    "assets": {
+      "icon": "https://images.unsplash.com/photo-1600080972464-8e5f35f63d08?w=256&q=80",
+      "poster": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&q=80",
+      "banner": "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1600&q=80",
+      "screenshots": [
+        "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1280&q=80"
+      ]
+    },
+    "platforms": {
+      "macos-arm64": {
+        "executable_relative_path": "WiimoteUserlandDriver-mac-arm64",
+        "asset_pattern": "WiimoteUserlandDriver.*",
+        "protected_user_paths": []
+      }
+    }
+  },
+  "HakkinDavid/languages-autohotkey": {
+    "id": "com.hakkin.languages-autohotkey",
+    "slug": "languages-autohotkey",
+    "title": "Language Input Hotkey",
+    "category": "tool",
+    "developer": "HakkinDavid",
+    "summary": "Entrada rápida de caracteres especiales y acentos para múltiples idiomas sin alternar la distribución del teclado.",
+    "description_markdown": "# Language Input Hotkey\n\nUtilidad en segundo plano inspirada en Microsoft Word que permite introducir fácilmente caracteres con tildes, diéresis y tonos fonéticos (pinyin, español) mediante combinaciones intuitivas.",
+    "tags": ["Utility", "Typing", "Languages", "Productivity", "Windows"],
+    "assets": {
+      "icon": "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=256&q=80",
+      "poster": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&q=80",
+      "banner": "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=1600&q=80",
+      "screenshots": [
+        "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=1280&q=80"
+      ]
+    },
+    "platforms": {
+      "windows-x64": {
+        "executable_relative_path": "spanish-v1.0.exe",
+        "asset_pattern": "spanish.*\\.exe",
+        "protected_user_paths": []
+      }
+    }
+  },
+  "HakkinDavid/cathelper": {
+    "id": "com.hakkin.cathelper",
+    "slug": "cathelper",
+    "title": "CAT Helper",
+    "category": "app",
+    "developer": "HakkinDavid",
+    "summary": "Herramienta ágil de cálculo y seguimiento de métricas operativas CAT.",
+    "description_markdown": "# CAT Helper\n\nAplicación móvil diseñada para agilizar el registro y cálculo de parámetros de rendimiento y seguimiento en procesos operativos.",
+    "tags": ["Calculator", "Finance", "Utility", "Android"],
+    "assets": {
+      "icon": "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=256&q=80",
+      "poster": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80",
+      "banner": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1600&q=80",
+      "screenshots": [
+        "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1280&q=80"
+      ]
+    },
+    "platforms": {
+      "android": {
+        "executable_relative_path": "CATHelper.apk",
+        "asset_pattern": "CATHelper.*\\.apk",
+        "protected_user_paths": []
+      }
+    }
+  },
+  "HakkinDavid/CatifyMod-Forge": {
+    "id": "com.hakkin.catify-mod",
+    "slug": "catify-mod",
+    "title": "CatifyMod Fabric",
+    "category": "tool",
+    "developer": "HakkinDavid",
+    "summary": "Mod de personalización felina para Minecraft con sincronización multijugador.",
+    "description_markdown": "# CatifyMod Fabric\n\nModificación para Minecraft que introduce personalización de tamaño y características felinas con soporte completo para sincronización en servidores multijugador.",
+    "tags": ["Minecraft", "Mod", "Gaming", "Java", "Multiplayer"],
+    "assets": {
+      "icon": "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=256&q=80",
+      "poster": "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?w=600&q=80",
+      "banner": "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=1600&q=80",
+      "screenshots": [
+        "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?w=1280&q=80"
+      ]
+    },
+    "platforms": {
+      "windows-x64": {
+        "executable_relative_path": "catify-1.1.1.jar",
+        "asset_pattern": "catify.*\\.jar",
+        "protected_user_paths": []
+      }
+    }
+  }
+}
