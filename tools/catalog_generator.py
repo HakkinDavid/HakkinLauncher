@@ -416,23 +416,33 @@ def generate_catalog(overrides_path, existing_catalog_path=None):
 
         apps.append(app_entry)
 
-    # Launcher metadata definition
-    launcher_meta = {
-        "latest_version": "1.0.0",
-        "min_required_launcher_version": "1.0.0",
-        "releases": {
-            "windows-x64": {
-                "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/v1.0.0/HakkinLauncher-windows-x64.zip",
-                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-                "size_bytes": 45000000
-            },
-            "macos-arm64": {
-                "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/v1.0.0/HakkinLauncher-macos-arm64.zip",
-                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-                "size_bytes": 48000000
+    # Launcher metadata definition (loaded dynamically from tools/launcher_meta.json if present)
+    launcher_meta_path = os.path.join(os.path.dirname(overrides_path), "launcher_meta.json")
+    launcher_meta = None
+    if os.path.isfile(launcher_meta_path):
+        try:
+            with open(launcher_meta_path, "r", encoding="utf-8") as f:
+                launcher_meta = json.load(f)
+        except Exception as e:
+            print(f"Warning: could not load launcher_meta.json: {e}", file=sys.stderr)
+
+    if not launcher_meta:
+        launcher_meta = {
+            "latest_version": "1.0.0",
+            "min_required_launcher_version": "1.0.0",
+            "releases": {
+                "windows-x64": {
+                    "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/v1.0.0/HakkinLauncher-windows-x64.zip",
+                    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                    "size_bytes": 45000000
+                },
+                "macos-arm64": {
+                    "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/v1.0.0/HakkinLauncher-macos-arm64.zip",
+                    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                    "size_bytes": 48000000
+                }
             }
         }
-    }
 
     manifest = {
         "version": "2.0.0",

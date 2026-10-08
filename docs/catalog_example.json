@@ -1,6 +1,6 @@
 {
   "version": "2.0.0",
-  "catalog_timestamp": "2026-10-08T21:36:13.281538+00:00",
+  "catalog_timestamp": "2026-10-08T21:54:44.526720+00:00",
   "launcher_meta": {
     "latest_version": "1.0.0",
     "min_required_launcher_version": "1.0.0",
@@ -107,7 +107,7 @@
               "version": "0.0.1",
               "release_date": "2026-10-08T00:00:00Z",
               "changelog": "Lanzamiento de Tecate Simulator v0.0.1.",
-              "executable_relative_path": "tecate.app/Contents/MacOS/tecate",
+              "executable_relative_path": "Tecate Simulator Facade MVP.app/Contents/MacOS/tecate",
               "package": {
                 "url": "https://github.com/Bonsanbec/tecate-simulator/releases/download/latest/tecate-macos-v0.0.1-release.zip",
                 "size_bytes": 798030827,

@@ -114,7 +114,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final manifestAsync = ref.watch(catalogManifestProvider);
     final launcherMeta = manifestAsync.value?.launcherMeta;
     final hasLauncherUpdate = launcherMeta != null &&
-        launcherMeta.latestVersion != AppConstants.appVersion;
+        SelfUpdateService.isNewerVersion(launcherMeta.latestVersion, AppConstants.appVersion);
 
     return Scaffold(
       backgroundColor: AppColors.background,

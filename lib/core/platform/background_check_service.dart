@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import '../../features/catalog/data/repositories/catalog_repository.dart';
 import '../../features/library/data/repositories/library_repository.dart';
+import '../../features/self_update/services/self_update_service.dart';
 import '../constants/app_constants.dart';
 import 'notification_service.dart';
 
@@ -55,7 +56,7 @@ class BackgroundCheckService {
       // 2. Comprobar si el propio lanzador tiene actualización
       if (manifest.launcherMeta != null) {
         final latestLauncher = manifest.launcherMeta!.latestVersion;
-        if (latestLauncher != AppConstants.appVersion) {
+        if (SelfUpdateService.isNewerVersion(latestLauncher, AppConstants.appVersion)) {
           updatesFound[AppConstants.appName] = latestLauncher;
           if (silent) {
             await NotificationService.showNotification(
