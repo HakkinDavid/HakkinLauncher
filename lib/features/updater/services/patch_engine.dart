@@ -40,7 +40,8 @@ class UpdateStatus {
   });
 }
 
-/// Motor de instalación y actualización inteligente con soporte para Delta Patching, Fallback y Protección de Datos.
+/// Motor de instalación y actualización inteligente con soporte para Catálogo Histórico v2.0,
+/// Delta Patching unidireccional y Flujo de Instalación Limpia para versiones anteriores.
 class PatchEngine {
   final DownloaderService _downloader;
   final LibraryRepository _libraryRepository;
@@ -51,20 +52,36 @@ class PatchEngine {
   })  : _downloader = downloader ?? DownloaderService(),
         _libraryRepository = libraryRepository ?? LibraryRepository();
 
+  /// Compara dos versiones semánticas para determinar si v1 es estrictamente menor que v2
+  bool _isOlderVersion(String v1, String v2) {
+    final p1 = RegExp(r'\d+').allMatches(v1).map((m) => int.parse(m.group(0)!)).toList();
+    final p2 = RegExp(r'\d+').allMatches(v2).map((m) => int.parse(m.group(0)!)).toList();
+    final maxLen = p1.length > p2.length ? p1.length : p2.length;
+    for (var i = 0; i < maxLen; i++) {
+      final n1 = i < p1.length ? p1[i] : 0;
+      final n2 = i < p2.length ? p2[i] : 0;
+      if (n1 < n2) return true;
+      if (n1 > n2) return false;
+    }
+    return false;
+  }
+
   /// Ejecuta el flujo completo de instalación o actualización.
   Stream<UpdateStatus> installOrUpdate({
     required AppEntry app,
     required String platformKey,
+    String? targetVersion,
+    bool isCleanInstall = false,
     String? customInstallPath,
   }) async* {
     yield const UpdateStatus(
       stage: UpdateStage.checking,
-      message: 'Comprobando estado de la aplicación...',
+      message: 'Comprobando estado y versión de la aplicación...',
       progress: 0.05,
     );
 
     final platformRelease = app.getPlatformRelease(platformKey);
-    if (platformRelease == null) {
+    if (platformRelease == null || platformRelease.versions.isEmpty) {
       yield const UpdateStatus(
         stage: UpdateStage.failed,
         message: 'Esta aplicación no tiene versión para tu plataforma actual.',
@@ -73,29 +90,157 @@ class PatchEngine {
       return;
     }
 
+    final targetRelease = (targetVersion != null
+            ? platformRelease.getRelease(targetVersion)
+            : null) ??
+        platformRelease.latestRelease;
+    final targetVersionStr = targetRelease.version;
+
     final installed = await _libraryRepository.getInstalledApp(app.id);
-    final isAnUpdate = installed != null;
     final downloadsDir = await OsPaths.getDownloadsDirectory();
     final defaultAppsDir = await OsPaths.getDefaultAppsInstallDirectory();
     final targetInstallDir = Directory(
       customInstallPath ?? installed?.installDirectory ?? p.join(defaultAppsDir.path, app.slug),
     );
 
-    // Determinar si es una actualización delta factible
+    // Detección de instalación de versión anterior (Downgrade)
+    final isOlderTarget = installed != null &&
+        _isOlderVersion(targetVersionStr, installed.installedVersion);
+    final requiresCleanInstall = isCleanInstall || isOlderTarget;
+
+    // 1. FLUJO DE INSTALACIÓN LIMPIA (Obligatorio para versiones anteriores o solicitado)
+    if (requiresCleanInstall) {
+      yield UpdateStatus(
+        stage: UpdateStage.preservingUserData,
+        message: 'Iniciando instalación limpia de v$targetVersionStr (protegiendo datos)...',
+        progress: 0.1,
+      );
+
+      final userBackups = <String, List<int>>{};
+      if (await targetInstallDir.exists() && platformRelease.protectedUserPaths.isNotEmpty) {
+        for (final userRelPath in platformRelease.protectedUserPaths) {
+          final cleanedRel = userRelPath.replaceAll('**', '').replaceAll('*', '');
+          final protectedFile = File(p.join(targetInstallDir.path, cleanedRel));
+          if (await protectedFile.exists()) {
+            userBackups[cleanedRel] = await protectedFile.readAsBytes();
+          }
+        }
+      }
+
+      // Descargar paquete completo de la versión objetivo
+      final pkg = targetRelease.package;
+      yield UpdateStatus(
+        stage: UpdateStage.downloading,
+        message: 'Descargando paquete limpio de v$targetVersionStr (${(pkg.sizeBytes / 1048576).toStringAsFixed(1)} MB)...',
+        progress: 0.25,
+      );
+
+      final cleanZipPath = p.join(downloadsDir.path, '${app.slug}_v${targetVersionStr}_clean.zip');
+      try {
+        await _downloader.downloadFile(
+          url: pkg.url,
+          destinationPath: cleanZipPath,
+          onProgress: (p) {},
+        );
+
+        yield const UpdateStatus(
+          stage: UpdateStage.verifyingChecksum,
+          message: 'Verificando integridad criptográfica del paquete...',
+          progress: 0.55,
+        );
+
+        final zipFile = File(cleanZipPath);
+        final isPkgValid = pkg.sha256.isEmpty ||
+            await HashValidator.verifySha256(zipFile, pkg.sha256);
+
+        if (!isPkgValid) {
+          yield const UpdateStatus(
+            stage: UpdateStage.failed,
+            message: 'Error de integridad: el hash SHA-256 no coincide.',
+            error: 'Hash mismatch',
+          );
+          return;
+        }
+
+        // Limpiar directorio objetivo garantizando instalación desde cero
+        yield const UpdateStatus(
+          stage: UpdateStage.extractingFullPackage,
+          message: 'Limpiando directorio y extrayendo paquete...',
+          progress: 0.7,
+        );
+
+        if (await targetInstallDir.exists()) {
+          try {
+            await targetInstallDir.delete(recursive: true);
+          } catch (_) {}
+        }
+        await targetInstallDir.create(recursive: true);
+
+        await _extractZip(zipFile, targetInstallDir);
+
+        // Restaurar datos de usuario protegidos
+        if (userBackups.isNotEmpty) {
+          for (final entry in userBackups.entries) {
+            final dest = File(p.join(targetInstallDir.path, entry.key));
+            if (!await dest.parent.exists()) {
+              await dest.parent.create(recursive: true);
+            }
+            await dest.writeAsBytes(entry.value);
+          }
+        }
+
+        // Scripts post-instalación de la versión si existen
+        if (targetRelease.scripts.postInstall != null) {
+          final scriptPath = p.join(targetInstallDir.path, targetRelease.scripts.postInstall);
+          await ProcessLauncher.runScript(
+            scriptPath: scriptPath,
+            workingDirectory: targetInstallDir.path,
+          );
+        }
+
+        await _finalizeInstallation(
+          app: app,
+          versionRelease: targetRelease,
+          targetInstallDir: targetInstallDir,
+          platformKey: platformKey,
+        );
+
+        await CleanerService.cleanTemporaryFiles();
+
+        await NotificationService.notifyInstallCompleted(
+          '${app.title} (Instalación Limpia v$targetVersionStr)',
+        );
+
+        yield UpdateStatus(
+          stage: UpdateStage.completed,
+          message: '¡Instalación limpia de v$targetVersionStr completada con éxito!',
+          progress: 1.0,
+        );
+        return;
+      } catch (e) {
+        yield UpdateStatus(
+          stage: UpdateStage.failed,
+          message: 'Error en instalación limpia: $e',
+          error: e.toString(),
+        );
+        return;
+      }
+    }
+
+    // 2. ACTUALIZACIÓN HACIA ADELANTE (Intentar Delta Update si aplica)
     bool shouldAttemptDelta = false;
     DeltaUpdate? matchedDelta;
 
-    if (installed != null && installed.installedVersion != app.latestVersion) {
+    if (installed != null && installed.installedVersion != targetVersionStr) {
       matchedDelta = platformRelease.findDeltaFor(
         installed.installedVersion,
-        app.latestVersion,
+        targetVersionStr,
       );
       if (matchedDelta != null) {
         shouldAttemptDelta = true;
       }
     }
 
-    // 1. Intentar Delta Update si aplica
     if (shouldAttemptDelta && matchedDelta != null) {
       yield UpdateStatus(
         stage: UpdateStage.downloading,
@@ -113,7 +258,6 @@ class PatchEngine {
           onProgress: (p) {},
         );
 
-        // Verificar integridad del parche
         yield const UpdateStatus(
           stage: UpdateStage.verifyingChecksum,
           message: 'Verificando firma de seguridad del parche...',
@@ -125,14 +269,13 @@ class PatchEngine {
             await HashValidator.verifySha256(patchFile, matchedDelta.patchSha256);
 
         if (patchValid) {
-          // Ejecutar scripts pre-instalación si existen
-          if (platformRelease.scripts.preInstall != null && await targetInstallDir.exists()) {
+          if (targetRelease.scripts.preInstall != null && await targetInstallDir.exists()) {
             yield const UpdateStatus(
               stage: UpdateStage.runningPreScripts,
               message: 'Ejecutando script previo a la actualización...',
               progress: 0.5,
             );
-            final preScriptPath = p.join(targetInstallDir.path, platformRelease.scripts.preInstall);
+            final preScriptPath = p.join(targetInstallDir.path, targetRelease.scripts.preInstall);
             await ProcessLauncher.runScript(
               scriptPath: preScriptPath,
               workingDirectory: targetInstallDir.path,
@@ -148,16 +291,15 @@ class PatchEngine {
           deltaSuccess = await _applyHDiffPatch(
             patchFile: patchFile,
             targetDirectory: targetInstallDir,
-            executableRelativePath: platformRelease.executableRelativePath,
+            executableRelativePath: targetRelease.executableRelativePath,
           );
 
-          // Verificar hash del binario resultante post-patch
           if (deltaSuccess && matchedDelta.targetSha256.isNotEmpty) {
-            final exeFile = File(p.join(targetInstallDir.path, platformRelease.executableRelativePath));
+            final exeFile = File(p.join(targetInstallDir.path, targetRelease.executableRelativePath));
             if (await exeFile.exists()) {
               final hashMatch = await HashValidator.verifySha256(exeFile, matchedDelta.targetSha256);
               if (!hashMatch) {
-                debugPrint('Aviso: Hash del binario tras parche no coincide. Descartando delta.');
+                debugPrint('Aviso: Hash tras parche no coincide. Descartando delta.');
                 deltaSuccess = false;
               }
             } else {
@@ -166,32 +308,28 @@ class PatchEngine {
           }
         }
       } catch (e) {
-        debugPrint('Fallo al aplicar parche delta: $e. Activando fallback.');
+        debugPrint('Fallo al aplicar parche delta: $e. Activando fallback a paquete completo.');
         deltaSuccess = false;
       }
 
       if (deltaSuccess) {
-        // Ejecutar script post-instalación si existe
-        if (platformRelease.scripts.postInstall != null && await targetInstallDir.exists()) {
-          final postScriptPath = p.join(targetInstallDir.path, platformRelease.scripts.postInstall);
+        if (targetRelease.scripts.postInstall != null && await targetInstallDir.exists()) {
+          final postScriptPath = p.join(targetInstallDir.path, targetRelease.scripts.postInstall);
           await ProcessLauncher.runScript(
             scriptPath: postScriptPath,
             workingDirectory: targetInstallDir.path,
           );
         }
 
-        // Delta exitoso
         await _finalizeInstallation(
           app: app,
-          platformRelease: platformRelease,
+          versionRelease: targetRelease,
           targetInstallDir: targetInstallDir,
           platformKey: platformKey,
         );
 
         await CleanerService.cleanTemporaryFiles();
-
-        // Notificación nativa
-        await NotificationService.notifyUpdateCompleted(app.title, app.latestVersion);
+        await NotificationService.notifyUpdateCompleted(app.title, targetVersionStr);
 
         yield const UpdateStatus(
           stage: UpdateStage.completed,
@@ -201,28 +339,26 @@ class PatchEngine {
         return;
       }
 
-      // Si el delta falló, continuamos de forma transparente al Full Package Fallback
       debugPrint('Activando descarga limpia de paquete completo (Fallback)');
     }
 
-    // 2. Descarga de paquete completo (Instalación limpia o Fallback)
-    final fullPkg = platformRelease.fullPackage;
+    // 3. DESCARGA DE PAQUETE COMPLETO (Instalación limpia inicial o Fallback)
+    final pkg = targetRelease.package;
     yield UpdateStatus(
       stage: UpdateStage.downloading,
-      message: 'Descargando paquete completo (${(fullPkg.sizeBytes / 1048576).toStringAsFixed(1)} MB)...',
+      message: 'Descargando paquete completo v$targetVersionStr (${(pkg.sizeBytes / 1048576).toStringAsFixed(1)} MB)...',
       progress: 0.2,
     );
 
-    final fullPackageZipPath = p.join(downloadsDir.path, '${app.slug}_full.zip');
+    final fullPackageZipPath = p.join(downloadsDir.path, '${app.slug}_v${targetVersionStr}_full.zip');
 
     try {
       await _downloader.downloadFile(
-        url: fullPkg.url,
+        url: pkg.url,
         destinationPath: fullPackageZipPath,
         onProgress: (p) {},
       );
 
-      // Verificar SHA-256 del paquete completo
       yield const UpdateStatus(
         stage: UpdateStage.verifyingChecksum,
         message: 'Verificando integridad criptográfica del paquete...',
@@ -230,8 +366,8 @@ class PatchEngine {
       );
 
       final zipFile = File(fullPackageZipPath);
-      final isFullValid = fullPkg.sha256.isEmpty ||
-          await HashValidator.verifySha256(zipFile, fullPkg.sha256);
+      final isFullValid = pkg.sha256.isEmpty ||
+          await HashValidator.verifySha256(zipFile, pkg.sha256);
 
       if (!isFullValid) {
         yield const UpdateStatus(
@@ -260,21 +396,19 @@ class PatchEngine {
         }
       }
 
-      // Ejecutar scripts pre-instalación si existen
-      if (platformRelease.scripts.preInstall != null && await targetInstallDir.exists()) {
+      if (targetRelease.scripts.preInstall != null && await targetInstallDir.exists()) {
         yield const UpdateStatus(
           stage: UpdateStage.runningPreScripts,
           message: 'Ejecutando script pre-instalación...',
           progress: 0.7,
         );
-        final preScriptPath = p.join(targetInstallDir.path, platformRelease.scripts.preInstall);
+        final preScriptPath = p.join(targetInstallDir.path, targetRelease.scripts.preInstall);
         await ProcessLauncher.runScript(
           scriptPath: preScriptPath,
           workingDirectory: targetInstallDir.path,
         );
       }
 
-      // Extracción del paquete
       yield const UpdateStatus(
         stage: UpdateStage.extractingFullPackage,
         message: 'Extrayendo archivos de la aplicación...',
@@ -287,7 +421,6 @@ class PatchEngine {
 
       await _extractZip(zipFile, targetInstallDir);
 
-      // Restaurar datos de usuario protegidos
       if (userBackups.isNotEmpty) {
         for (final entry in userBackups.entries) {
           final dest = File(p.join(targetInstallDir.path, entry.key));
@@ -298,34 +431,30 @@ class PatchEngine {
         }
       }
 
-      // Ejecutar scripts post-instalación si existen
-      if (platformRelease.scripts.postInstall != null) {
+      if (targetRelease.scripts.postInstall != null) {
         yield const UpdateStatus(
           stage: UpdateStage.runningPostScripts,
           message: 'Ejecutando script post-instalación...',
           progress: 0.9,
         );
-        final scriptPath = p.join(targetInstallDir.path, platformRelease.scripts.postInstall);
+        final scriptPath = p.join(targetInstallDir.path, targetRelease.scripts.postInstall);
         await ProcessLauncher.runScript(
           scriptPath: scriptPath,
           workingDirectory: targetInstallDir.path,
         );
       }
 
-      // Finalizar y registrar en la biblioteca
       await _finalizeInstallation(
         app: app,
-        platformRelease: platformRelease,
+        versionRelease: targetRelease,
         targetInstallDir: targetInstallDir,
         platformKey: platformKey,
       );
 
-      // Limpieza de temporales
       await CleanerService.cleanTemporaryFiles();
 
-      // Emitir notificación nativa
-      if (isAnUpdate) {
-        await NotificationService.notifyUpdateCompleted(app.title, app.latestVersion);
+      if (installed != null) {
+        await NotificationService.notifyUpdateCompleted(app.title, targetVersionStr);
       } else {
         await NotificationService.notifyInstallCompleted(app.title);
       }
@@ -354,14 +483,12 @@ class PatchEngine {
       final exeFile = File(p.join(targetDirectory.path, executableRelativePath));
       if (!await exeFile.exists()) return false;
 
-      // Intentar ejecutar el comando nativo hpatchz
       final result = await Process.run(
         'hpatchz',
         [exeFile.path, patchFile.path, exeFile.path],
       );
       return result.exitCode == 0;
     } catch (_) {
-      // Si no hay utilería hpatchz instalada globalmente, indicamos fallback
       return false;
     }
   }
@@ -386,13 +513,12 @@ class PatchEngine {
 
   Future<void> _finalizeInstallation({
     required AppEntry app,
-    required PlatformRelease platformRelease,
+    required AppVersionRelease versionRelease,
     required Directory targetInstallDir,
     required String platformKey,
   }) async {
-    final exePath = p.join(targetInstallDir.path, platformRelease.executableRelativePath);
+    final exePath = p.join(targetInstallDir.path, versionRelease.executableRelativePath);
 
-    // Asegurar permisos de ejecución en macOS / Linux
     if (Platform.isMacOS || Platform.isLinux) {
       try {
         await Process.run('chmod', ['+x', exePath]);
@@ -402,11 +528,11 @@ class PatchEngine {
     final installedApp = InstalledApp(
       id: app.id,
       title: app.title,
-      installedVersion: app.latestVersion,
+      installedVersion: versionRelease.version,
       executablePath: exePath,
       installDirectory: targetInstallDir.path,
       installedAt: DateTime.now(),
-      sizeBytes: platformRelease.fullPackage.sizeBytes,
+      sizeBytes: versionRelease.package.sizeBytes,
       platformKey: platformKey,
     );
 

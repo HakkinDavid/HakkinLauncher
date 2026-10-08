@@ -76,11 +76,14 @@ class InstalledAppsNotifier extends StateNotifier<AsyncValue<List<InstalledApp>>
     if (manifest != null) {
       final catalogApp = manifest.apps.where((a) => a.id == id).firstOrNull;
       final release = catalogApp?.getPlatformRelease(app.platformKey);
-      if (release != null && release.fullPackage.sha256.isNotEmpty) {
-        // En una verificación básica, corroboramos accesibilidad y tamaño
-        final size = await exeFile.length();
-        if (size == 0) {
-          return {'isValid': false, 'message': 'El archivo ejecutable está vacío (0 bytes)'};
+      if (release != null) {
+        final versionInfo = release.getRelease(app.installedVersion) ?? release.latestRelease;
+        if (versionInfo.package.sha256.isNotEmpty) {
+          // En una verificación básica, corroboramos accesibilidad y tamaño
+          final size = await exeFile.length();
+          if (size == 0) {
+            return {'isValid': false, 'message': 'El archivo ejecutable está vacío (0 bytes)'};
+          }
         }
       }
     }

@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "HakkinCatalogManifest",
+  "title": "HakkinCatalogManifestV2",
   "type": "object",
   "required": ["version", "catalog_timestamp", "apps"],
   "properties": {
     "version": {
       "type": "string",
-      "description": "Versión del esquema de especificación del catálogo"
+      "description": "Versión del esquema de especificación del catálogo (2.0.0)"
     },
     "catalog_timestamp": {
       "type": "string",
@@ -65,44 +65,56 @@
             "type": "object",
             "additionalProperties": {
               "type": "object",
-              "required": ["executable_relative_path", "full_package"],
+              "required": ["latest_version", "versions"],
               "properties": {
-                "executable_relative_path": { "type": "string" },
-                "full_package": {
-                  "type": "object",
-                  "required": ["version", "url", "sha256"],
-                  "properties": {
-                    "version": { "type": "string" },
-                    "url": { "type": "string", "format": "uri" },
-                    "size_bytes": { "type": "integer" },
-                    "sha256": { "type": "string" }
-                  }
-                },
-                "delta_updates": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "required": ["from_version", "to_version", "patch_format", "url", "patch_sha256", "target_sha256"],
-                    "properties": {
-                      "from_version": { "type": "string" },
-                      "to_version": { "type": "string" },
-                      "patch_format": { "type": "string", "enum": ["hdiff", "bsdiff"] },
-                      "url": { "type": "string", "format": "uri" },
-                      "size_bytes": { "type": "integer" },
-                      "patch_sha256": { "type": "string" },
-                      "target_sha256": { "type": "string" }
-                    }
-                  }
-                },
+                "latest_version": { "type": "string" },
                 "protected_user_paths": {
                   "type": "array",
                   "items": { "type": "string" }
                 },
-                "scripts": {
-                  "type": "object",
-                  "properties": {
-                    "pre_install": { "type": ["string", "null"] },
-                    "post_install": { "type": ["string", "null"] }
+                "versions": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "object",
+                    "required": ["version", "executable_relative_path", "package"],
+                    "properties": {
+                      "version": { "type": "string" },
+                      "release_date": { "type": ["string", "null"] },
+                      "changelog": { "type": "string" },
+                      "executable_relative_path": { "type": "string" },
+                      "package": {
+                        "type": "object",
+                        "required": ["url", "sha256", "size_bytes"],
+                        "properties": {
+                          "url": { "type": "string", "format": "uri" },
+                          "size_bytes": { "type": "integer" },
+                          "sha256": { "type": "string" }
+                        }
+                      },
+                      "delta_patches": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "required": ["from_version", "patch_format", "url", "patch_sha256", "target_sha256"],
+                          "properties": {
+                            "from_version": { "type": "string" },
+                            "patch_format": { "type": "string", "enum": ["hdiff", "bsdiff"] },
+                            "url": { "type": "string", "format": "uri" },
+                            "size_bytes": { "type": "integer" },
+                            "patch_sha256": { "type": "string" },
+                            "target_sha256": { "type": "string" }
+                          }
+                        }
+                      },
+                      "scripts": {
+                        "type": "object",
+                        "properties": {
+                          "pre_install": { "type": ["string", "null"] },
+                          "post_install": { "type": ["string", "null"] }
+                        }
+                      }
+                    }
                   }
                 }
               }

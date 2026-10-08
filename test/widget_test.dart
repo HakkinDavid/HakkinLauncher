@@ -41,32 +41,38 @@ void main() {
             "latest_version": "1.2.0",
             "platforms": {
               "macos-arm64": {
-                "executable_relative_path": "TestGame.app/Contents/MacOS/TestGame",
-                "full_package": {
-                  "version": "1.2.0",
-                  "url": "https://example.com/test-1.2.0.zip",
-                  "size_bytes": 1000000,
-                  "sha256": "11223344"
-                },
-                "delta_updates": [
-                  {
-                    "from_version": "1.1.0",
-                    "to_version": "1.2.0",
-                    "patch_format": "hdiff",
-                    "url": "https://example.com/patch-1.1-1.2.hdiff",
-                    "size_bytes": 50000,
-                    "patch_sha256": "55667788",
-                    "target_sha256": "11223344"
-                  }
-                ],
+                "latest_version": "1.2.0",
                 "protected_user_paths": [
                   "saves/**",
                   "config.ini"
                 ],
-                "scripts": {
-                  "pre_install": "scripts/pre.sh",
-                  "post_install": "scripts/setup.sh"
-                }
+                "versions": [
+                  {
+                    "version": "1.2.0",
+                    "release_date": "2026-10-08T00:00:00Z",
+                    "changelog": "Versión 1.2.0 de prueba.",
+                    "executable_relative_path": "TestGame.app/Contents/MacOS/TestGame",
+                    "package": {
+                      "url": "https://example.com/test-1.2.0.zip",
+                      "size_bytes": 1000000,
+                      "sha256": "11223344"
+                    },
+                    "delta_patches": [
+                      {
+                        "from_version": "1.1.0",
+                        "patch_format": "hdiff",
+                        "url": "https://example.com/patch-1.1-1.2.hdiff",
+                        "size_bytes": 50000,
+                        "patch_sha256": "55667788",
+                        "target_sha256": "11223344"
+                      }
+                    ],
+                    "scripts": {
+                      "pre_install": "scripts/pre.sh",
+                      "post_install": "scripts/setup.sh"
+                    }
+                  }
+                ]
               }
             }
           }
@@ -92,10 +98,10 @@ void main() {
 
       final release = app.getPlatformRelease('macos-arm64');
       expect(release, isNotNull);
-      expect(release!.executableRelativePath, 'TestGame.app/Contents/MacOS/TestGame');
+      expect(release!.latestRelease.executableRelativePath, 'TestGame.app/Contents/MacOS/TestGame');
       expect(release.protectedUserPaths, contains('saves/**'));
-      expect(release.scripts.preInstall, 'scripts/pre.sh');
-      expect(release.scripts.postInstall, 'scripts/setup.sh');
+      expect(release.latestRelease.scripts.preInstall, 'scripts/pre.sh');
+      expect(release.latestRelease.scripts.postInstall, 'scripts/setup.sh');
 
       // Prueba de búsqueda de delta patch
       final delta = release.findDeltaFor('1.1.0', '1.2.0');

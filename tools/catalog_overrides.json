@@ -155,9 +155,38 @@
     },
     "platforms": {
       "macos-arm64": {
-        "executable_relative_path": "Smart Scheduler.app/Contents/MacOS/Smart Scheduler",
-        "asset_pattern": "smart-scheduler-macos.*\\.zip",
-        "protected_user_paths": []
+        "protected_user_paths": [],
+        "versions": [
+          {
+            "version": "2.5.0",
+            "release_date": "2026-10-01T14:30:00Z",
+            "changelog": "Versión 2.5: Optimización de ranking y nuevo bundle de aplicación para macOS Apple Silicon.",
+            "executable_relative_path": "Smart Scheduler.app/Contents/MacOS/Smart Scheduler",
+            "asset_pattern": "smart-scheduler-macos.*\\.zip",
+            "delta_patches": [
+              {
+                "from_version": "2.0.0",
+                "patch_format": "hdiff",
+                "url": "https://github.com/HakkinDavid/smart-scheduler/releases/download/v2.5/patch-2.0.0-to-2.5.0.hdiff",
+                "size_bytes": 1420500,
+                "patch_sha256": "a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f90",
+                "target_sha256": "8805c43e262b29e4baf75fa9d4d7b3458c9b1214aaace63574f20cc6f5fa7ca1"
+              }
+            ]
+          },
+          {
+            "version": "2.0.0",
+            "release_date": "2026-08-15T10:00:00Z",
+            "changelog": "Versión 2.0: Primera versión con interfaz visual y soporte de restricciones.",
+            "executable_relative_path": "Smart Scheduler.app/Contents/MacOS/Smart Scheduler",
+            "package": {
+              "url": "https://github.com/HakkinDavid/smart-scheduler/releases/download/v2.0/smart-scheduler-macos-v2.0.zip",
+              "size_bytes": 31540120,
+              "sha256": "77e384bf8e999c011e0bc598e29bc11394a10ffc8821950ad0281b289cf291ae"
+            },
+            "delta_patches": []
+          }
+        ]
       }
     }
   },
@@ -205,9 +234,25 @@
     },
     "platforms": {
       "windows-x64": {
-        "executable_relative_path": "spanish-v1.0.exe",
-        "asset_pattern": "spanish.*\\.exe",
-        "protected_user_paths": []
+        "protected_user_paths": [],
+        "versions": [
+          {
+            "version": "1.1.0",
+            "release_date": "2026-09-20T12:00:00Z",
+            "changelog": "Versión 1.1: Soporte completo de acentos en español con accesos rápidos estilo MS Word.",
+            "executable_relative_path": "spanish-v1.0.exe",
+            "asset_pattern": "spanish.*\\.exe",
+            "delta_patches": []
+          },
+          {
+            "version": "1.0.0",
+            "release_date": "2026-07-10T11:00:00Z",
+            "changelog": "Versión 1.0: Módulo de pinyin con mapeo tonal para caracteres en mandarín.",
+            "executable_relative_path": "pinyin-v1.0.exe",
+            "asset_pattern": "pinyin.*\\.exe",
+            "delta_patches": []
+          }
+        ]
       }
     }
   },

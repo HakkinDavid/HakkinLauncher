@@ -8,17 +8,38 @@ import '../../../../shared/widgets/hakkin_button.dart';
 import '../../../../shared/widgets/status_badge.dart';
 import '../../../catalog/data/models/app_entry.dart';
 import '../../../catalog/presentation/controllers/catalog_controller.dart';
+import '../../../library/data/models/installed_app.dart';
 import '../../../library/presentation/controllers/library_controller.dart';
 import '../../../updater/presentation/controllers/update_controller.dart';
 import '../../../updater/services/patch_engine.dart';
 
-class AppDetailScreen extends ConsumerWidget {
+class AppDetailScreen extends ConsumerStatefulWidget {
   final String appId;
 
   const AppDetailScreen({super.key, required this.appId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AppDetailScreen> createState() => _AppDetailScreenState();
+}
+
+class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
+  String? _selectedVersion;
+
+  bool _isOlder(String v1, String v2) {
+    final p1 = RegExp(r'\d+').allMatches(v1).map((m) => int.parse(m.group(0)!)).toList();
+    final p2 = RegExp(r'\d+').allMatches(v2).map((m) => int.parse(m.group(0)!)).toList();
+    final maxLen = p1.length > p2.length ? p1.length : p2.length;
+    for (var i = 0; i < maxLen; i++) {
+      final n1 = i < p1.length ? p1[i] : 0;
+      final n2 = i < p2.length ? p2[i] : 0;
+      if (n1 < n2) return true;
+      if (n1 > n2) return false;
+    }
+    return false;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final manifestAsync = ref.watch(catalogManifestProvider);
     final installedAppsAsync = ref.watch(installedAppsProvider);
     final runningAppsAsync = ref.watch(runningAppsStreamProvider);
@@ -37,7 +58,7 @@ class AppDetailScreen extends ConsumerWidget {
         ),
         data: (manifest) {
           final app = manifest.apps.firstWhere(
-            (a) => a.id == appId,
+            (a) => a.id == widget.appId,
             orElse: () => const AppEntry(
               id: '',
               slug: '',
@@ -61,14 +82,20 @@ class AppDetailScreen extends ConsumerWidget {
           final installedApp = installedApps.where((a) => a.id == app.id).firstOrNull;
           final isInstalled = installedApp != null;
           final isRunning = (runningAppsAsync.value ?? {})[app.id] ?? false;
-          final hasUpdate = isInstalled && installedApp.installedVersion != app.latestVersion;
           final updateStatus = updateProgressMap[app.id];
           final isUpdating = updateStatus != null &&
               updateStatus.stage != UpdateStage.completed &&
               updateStatus.stage != UpdateStage.failed;
 
           final platformRelease = app.getPlatformRelease(currentPlatform);
-          final isSupported = platformRelease != null;
+          final isSupported = platformRelease != null && platformRelease.versions.isNotEmpty;
+
+          // Seleccionar versión actual o fallback a la última versión
+          final selectedVersionStr = _selectedVersion ??
+              (platformRelease != null ? platformRelease.latestVersion : app.latestVersion);
+          final selectedRelease = platformRelease?.getRelease(selectedVersionStr) ??
+              platformRelease?.latestRelease ??
+              const AppVersionRelease.empty();
 
           return CustomScrollView(
             slivers: [
@@ -141,14 +168,63 @@ class AppDetailScreen extends ConsumerWidget {
                                       Row(
                                         children: [
                                           StatusBadge.tag(app.category),
-                                          const SizedBox(width: 8),
-                                          Text(
-                                            'v${app.latestVersion}',
-                                            style: const TextStyle(
-                                              color: AppColors.platinumMuted,
-                                              fontSize: 13,
+                                          const SizedBox(width: 10),
+
+                                          // Selector de Versiones Históricas
+                                          if (isSupported && platformRelease.availableVersions.isNotEmpty)
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                              decoration: BoxDecoration(
+                                                color: AppColors.surfaceElevated.withValues(alpha: 0.9),
+                                                borderRadius: BorderRadius.circular(8),
+                                                border: Border.all(color: AppColors.surfaceBorder),
+                                              ),
+                                              child: DropdownButtonHideUnderline(
+                                                child: DropdownButton<String>(
+                                                  value: selectedVersionStr,
+                                                  dropdownColor: AppColors.surface,
+                                                  isDense: true,
+                                                  icon: const Icon(
+                                                    Icons.arrow_drop_down,
+                                                    color: AppColors.platinum,
+                                                    size: 18,
+                                                  ),
+                                                  style: const TextStyle(
+                                                    color: AppColors.platinum,
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                  items: platformRelease.availableVersions.map((v) {
+                                                    final isLatest = v == platformRelease.latestVersion;
+                                                    return DropdownMenuItem<String>(
+                                                      value: v,
+                                                      child: Text(
+                                                        isLatest ? 'v$v (Reciente)' : 'v$v',
+                                                        style: const TextStyle(
+                                                          color: AppColors.platinum,
+                                                          fontSize: 12,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  }).toList(),
+                                                  onChanged: (newV) {
+                                                    if (newV != null) {
+                                                      setState(() {
+                                                        _selectedVersion = newV;
+                                                      });
+                                                    }
+                                                  },
+                                                ),
+                                              ),
+                                            )
+                                          else
+                                            Text(
+                                              'v${app.latestVersion}',
+                                              style: const TextStyle(
+                                                color: AppColors.platinumMuted,
+                                                fontSize: 13,
+                                              ),
                                             ),
-                                          ),
                                         ],
                                       ),
                                       const SizedBox(height: 8),
@@ -166,12 +242,11 @@ class AppDetailScreen extends ConsumerWidget {
 
                                 // Botón de Acción Principal
                                 _buildActionButton(
-                                  ref: ref,
                                   app: app,
+                                  selectedVersionStr: selectedVersionStr,
                                   isSupported: isSupported,
                                   isInstalled: isInstalled,
                                   isRunning: isRunning,
-                                  hasUpdate: hasUpdate,
                                   isUpdating: isUpdating,
                                   installedApp: installedApp,
                                   platformRelease: platformRelease,
@@ -294,39 +369,85 @@ class AppDetailScreen extends ConsumerWidget {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Descripción en Markdown
+                      // Descripción en Markdown y Notas de Versión
                       Expanded(
                         flex: 3,
-                        child: Container(
-                          padding: const EdgeInsets.all(24),
-                          decoration: BoxDecoration(
-                            color: AppColors.surface,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColors.surfaceBorder),
-                          ),
-                          child: MarkdownBody(
-                            data: app.descriptionMarkdown.isNotEmpty
-                                ? app.descriptionMarkdown
-                                : app.summary,
-                            styleSheet: MarkdownStyleSheet(
-                              p: const TextStyle(color: AppColors.platinumMuted, fontSize: 14),
-                              h1: const TextStyle(
-                                color: AppColors.platinum,
-                                fontSize: 22,
-                                fontWeight: FontWeight.w700,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (selectedRelease.changelog.isNotEmpty) ...[
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(16),
+                                margin: const EdgeInsets.only(bottom: 20),
+                                decoration: BoxDecoration(
+                                  color: AppColors.surface,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: AppColors.celestialBlue.withValues(alpha: 0.4)),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.history_edu, color: AppColors.celestialBlue, size: 20),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          'Notas de la Versión v${selectedRelease.version}',
+                                          style: const TextStyle(
+                                            color: AppColors.platinum,
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 15,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      selectedRelease.changelog,
+                                      style: const TextStyle(
+                                        color: AppColors.platinumMuted,
+                                        fontSize: 13,
+                                        height: 1.4,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                              h2: const TextStyle(
-                                color: AppColors.platinum,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
+                            ],
+
+                            Container(
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                color: AppColors.surface,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: AppColors.surfaceBorder),
                               ),
-                              h3: const TextStyle(
-                                color: AppColors.platinum,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
+                              child: MarkdownBody(
+                                data: app.descriptionMarkdown.isNotEmpty
+                                    ? app.descriptionMarkdown
+                                    : app.summary,
+                                styleSheet: MarkdownStyleSheet(
+                                  p: const TextStyle(color: AppColors.platinumMuted, fontSize: 14),
+                                  h1: const TextStyle(
+                                    color: AppColors.platinum,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                  h2: const TextStyle(
+                                    color: AppColors.platinum,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                  h3: const TextStyle(
+                                    color: AppColors.platinum,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
                       const SizedBox(width: 24),
@@ -355,16 +476,25 @@ class AppDetailScreen extends ConsumerWidget {
                               const Divider(height: 24),
                               _buildMetaRow('Desarrollador', app.developer),
                               _buildMetaRow('Categoría', app.category.toUpperCase()),
-                              _buildMetaRow('Versión Reciente', 'v${app.latestVersion}'),
-                              if (platformRelease != null) ...[
+                              _buildMetaRow('Versión Seleccionada', 'v${selectedRelease.version}'),
+                              if (selectedRelease.releaseDate != null)
                                 _buildMetaRow(
-                                  'Tamaño de Descarga',
-                                  '${(platformRelease.fullPackage.sizeBytes / 1048576).toStringAsFixed(1)} MB',
+                                  'Fecha de Versión',
+                                  '${selectedRelease.releaseDate!.day.toString().padLeft(2, '0')}/${selectedRelease.releaseDate!.month.toString().padLeft(2, '0')}/${selectedRelease.releaseDate!.year}',
+                                ),
+                              if (isSupported) ...[
+                                _buildMetaRow(
+                                  'Ejecutable Relativo',
+                                  selectedRelease.executableRelativePath,
                                 ),
                                 _buildMetaRow(
-                                  'Soporte de Diff',
-                                  platformRelease.deltaUpdates.isNotEmpty
-                                      ? 'Disponible (${platformRelease.deltaUpdates.length} parches)'
+                                  'Tamaño de Descarga',
+                                  '${(selectedRelease.package.sizeBytes / 1048576).toStringAsFixed(1)} MB',
+                                ),
+                                _buildMetaRow(
+                                  'Soporte Diferencial',
+                                  selectedRelease.deltaPatches.isNotEmpty
+                                      ? 'Disponible (${selectedRelease.deltaPatches.length} parches)'
                                       : 'Solo descarga completa',
                                 ),
                                 _buildMetaRow(
@@ -390,15 +520,14 @@ class AppDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildActionButton({
-    required WidgetRef ref,
     required AppEntry app,
+    required String selectedVersionStr,
     required bool isSupported,
     required bool isInstalled,
     required bool isRunning,
-    required bool hasUpdate,
     required bool isUpdating,
-    required dynamic installedApp,
-    required dynamic platformRelease,
+    required InstalledApp? installedApp,
+    required PlatformRelease? platformRelease,
   }) {
     if (!isSupported) {
       return const HakkinButton(
@@ -426,35 +555,113 @@ class AppDetailScreen extends ConsumerWidget {
       );
     }
 
-    if (hasUpdate) {
+    if (isInstalled && installedApp != null) {
+      // 1. Misma versión instalada
+      if (selectedVersionStr == installedApp.installedVersion) {
+        return HakkinButton(
+          text: 'Jugar / Abrir (v$selectedVersionStr)',
+          icon: Icons.play_arrow,
+          variant: HakkinButtonVariant.successPlay,
+          onPressed: () {
+            ref.read(installedAppsProvider.notifier).launchApp(installedApp);
+          },
+        );
+      }
+
+      // 2. Versión anterior seleccionada: INSTALACIÓN LIMPIA CON ADVERTENCIA
+      if (_isOlder(selectedVersionStr, installedApp.installedVersion)) {
+        return HakkinButton(
+          text: 'Instalación Limpia (v$selectedVersionStr)',
+          icon: Icons.warning_amber_rounded,
+          variant: HakkinButtonVariant.secondary,
+          onPressed: () {
+            _showCleanInstallWarningDialog(
+              app: app,
+              currentVersion: installedApp.installedVersion,
+              targetVersion: selectedVersionStr,
+            );
+          },
+        );
+      }
+
+      // 3. Versión posterior seleccionada: ACTUALIZAR
       return HakkinButton(
-        text: 'Actualizar a v${app.latestVersion}',
+        text: 'Actualizar a v$selectedVersionStr',
         icon: Icons.arrow_circle_up,
         variant: HakkinButtonVariant.primaryPlatinum,
         onPressed: () {
-          ref.read(updateProgressProvider.notifier).startInstallOrUpdate(app);
+          ref.read(updateProgressProvider.notifier).startInstallOrUpdate(
+                app,
+                targetVersion: selectedVersionStr,
+              );
         },
       );
     }
 
-    if (isInstalled) {
-      return HakkinButton(
-        text: 'Jugar / Abrir',
-        icon: Icons.play_arrow,
-        variant: HakkinButtonVariant.successPlay,
-        onPressed: () {
-          ref.read(installedAppsProvider.notifier).launchApp(installedApp);
-        },
-      );
-    }
-
+    // No instalado
     return HakkinButton(
-      text: 'Instalar',
+      text: 'Instalar v$selectedVersionStr',
       icon: Icons.download,
       variant: HakkinButtonVariant.primaryPlatinum,
       onPressed: () {
-        ref.read(updateProgressProvider.notifier).startInstallOrUpdate(app);
+        ref.read(updateProgressProvider.notifier).startInstallOrUpdate(
+              app,
+              targetVersion: selectedVersionStr,
+            );
       },
+    );
+  }
+
+  void _showCleanInstallWarningDialog({
+    required AppEntry app,
+    required String currentVersion,
+    required String targetVersion,
+  }) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+          side: const BorderSide(color: AppColors.surfaceBorder),
+        ),
+        title: const Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Colors.amberAccent),
+            SizedBox(width: 8),
+            Text(
+              'Instalación Limpia Requerida',
+              style: TextStyle(color: AppColors.platinum, fontSize: 18),
+            ),
+          ],
+        ),
+        content: Text(
+          'Tienes instalada la versión $currentVersion.\n\n'
+          'HakkinLauncher no permite degradar versiones sobre la instalación activa. '
+          'Para cambiar a la versión anterior ($targetVersion), se realizará una instalación limpia desde cero.\n\n'
+          'Tus datos de usuario y partidas guardadas serán aislados y restaurados automáticamente.\n\n'
+          '¿Deseas proceder?',
+          style: const TextStyle(color: AppColors.platinumMuted, fontSize: 13, height: 1.4),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancelar', style: TextStyle(color: AppColors.platinumMuted)),
+          ),
+          HakkinButton(
+            text: 'Proceder con Instalación Limpia',
+            variant: HakkinButtonVariant.primaryPlatinum,
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              ref.read(updateProgressProvider.notifier).startInstallOrUpdate(
+                    app,
+                    targetVersion: targetVersion,
+                    isCleanInstall: true,
+                  );
+            },
+          ),
+        ],
+      ),
     );
   }
 

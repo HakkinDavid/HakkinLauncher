@@ -177,29 +177,109 @@ class AppAssets {
 }
 
 class PlatformRelease {
-  final String executableRelativePath;
-  final FullPackage fullPackage;
-  final List<DeltaUpdate> deltaUpdates;
+  final String latestVersion;
   final List<String> protectedUserPaths;
-  final Scripts scripts;
+  final List<AppVersionRelease> versions;
 
   const PlatformRelease({
-    required this.executableRelativePath,
-    required this.fullPackage,
-    this.deltaUpdates = const [],
+    required this.latestVersion,
     this.protectedUserPaths = const [],
-    this.scripts = const Scripts(),
+    required this.versions,
   });
 
   factory PlatformRelease.fromJson(Map<String, dynamic> json) {
+    final rawVersions = json['versions'] as List<dynamic>? ?? [];
+    final versionsList = rawVersions
+        .map((e) => AppVersionRelease.fromJson(e as Map<String, dynamic>))
+        .toList();
+
     return PlatformRelease(
-      executableRelativePath: json['executable_relative_path'] as String? ?? '',
-      fullPackage: FullPackage.fromJson(json['full_package'] as Map<String, dynamic>? ?? {}),
-      deltaUpdates: (json['delta_updates'] as List<dynamic>? ?? [])
-          .map((e) => DeltaUpdate.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      latestVersion: json['latest_version'] as String? ??
+          (versionsList.isNotEmpty ? versionsList.first.version : '1.0.0'),
       protectedUserPaths: (json['protected_user_paths'] as List<dynamic>? ?? [])
           .map((e) => e.toString())
+          .toList(),
+      versions: versionsList,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'latest_version': latestVersion,
+        'protected_user_paths': protectedUserPaths,
+        'versions': versions.map((e) => e.toJson()).toList(),
+      };
+
+  /// Obtiene la versión más reciente disponible
+  AppVersionRelease get latestRelease => versions.firstWhere(
+        (v) => v.version == latestVersion,
+        orElse: () =>
+            versions.isNotEmpty ? versions.first : const AppVersionRelease.empty(),
+      );
+
+  /// Obtiene una versión específica por su identificador
+  AppVersionRelease? getRelease(String version) {
+    for (final v in versions) {
+      if (v.version == version) return v;
+    }
+    return null;
+  }
+
+  /// Lista ordenada de nombres de versión disponibles
+  List<String> get availableVersions => versions.map((v) => v.version).toList();
+
+  /// Encuentra si hay un parche delta aplicable desde una versión instalada específica hacia una versión destino
+  DeltaUpdate? findDeltaFor(String fromVersion, String toVersion) {
+    final target = getRelease(toVersion);
+    if (target != null) {
+      for (final delta in target.deltaPatches) {
+        if (delta.fromVersion == fromVersion) {
+          return delta;
+        }
+      }
+    }
+    return null;
+  }
+}
+
+class AppVersionRelease {
+  final String version;
+  final DateTime? releaseDate;
+  final String changelog;
+  final String executableRelativePath;
+  final PackageArtifact package;
+  final List<DeltaUpdate> deltaPatches;
+  final Scripts scripts;
+
+  const AppVersionRelease({
+    required this.version,
+    this.releaseDate,
+    this.changelog = '',
+    required this.executableRelativePath,
+    required this.package,
+    this.deltaPatches = const [],
+    this.scripts = const Scripts(),
+  });
+
+  const AppVersionRelease.empty()
+      : version = '1.0.0',
+        releaseDate = null,
+        changelog = '',
+        executableRelativePath = '',
+        package = const PackageArtifact.empty(),
+        deltaPatches = const [],
+        scripts = const Scripts();
+
+  factory AppVersionRelease.fromJson(Map<String, dynamic> json) {
+    return AppVersionRelease(
+      version: json['version'] as String? ?? '1.0.0',
+      releaseDate: json['release_date'] != null
+          ? DateTime.tryParse(json['release_date'].toString())
+          : null,
+      changelog: json['changelog'] as String? ?? '',
+      executableRelativePath: json['executable_relative_path'] as String? ?? '',
+      package: PackageArtifact.fromJson(json['package'] as Map<String, dynamic>? ?? {}),
+      deltaPatches: (json['delta_patches'] as List<dynamic>? ?? [])
+          .map((e) => DeltaUpdate.fromJson(e as Map<String, dynamic>))
           .toList(),
       scripts: json['scripts'] != null
           ? Scripts.fromJson(json['scripts'] as Map<String, dynamic>)
@@ -208,40 +288,34 @@ class PlatformRelease {
   }
 
   Map<String, dynamic> toJson() => {
+        'version': version,
+        if (releaseDate != null) 'release_date': releaseDate!.toIso8601String(),
+        'changelog': changelog,
         'executable_relative_path': executableRelativePath,
-        'full_package': fullPackage.toJson(),
-        'delta_updates': deltaUpdates.map((e) => e.toJson()).toList(),
-        'protected_user_paths': protectedUserPaths,
+        'package': package.toJson(),
+        'delta_patches': deltaPatches.map((e) => e.toJson()).toList(),
         'scripts': scripts.toJson(),
       };
-
-  /// Encuentra si hay un parche delta aplicable desde una versión instalada específica
-  DeltaUpdate? findDeltaFor(String fromVersion, String toVersion) {
-    for (final delta in deltaUpdates) {
-      if (delta.fromVersion == fromVersion && delta.toVersion == toVersion) {
-        return delta;
-      }
-    }
-    return null;
-  }
 }
 
-class FullPackage {
-  final String version;
+class PackageArtifact {
   final String url;
   final int sizeBytes;
   final String sha256;
 
-  const FullPackage({
-    required this.version,
+  const PackageArtifact({
     required this.url,
     this.sizeBytes = 0,
     required this.sha256,
   });
 
-  factory FullPackage.fromJson(Map<String, dynamic> json) {
-    return FullPackage(
-      version: json['version'] as String? ?? '1.0.0',
+  const PackageArtifact.empty()
+      : url = '',
+        sizeBytes = 0,
+        sha256 = '';
+
+  factory PackageArtifact.fromJson(Map<String, dynamic> json) {
+    return PackageArtifact(
       url: json['url'] as String? ?? '',
       sizeBytes: (json['size_bytes'] as num?)?.toInt() ?? 0,
       sha256: json['sha256'] as String? ?? '',
@@ -249,7 +323,6 @@ class FullPackage {
   }
 
   Map<String, dynamic> toJson() => {
-        'version': version,
         'url': url,
         'size_bytes': sizeBytes,
         'sha256': sha256,

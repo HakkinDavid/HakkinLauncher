@@ -216,7 +216,11 @@ class LibraryScreen extends ConsumerWidget {
                               icon: const Icon(Icons.more_vert, color: AppColors.platinumMuted),
                               color: AppColors.surfaceElevated,
                               onSelected: (val) async {
-                                if (val == 'args') {
+                                if (val == 'versions') {
+                                  if (catalogApp != null) {
+                                    context.go('/app/${catalogApp.id}');
+                                  }
+                                } else if (val == 'args') {
                                   _showArgumentsDialog(context, ref, installedApp);
                                 } else if (val == 'shortcut') {
                                   final ok = await ShortcutService.createDesktopShortcut(
@@ -253,6 +257,16 @@ class LibraryScreen extends ConsumerWidget {
                                 }
                               },
                               itemBuilder: (ctx) => [
+                                const PopupMenuItem(
+                                  value: 'versions',
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.history, size: 18, color: AppColors.platinum),
+                                      SizedBox(width: 8),
+                                      Text('Gestionar versiones'),
+                                    ],
+                                  ),
+                                ),
                                 const PopupMenuItem(
                                   value: 'args',
                                   child: Row(

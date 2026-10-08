@@ -16,7 +16,11 @@ class UpdateProgressNotifier extends StateNotifier<Map<String, UpdateStatus>> {
 
   UpdateProgressNotifier(this._ref) : super({});
 
-  Future<void> startInstallOrUpdate(AppEntry app) async {
+  Future<void> startInstallOrUpdate(
+    AppEntry app, {
+    String? targetVersion,
+    bool isCleanInstall = false,
+  }) async {
     final patchEngine = _ref.read(patchEngineProvider);
     final platformKey = OsPaths.getCurrentPlatformKey();
 
@@ -26,6 +30,8 @@ class UpdateProgressNotifier extends StateNotifier<Map<String, UpdateStatus>> {
     await for (final status in patchEngine.installOrUpdate(
       app: app,
       platformKey: platformKey,
+      targetVersion: targetVersion,
+      isCleanInstall: isCleanInstall,
       customInstallPath: customPath?.isNotEmpty == true ? customPath : null,
     )) {
       state = {...state, app.id: status};
