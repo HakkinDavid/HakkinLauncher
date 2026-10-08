@@ -64,23 +64,38 @@ void main() {
         }
       }
 
-      // Verificación específica de tecate-simulator (soporte multiplataforma)
+      // 1. Verificación de tecate-simulator (Videojuego social con soporte dual Windows y macOS)
       final tecate = manifest.apps.firstWhere((a) => a.id == 'com.bonsanbec.tecate-simulator');
+      expect(tecate.title, 'Tecate Simulator');
       expect(tecate.category, 'game');
       expect(tecate.supportsPlatform('windows-x64'), isTrue);
       expect(tecate.supportsPlatform('macos-arm64'), isTrue);
 
-      final tecateWin = tecate.getPlatformRelease('windows-x64');
-      expect(tecateWin, isNotNull);
-      expect(tecateWin!.executableRelativePath, 'TecateSimulator.exe');
+      final tecateWin = tecate.getPlatformRelease('windows-x64')!;
+      expect(tecateWin.executableRelativePath, 'tecate.exe');
       expect(tecateWin.fullPackage.sizeBytes, 771167643);
       expect(tecateWin.fullPackage.sha256, 'c3e622e8a6cc35ff295c44c770496a2f06847c735605c8f4a22b2ba45019be2a');
 
-      final tecateMac = tecate.getPlatformRelease('macos-arm64');
-      expect(tecateMac, isNotNull);
-      expect(tecateMac!.executableRelativePath, 'TecateSimulator.app/Contents/MacOS/TecateSimulator');
+      final tecateMac = tecate.getPlatformRelease('macos-arm64')!;
+      expect(tecateMac.executableRelativePath, 'tecate.app/Contents/MacOS/tecate');
       expect(tecateMac.fullPackage.sizeBytes, 798030827);
       expect(tecateMac.fullPackage.sha256, '86286cae84f07e0978bc32fb9597cc06bd795030e0c6d96c6fcf6ccd42801cbd');
+
+      // 2. Verificación de fractochales (Simulación de rayos con main.exe)
+      final fracto = manifest.apps.firstWhere((a) => a.id == 'com.bonsanbec.fractochales');
+      expect(fracto.title, 'Fractochales');
+      final fractoWin = fracto.getPlatformRelease('windows-x64')!;
+      expect(fractoWin.executableRelativePath, 'main.exe');
+      expect(fractoWin.fullPackage.sizeBytes, 23238440);
+
+      // 3. Verificación de firefighter-form (Bomberos Tijuana con bomberos.exe)
+      final bomberos = manifest.apps.firstWhere((a) => a.id == 'com.hakkin.firefighter-form');
+      expect(bomberos.getPlatformRelease('windows-x64')!.executableRelativePath, 'bomberos.exe');
+
+      // 4. Verificación de smart-scheduler (Optimizador académico con Smart Scheduler.app)
+      final scheduler = manifest.apps.firstWhere((a) => a.id == 'com.hakkin.smart-scheduler');
+      expect(scheduler.getPlatformRelease('macos-arm64')!.executableRelativePath,
+          'Smart Scheduler.app/Contents/MacOS/Smart Scheduler');
     }
 
     test('Valida docs/catalog.json generado contra el contrato Dart', () {
