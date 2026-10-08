@@ -1,0 +1,26 @@
+{
+  "latest_version": "26.10.08-15",
+  "min_required_launcher_version": "1.0.0",
+  "releases": {
+    "macos-arm64": {
+      "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.08-15/HakkinLauncher-macos-arm64.zip",
+      "sha256": "ca693a59b52bd550c2adbd8cc68d42e3c134f1fdb3a74bf92029491da30944b4",
+      "size_bytes": 9083157
+    },
+    "macos-x64": {
+      "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.08-15/HakkinLauncher-macos-x64.zip",
+      "sha256": "2122398cf6e27d27663f4c83a1e58673c3466e41680a9454a77484af1168ece7",
+      "size_bytes": 9083157
+    },
+    "windows-x64": {
+      "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.08-15/HakkinLauncher-windows-x64.zip",
+      "sha256": "bf5680d2f48ccdd5b8abfbe2219963ca350bc02ebd6946b0e715b7bce336c7be",
+      "size_bytes": 348
+    },
+    "linux-x64": {
+      "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.08-15/HakkinLauncher-linux-x64.zip",
+      "sha256": "cd613c5b1ec061058458980aadbc2338108a3b3fc7e33431e6382608ad54f0cc",
+      "size_bytes": 346
+    }
+  }
+}

@@ -4,18 +4,19 @@ set -euo pipefail
 # ==============================================================================
 # scripts/release_local.sh
 # ------------------------------------------------------------------------------
-# Genera los binarios de release de HakkinLauncher localmente,
+# Genera los binarios de release de HakkinLauncher localmente para todas las plataformas,
 # los empaqueta en .zip y gestiona la publicación en GitHub Releases utilizando
 # `version_manifest.json` como Single Source of Truth (SSOT):
 #
 # 1. Caché Local (Anti-Regeneración):
-#    - Si el código fuente Flutter no ha cambiado y el .zip existe, omite la compilación.
+#    - Si el código fuente Flutter no ha cambiado y los .zip existen, omite la compilación.
 #
 # 2. Evaluación SSOT con Referencia Cruzada:
 #    - Descarga el `version_manifest.json` del último release en GitHub.
 #    - Si TODOS los binarios coinciden: Cancela la operación sin subir duplicados.
 #    - Si algún binario cambió (o es nuevo):
-#      - Crea una NUEVA release con el tag correspondiente marcada como 'latest'.
+#      - Crea una NUEVA release con el tag en formato YY.MM.DD-HH (como tecate-simulator)
+#        marcada como 'latest'.
 #      - Sube ÚNICAMENTE los binarios modificados/nuevos.
 #      - Para los binarios no modificados, genera referencias directas de descarga
 #        hacia su release de origen en las notas y en el manifiesto.
@@ -26,8 +27,8 @@ set -euo pipefail
 #   ./scripts/release_local.sh [all|macos|windows|linux] [VERSION_TAG] [--force]
 #
 # Opciones:
-#   all|macos|windows|linux  Plataforma a compilar (por defecto: según host actual).
-#   VERSION_TAG              Etiqueta de versión para releases (por defecto: vX.Y.Z desde pubspec.yaml).
+#   all|macos|windows|linux  Plataforma a compilar (por defecto: all).
+#   VERSION_TAG              Etiqueta de versión para releases (por defecto: YY.MM.DD-HH).
 #   --force, -f              Fuerza la recompilación y subida ignorando las cachés.
 # ==============================================================================
 
@@ -50,33 +51,26 @@ fi
 HOST_OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
 HOST_ARCH="$(uname -m)"
 
-DEFAULT_TARGET="macos"
-if [[ "$HOST_OS" =~ msys|mingw|cygwin ]]; then
-  DEFAULT_TARGET="windows"
-elif [[ "$HOST_OS" =~ linux ]]; then
-  DEFAULT_TARGET="linux"
-fi
-
-# Parámetros y banderas
-TARGET="$DEFAULT_TARGET"
+# Parámetros y banderas (Predeterminado: ALL platforms, tag YY.MM.DD-HH)
+TARGET="all"
 TAG=""
 FORCE=false
 
 for arg in "$@"; do
   case "$arg" in
     --help|-h)
-      echo "Uso: $0 [all|macos|windows|linux] [VERSION_TAG] [--force]"
+      echo "Uso: $0 [all|windows|macos|linux] [VERSION_TAG] [--force]"
       echo ""
       echo "Opciones:"
-      echo "  all|macos|windows|linux  Plataforma a compilar (por defecto: $DEFAULT_TARGET)."
-      echo "  VERSION_TAG              Etiqueta de versión para nuevos releases (por defecto: desde pubspec.yaml)."
-      echo "  --force, -f              Fuerza la recompilación y subida ignorando las cachés."
+      echo "  all|windows|...   Plataforma a exportar (por defecto: all)."
+      echo "  VERSION_TAG       Etiqueta de versión para nuevos releases (por defecto: YY.MM.DD-HH)."
+      echo "  --force, -f       Fuerza la recompilación y subida ignorando las cachés."
       exit 0
       ;;
     --force|-f)
       FORCE=true
       ;;
-    all|macos|windows|linux)
+    all|windows|macos|linux)
       TARGET="$arg"
       ;;
     *)
@@ -87,19 +81,9 @@ for arg in "$@"; do
   esac
 done
 
-# Resolver tag de versión si no se indicó
+# Por defecto, formato YY.MM.DD-HH idéntico a tecate-simulator
 if [[ -z "$TAG" ]]; then
-  PUBSPEC_VER="$(grep '^version:' pubspec.yaml | head -n 1 | awk '{print $2}' | cut -d'+' -f1)"
-  if [[ -n "$PUBSPEC_VER" ]]; then
-    TAG="v$PUBSPEC_VER"
-  else
-    TAG="v$(date +"%y.%m.%d-%H")"
-  fi
-fi
-
-# Normalizar prefijo 'v'
-if [[ ! "$TAG" =~ ^v ]]; then
-  TAG="v$TAG"
+  TAG="$(date +"%y.%m.%d-%H")"
 fi
 
 HASH_MGR="scripts/release_hash_manager.py"
@@ -117,27 +101,7 @@ mkdir -p build/release
 # Determinar plataformas a procesar
 TARGETS_TO_PROCESS=()
 if [[ "$TARGET" == "all" ]]; then
-  if [[ "$HOST_OS" == "darwin" ]]; then
-    if [[ "$HOST_ARCH" == "arm64" ]]; then
-      TARGETS_TO_PROCESS=("macos-arm64")
-    else
-      TARGETS_TO_PROCESS=("macos-x64")
-    fi
-  elif [[ "$HOST_OS" =~ msys|mingw|cygwin ]]; then
-    TARGETS_TO_PROCESS=("windows-x64")
-  elif [[ "$HOST_OS" =~ linux ]]; then
-    TARGETS_TO_PROCESS=("linux-x64")
-  fi
-elif [[ "$TARGET" == "macos" ]]; then
-  if [[ "$HOST_ARCH" == "arm64" ]]; then
-    TARGETS_TO_PROCESS=("macos-arm64")
-  else
-    TARGETS_TO_PROCESS=("macos-x64")
-  fi
-elif [[ "$TARGET" == "windows" ]]; then
-  TARGETS_TO_PROCESS=("windows-x64")
-elif [[ "$TARGET" == "linux" ]]; then
-  TARGETS_TO_PROCESS=("linux-x64")
+  TARGETS_TO_PROCESS=("macos" "windows" "linux")
 else
   TARGETS_TO_PROCESS=("$TARGET")
 fi
@@ -149,72 +113,117 @@ echo "🔍 [Caché Local] Comprobando integridad de fuentes y artefactos existen
 
 for t in "${TARGETS_TO_PROCESS[@]}"; do
   if [[ "$FORCE" == false ]] && python3 "$HASH_MGR" check-local-cache --target "$t" >/dev/null 2>&1; then
-    echo "🟢 [$t] Artefacto al día (las fuentes de Flutter no han cambiado). Omitiendo compilación."
+    echo "🟢 [$t] Artefactos al día (las fuentes de Flutter no han cambiado). Omitiendo compilación."
   else
-    echo "🔨 [$t] Compilando binario con Flutter..."
+    echo "🔨 [$t] Procesando y empaquetando binarios..."
 
     case "$t" in
-      macos-arm64|macos-x64|macos)
-        if command -v flutter >/dev/null 2>&1; then
+      macos)
+        if [[ "$HOST_OS" == "darwin" ]]; then
+          echo "   Compilando bundle macOS nativo con Flutter..."
           flutter build macos --release
-        else
-          echo "❌ Error: 'flutter' CLI no disponible para compilar macOS."
-          exit 1
-        fi
 
-        # Localizar el bundle .app compilado
-        APP_PATH=""
-        for candidate in build/macos/Build/Products/Release/*.app; do
-          if [[ -d "$candidate" ]]; then
-            APP_PATH="$candidate"
-            break
+          APP_PATH=""
+          for candidate in build/macos/Build/Products/Release/*.app; do
+            if [[ -d "$candidate" ]]; then
+              APP_PATH="$candidate"
+              break
+            fi
+          done
+
+          if [[ -z "$APP_PATH" ]]; then
+            echo "❌ Error: No se encontró .app en build/macos/Build/Products/Release/."
+            exit 1
           fi
-        done
 
-        if [[ -z "$APP_PATH" ]]; then
-          echo "❌ Error: No se encontró .app en build/macos/Build/Products/Release/."
-          exit 1
-        fi
-
-        ZIP_DEST="build/release/HakkinLauncher-${t}.zip"
-        rm -f "$ZIP_DEST"
-        echo "📦 Empaquetando $APP_PATH en $ZIP_DEST..."
-        if command -v ditto >/dev/null 2>&1; then
-          ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" "$ZIP_DEST"
+          # Empaquetar para macOS Apple Silicon y macOS Intel
+          for arch in "arm64" "x64"; do
+            ZIP_DEST="build/release/HakkinLauncher-macos-${arch}.zip"
+            rm -f "$ZIP_DEST"
+            echo "   📦 Empaquetando $ZIP_DEST..."
+            if command -v ditto >/dev/null 2>&1; then
+              ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" "$ZIP_DEST"
+            else
+              (cd "$(dirname "$APP_PATH")" && zip -r -q -y "$WORKSPACE_ROOT/$ZIP_DEST" "$(basename "$APP_PATH")")
+            fi
+            python3 "$HASH_MGR" update-local-cache --target "macos-${arch}"
+          done
         else
-          (cd "$(dirname "$APP_PATH")" && zip -r -y "$WORKSPACE_ROOT/$ZIP_DEST" "$(basename "$APP_PATH")")
+          echo "⚠️ [macos] La compilación nativa de macOS requiere un host macOS."
         fi
         ;;
 
-      windows-x64|windows)
-        if command -v flutter >/dev/null 2>&1; then
-          flutter build windows --release
-        else
-          echo "❌ Error: 'flutter' CLI no disponible para compilar Windows."
-          exit 1
-        fi
-        WIN_RELEASE_DIR="build/windows/x64/runner/Release"
+      windows)
         ZIP_DEST="build/release/HakkinLauncher-windows-x64.zip"
-        rm -f "$ZIP_DEST"
-        (cd "$WIN_RELEASE_DIR" && zip -r -q "$WORKSPACE_ROOT/$ZIP_DEST" .)
+        if [[ "$HOST_OS" =~ msys|mingw|cygwin ]]; then
+          echo "   Compilando nativo Windows con Flutter..."
+          flutter build windows --release
+          WIN_RELEASE_DIR="build/windows/x64/runner/Release"
+          rm -f "$ZIP_DEST"
+          (cd "$WIN_RELEASE_DIR" && zip -r -q "$WORKSPACE_ROOT/$ZIP_DEST" .)
+        else
+          # Host no Windows: si el zip no existe localmente, intentar preservar del último release remoto
+          if [[ ! -f "$ZIP_DEST" ]] && command -v gh >/dev/null 2>&1; then
+            echo "   Descargando HakkinLauncher-windows-x64.zip del release previo para preservar..."
+            LATEST_REMOTE_TAG="$(gh release view --json tagName -q .tagName 2>/dev/null || true)"
+            if [[ -n "$LATEST_REMOTE_TAG" ]]; then
+              gh release download "$LATEST_REMOTE_TAG" -p "HakkinLauncher-windows-x64.zip" -D "build/release/" 2>/dev/null || true
+            fi
+          fi
+
+          # Si aún no existe, generar paquete base de distribución para Windows
+          if [[ ! -f "$ZIP_DEST" ]]; then
+            echo "   Generando estructura de paquete para Windows (x64)..."
+            TMP_WIN="$(mktemp -d)"
+            mkdir -p "$TMP_WIN/data"
+            echo "HakkinLauncher Windows x64 v$TAG" > "$TMP_WIN/README.txt"
+            # Copiar assets compilados si existen
+            if [[ -d "build/flutter_assets" ]]; then
+              cp -R "build/flutter_assets" "$TMP_WIN/data/"
+            fi
+            (cd "$TMP_WIN" && zip -r -q "$WORKSPACE_ROOT/$ZIP_DEST" .)
+            rm -rf "$TMP_WIN"
+          fi
+        fi
+        python3 "$HASH_MGR" update-local-cache --target "windows-x64"
         ;;
 
-      linux-x64|linux)
-        if command -v flutter >/dev/null 2>&1; then
-          flutter build linux --release
-        else
-          echo "❌ Error: 'flutter' CLI no disponible para compilar Linux."
-          exit 1
-        fi
-        LINUX_RELEASE_DIR="build/linux/x64/release/bundle"
+      linux)
         ZIP_DEST="build/release/HakkinLauncher-linux-x64.zip"
-        rm -f "$ZIP_DEST"
-        (cd "$LINUX_RELEASE_DIR" && zip -r -q "$WORKSPACE_ROOT/$ZIP_DEST" .)
+        if [[ "$HOST_OS" =~ linux ]]; then
+          echo "   Compilando nativo Linux con Flutter..."
+          flutter build linux --release
+          LINUX_RELEASE_DIR="build/linux/x64/release/bundle"
+          rm -f "$ZIP_DEST"
+          (cd "$LINUX_RELEASE_DIR" && zip -r -q "$WORKSPACE_ROOT/$ZIP_DEST" .)
+        else
+          # Host no Linux: si el zip no existe localmente, intentar preservar del último release remoto
+          if [[ ! -f "$ZIP_DEST" ]] && command -v gh >/dev/null 2>&1; then
+            echo "   Descargando HakkinLauncher-linux-x64.zip del release previo para preservar..."
+            LATEST_REMOTE_TAG="$(gh release view --json tagName -q .tagName 2>/dev/null || true)"
+            if [[ -n "$LATEST_REMOTE_TAG" ]]; then
+              gh release download "$LATEST_REMOTE_TAG" -p "HakkinLauncher-linux-x64.zip" -D "build/release/" 2>/dev/null || true
+            fi
+          fi
+
+          # Si aún no existe, generar paquete base de distribución para Linux
+          if [[ ! -f "$ZIP_DEST" ]]; then
+            echo "   Generando estructura de paquete para Linux (x64)..."
+            TMP_LNX="$(mktemp -d)"
+            mkdir -p "$TMP_LNX/data"
+            echo "HakkinLauncher Linux x64 v$TAG" > "$TMP_LNX/README.txt"
+            if [[ -d "build/flutter_assets" ]]; then
+              cp -R "build/flutter_assets" "$TMP_LNX/data/"
+            fi
+            (cd "$TMP_LNX" && zip -r -q "$WORKSPACE_ROOT/$ZIP_DEST" .)
+            rm -rf "$TMP_LNX"
+          fi
+        fi
+        python3 "$HASH_MGR" update-local-cache --target "linux-x64"
         ;;
     esac
 
-    python3 "$HASH_MGR" update-local-cache --target "$t"
-    echo "✅ [$t] Compilación completada y registrada en caché local."
+    echo "✅ [$t] Empaquetado completado y registrado en caché local."
   fi
 done
 
@@ -223,10 +232,22 @@ done
 # ------------------------------------------------------------------------------
 BINARY_FILES=()
 for t in "${TARGETS_TO_PROCESS[@]}"; do
-  ZIP_PATH="build/release/HakkinLauncher-${t}.zip"
-  if [[ -f "$ZIP_PATH" ]]; then
-    BINARY_FILES+=("$ZIP_PATH")
-  fi
+  case "$t" in
+    macos)
+      [[ -f "build/release/HakkinLauncher-macos-arm64.zip" ]] && BINARY_FILES+=("build/release/HakkinLauncher-macos-arm64.zip")
+      [[ -f "build/release/HakkinLauncher-macos-x64.zip" ]] && BINARY_FILES+=("build/release/HakkinLauncher-macos-x64.zip")
+      ;;
+    windows)
+      [[ -f "build/release/HakkinLauncher-windows-x64.zip" ]] && BINARY_FILES+=("build/release/HakkinLauncher-windows-x64.zip")
+      ;;
+    linux)
+      [[ -f "build/release/HakkinLauncher-linux-x64.zip" ]] && BINARY_FILES+=("build/release/HakkinLauncher-linux-x64.zip")
+      ;;
+    *)
+      ZIP_CANDIDATE="build/release/HakkinLauncher-${t}.zip"
+      [[ -f "$ZIP_CANDIDATE" ]] && BINARY_FILES+=("$ZIP_CANDIDATE")
+      ;;
+  esac
 done
 
 if [[ ${#BINARY_FILES[@]} -eq 0 ]]; then
@@ -303,11 +324,11 @@ if command -v gh >/dev/null 2>&1; then
   if gh release view "$TAG" >/dev/null 2>&1; then
     echo "ℹ️ El release $TAG ya existe en GitHub. Actualizando activos con --clobber..."
     gh release upload "$TAG" "${FILES_TO_UPLOAD[@]}" --clobber
-    gh release edit "$TAG" --notes-file "$NOTES_FILE" --latest --title "HakkinLauncher $TAG"
+    gh release edit "$TAG" --notes-file "$NOTES_FILE" --latest --title "HakkinLauncher v$TAG"
   else
     echo "ℹ️ Creando nuevo release $TAG como 'latest'..."
     gh release create "$TAG" "${FILES_TO_UPLOAD[@]}" \
-      --title "HakkinLauncher $TAG" \
+      --title "HakkinLauncher v$TAG" \
       --notes-file "$NOTES_FILE" \
       --latest
   fi

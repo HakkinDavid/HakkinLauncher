@@ -141,53 +141,77 @@ def save_local_manifest(data):
 
 def is_target_cached(target):
     """Verifica si el binario local está al día con el estado actual de las fuentes."""
-    cfg = TARGET_CONFIG.get(target)
-    if not cfg:
-        return False, f"Target desconocido: {target}"
-    target_file = cfg["path"]
-    if not os.path.isfile(target_file):
-        return False, "El archivo empaquetado no existe en build/release/."
+    if target == "macos":
+        subtargets = ["macos-arm64", "macos-x64"]
+    elif target == "windows":
+        subtargets = ["windows-x64"]
+    elif target == "linux":
+        subtargets = ["linux-x64"]
+    else:
+        subtargets = [target]
 
-    manifest = load_local_manifest()
-    cached_source_hash = manifest.get("source_hashes", {}).get(target)
-    current_source_hash = compute_source_hash(target)
+    for sub in subtargets:
+        cfg = TARGET_CONFIG.get(sub)
+        if not cfg:
+            return False, f"Target desconocido: {sub}"
+        target_file = cfg["path"]
+        if not os.path.isfile(target_file):
+            return False, f"El archivo {os.path.basename(target_file)} no existe en build/release/."
 
-    if not cached_source_hash or cached_source_hash != current_source_hash:
-        return False, "Las fuentes del lanzador han cambiado desde la última compilación."
+        manifest = load_local_manifest()
+        cached_source_hash = manifest.get("source_hashes", {}).get(sub)
+        current_source_hash = compute_source_hash(sub)
 
-    target_entry = manifest.get("targets", {}).get(target, {})
-    cached_file_hash = target_entry.get("sha256")
-    actual_file_hash = compute_file_sha256(target_file)
+        if not cached_source_hash or cached_source_hash != current_source_hash:
+            return False, f"Las fuentes de {sub} han cambiado desde la última compilación."
 
-    if not cached_file_hash or cached_file_hash != actual_file_hash:
-        return False, "El hash del archivo empaquetado no coincide con el manifiesto local."
+        target_entry = manifest.get("targets", {}).get(sub, {})
+        cached_file_hash = target_entry.get("sha256")
+        actual_file_hash = compute_file_sha256(target_file)
 
-    return True, f"Fuentes idénticas ({current_source_hash[:10]}...)"
+        if not cached_file_hash or cached_file_hash != actual_file_hash:
+            return False, f"El hash del archivo {os.path.basename(target_file)} no coincide con el manifiesto local."
+
+    return True, "Artefactos y fuentes idénticos."
 
 
 def update_target_cache(target):
     """Actualiza la entrada del target en el manifiesto tras una compilación exitosa."""
-    cfg = TARGET_CONFIG.get(target)
-    if not cfg:
-        return False
-    target_file = cfg["path"]
-    if not os.path.isfile(target_file):
-        return False
-
-    current_source_hash = compute_source_hash(target)
-    actual_file_hash = compute_file_sha256(target_file)
-    size_bytes = os.path.getsize(target_file)
+    if target == "macos":
+        subtargets = ["macos-arm64", "macos-x64"]
+    elif target == "windows":
+        subtargets = ["windows-x64"]
+    elif target == "linux":
+        subtargets = ["linux-x64"]
+    else:
+        subtargets = [target]
 
     manifest = load_local_manifest()
-    manifest.setdefault("source_hashes", {})[target] = current_source_hash
-    manifest.setdefault("targets", {})[target] = {
-        "file": os.path.relpath(target_file, WORKSPACE_ROOT),
-        "sha256": actual_file_hash,
-        "size_bytes": size_bytes,
-        "updated_at": datetime.now(timezone.utc).isoformat()
-    }
+    all_ok = True
+
+    for sub in subtargets:
+        cfg = TARGET_CONFIG.get(sub)
+        if not cfg:
+            continue
+        target_file = cfg["path"]
+        if not os.path.isfile(target_file):
+            all_ok = False
+            continue
+
+        current_source_hash = compute_source_hash(sub)
+        actual_file_hash = compute_file_sha256(target_file)
+        size_bytes = os.path.getsize(target_file)
+
+        manifest.setdefault("source_hashes", {})[sub] = current_source_hash
+        manifest.setdefault("targets", {})[sub] = {
+            "file": os.path.relpath(target_file, WORKSPACE_ROOT),
+            "sha256": actual_file_hash,
+            "size_bytes": size_bytes,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+
     save_local_manifest(manifest)
-    return True
+    return all_ok
 
 
 def get_repo_slug():
