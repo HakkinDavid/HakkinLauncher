@@ -2,28 +2,28 @@
   "version": "2.0.0",
   "catalog_timestamp": "2026-10-09T09:43:51.459317+00:00",
   "launcher_meta": {
-    "latest_version": "26.10.08-23",
+    "latest_version": "26.10.09-09",
     "min_required_launcher_version": "1.0.0",
     "releases": {
       "macos-arm64": {
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.08-23/HakkinLauncher-macos-arm64.zip",
-        "sha256": "8050afffd41e7d7216084f28ca8cd1bf51253b8bb9d2fb174295f1ddeaf9f88f",
-        "size_bytes": 10980145
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.09-09/HakkinLauncher-macos-arm64.zip",
+        "sha256": "2499d07975b3fcaded283013d34c40300b95c876bda71c73636ed18f818ffcac",
+        "size_bytes": 11575287
       },
       "macos-x64": {
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.08-23/HakkinLauncher-macos-x64.zip",
-        "sha256": "2217aa5b27b1885507169ad9de28089826c43c1b0def4ffa5368ca612d0a0486",
-        "size_bytes": 10980145
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.09-09/HakkinLauncher-macos-x64.zip",
+        "sha256": "a2070178f8932ce61105a26f68ec20ba3d8a4bcdf66f1da3abc9f4e4f62742eb",
+        "size_bytes": 11575287
       },
       "windows-x64": {
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.08-15/HakkinLauncher-windows-x64.zip",
-        "sha256": "bf5680d2f48ccdd5b8abfbe2219963ca350bc02ebd6946b0e715b7bce336c7be",
-        "size_bytes": 348
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.09-09/HakkinLauncher-windows-x64.zip",
+        "sha256": "12734d6b27a4f8e514f9f6fce605e19fb7fc5b0f88d72d69814ff7c44384ce32",
+        "size_bytes": 12704901
       },
       "linux-x64": {
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.08-15/HakkinLauncher-linux-x64.zip",
-        "sha256": "cd613c5b1ec061058458980aadbc2338108a3b3fc7e33431e6382608ad54f0cc",
-        "size_bytes": 346
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.09-09/HakkinLauncher-linux-x64.zip",
+        "sha256": "a79ed5d626e4f20305d25b88dc7fa4bbbb956a3912b7e297ff7364df02bf0896",
+        "size_bytes": 10869052
       }
     }
   },
