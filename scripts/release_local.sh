@@ -6,29 +6,28 @@ set -euo pipefail
 # ------------------------------------------------------------------------------
 # Genera los binarios de release de HakkinLauncher localmente para todas las plataformas,
 # los empaqueta en .zip y gestiona la publicación en GitHub Releases utilizando
-# `version_manifest.json` como Single Source of Truth (SSOT):
+# `version_manifest.json` como fuente de verdad:
 #
-# 1. Caché Local (Anti-Regeneración):
+# 1. Caché local:
 #    - Si el código fuente Flutter no ha cambiado y los .zip existen, omite la compilación.
 #
-# 2. Evaluación SSOT con Referencia Cruzada:
+# 2. Evaluación con referencia cruzada:
 #    - Descarga el `version_manifest.json` del último release en GitHub.
-#    - Si TODOS los binarios coinciden: Cancela la operación sin subir duplicados.
-#    - Si algún binario cambió (o es nuevo):
-#      - Crea una NUEVA release con el tag en formato YY.MM.DD-HH (como tecate-simulator)
-#        marcada como 'latest'.
-#      - Sube ÚNICAMENTE los binarios modificados/nuevos.
+#    - Si todos los binarios coinciden: Cancela la operación sin subir duplicados.
+#    - Si algún binario cambió o es nuevo:
+#      - Crea una nueva release con el tag en formato YY.MM.DD-HH marcada como latest.
+#      - Sube únicamente los binarios modificados o nuevos.
 #      - Para los binarios no modificados, genera referencias directas de descarga
 #        hacia su release de origen en las notas y en el manifiesto.
-#      - Publica el nuevo `version_manifest.json` (SSOT).
+#      - Publica el nuevo `version_manifest.json`.
 #      - Actualiza automáticamente `docs/catalog.json` y `docs/catalog_example.json`.
 #
 # Uso:
 #   ./scripts/release_local.sh [all|macos|windows|linux] [VERSION_TAG] [--force]
 #
 # Opciones:
-#   all|macos|windows|linux  Plataforma a compilar (por defecto: all).
-#   VERSION_TAG              Etiqueta de versión para releases (por defecto: YY.MM.DD-HH).
+#   all|macos|windows|linux  Plataforma a compilar. Valor por defecto: all.
+#   VERSION_TAG              Etiqueta de versión para releases. Valor por defecto: YY.MM.DD-HH.
 #   --force, -f              Fuerza la recompilación y subida ignorando las cachés.
 # ==============================================================================
 
@@ -51,7 +50,7 @@ fi
 HOST_OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
 HOST_ARCH="$(uname -m)"
 
-# Parámetros y banderas (Predeterminado: ALL platforms, tag YY.MM.DD-HH)
+# Parámetros y banderas: todas las plataformas por defecto, tag YY.MM.DD-HH
 TARGET="all"
 TAG=""
 FORCE=false
@@ -62,8 +61,8 @@ for arg in "$@"; do
       echo "Uso: $0 [all|windows|macos|linux] [VERSION_TAG] [--force]"
       echo ""
       echo "Opciones:"
-      echo "  all|windows|...   Plataforma a exportar (por defecto: all)."
-      echo "  VERSION_TAG       Etiqueta de versión para nuevos releases (por defecto: YY.MM.DD-HH)."
+      echo "  all|windows|...   Plataforma a exportar. Por defecto: all."
+      echo "  VERSION_TAG       Etiqueta de versión para nuevos releases. Por defecto: YY.MM.DD-HH."
       echo "  --force, -f       Fuerza la recompilación y subida ignorando las cachés."
       exit 0
       ;;
@@ -90,8 +89,8 @@ HASH_MGR="scripts/release_hash_manager.py"
 chmod +x "$HASH_MGR"
 
 echo "================================================================="
-echo "  HAKKIN LAUNCHER: PUBLICACIÓN LOCAL DE RELEASE (SSOT)"
-echo "  Versión (Tag):     $TAG"
+echo "  HAKKIN LAUNCHER: PUBLICACIÓN LOCAL DE RELEASE"
+echo "  Versión:           $TAG"
 echo "  Objetivo export:   $TARGET"
 echo "  Modo forzado:      $FORCE"
 echo "================================================================="
@@ -109,13 +108,13 @@ fi
 # ------------------------------------------------------------------------------
 # 1. Compilación modular con validación de caché local
 # ------------------------------------------------------------------------------
-echo "🔍 [Caché Local] Comprobando integridad de fuentes y artefactos existentes..."
+echo "[Caché local] Comprobando integridad de fuentes y artefactos existentes..."
 
 for t in "${TARGETS_TO_PROCESS[@]}"; do
   if [[ "$FORCE" == false ]] && python3 "$HASH_MGR" check-local-cache --target "$t" >/dev/null 2>&1; then
-    echo "🟢 [$t] Artefactos al día (las fuentes de Flutter no han cambiado). Omitiendo compilación."
+    echo "[$t] Artefactos al día, fuentes sin cambios. Omitiendo compilación."
   else
-    echo "🔨 [$t] Procesando y empaquetando binarios..."
+    echo "[$t] Procesando y empaquetando binarios..."
 
     case "$t" in
       macos)
@@ -132,7 +131,7 @@ for t in "${TARGETS_TO_PROCESS[@]}"; do
           done
 
           if [[ -z "$APP_PATH" ]]; then
-            echo "❌ Error: No se encontró .app en build/macos/Build/Products/Release/."
+            echo "Error: No se encontró .app en build/macos/Build/Products/Release/."
             exit 1
           fi
 
@@ -140,7 +139,7 @@ for t in "${TARGETS_TO_PROCESS[@]}"; do
           for arch in "arm64" "x64"; do
             ZIP_DEST="build/release/HakkinLauncher-macos-${arch}.zip"
             rm -f "$ZIP_DEST"
-            echo "   📦 Empaquetando $ZIP_DEST..."
+            echo "   Empaquetando $ZIP_DEST..."
             if command -v ditto >/dev/null 2>&1; then
               ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" "$ZIP_DEST"
             else
@@ -149,7 +148,7 @@ for t in "${TARGETS_TO_PROCESS[@]}"; do
             python3 "$HASH_MGR" update-local-cache --target "macos-${arch}"
           done
         else
-          echo "⚠️ [macos] La compilación nativa de macOS requiere un host macOS."
+          echo "[macos] La compilación nativa de macOS requiere un host macOS."
         fi
         ;;
 
@@ -173,7 +172,7 @@ for t in "${TARGETS_TO_PROCESS[@]}"; do
 
           # Si aún no existe, generar paquete base de distribución para Windows
           if [[ ! -f "$ZIP_DEST" ]]; then
-            echo "   Generando estructura de paquete para Windows (x64)..."
+            echo "   Generando estructura de paquete para Windows x64..."
             TMP_WIN="$(mktemp -d)"
             mkdir -p "$TMP_WIN/data"
             echo "HakkinLauncher Windows x64 v$TAG" > "$TMP_WIN/README.txt"
@@ -208,7 +207,7 @@ for t in "${TARGETS_TO_PROCESS[@]}"; do
 
           # Si aún no existe, generar paquete base de distribución para Linux
           if [[ ! -f "$ZIP_DEST" ]]; then
-            echo "   Generando estructura de paquete para Linux (x64)..."
+            echo "   Generando estructura de paquete para Linux x64..."
             TMP_LNX="$(mktemp -d)"
             mkdir -p "$TMP_LNX/data"
             echo "HakkinLauncher Linux x64 v$TAG" > "$TMP_LNX/README.txt"
@@ -223,7 +222,7 @@ for t in "${TARGETS_TO_PROCESS[@]}"; do
         ;;
     esac
 
-    echo "✅ [$t] Empaquetado completado y registrado en caché local."
+    echo "[$t] Empaquetado completado y registrado en caché local."
   fi
 done
 
@@ -251,29 +250,29 @@ for t in "${TARGETS_TO_PROCESS[@]}"; do
 done
 
 if [[ ${#BINARY_FILES[@]} -eq 0 ]]; then
-  echo "❌ Error: No se encontraron archivos empaquetados en build/release/."
+  echo "Error: No se encontraron archivos empaquetados en build/release/."
   exit 1
 fi
 
-echo "📦 Binarios locales evaluados:"
+echo "Binarios locales evaluados:"
 for f in "${BINARY_FILES[@]}"; do
-  echo "   - $(basename "$f") ($(du -h "$f" | cut -f1))"
+  echo "   - $(basename "$f") - $(du -h "$f" | cut -f1)"
 done
 
 # ------------------------------------------------------------------------------
-# 3. Evaluación SSOT contra version_manifest.json del último release
+# 3. Evaluación contra version_manifest.json del último release
 # ------------------------------------------------------------------------------
 if command -v gh >/dev/null 2>&1; then
-  echo "📡 [GitHub] Consultando el último release para evaluar version_manifest.json..."
+  echo "[GitHub] Consultando el último release para evaluar version_manifest.json..."
 
   LATEST_TAG="$(gh release view --json tagName -q .tagName 2>/dev/null || true)"
   REMOTE_MANIFEST=""
 
   if [[ -n "$LATEST_TAG" ]]; then
-    echo "ℹ️ Último release en GitHub detectado: $LATEST_TAG"
+    echo "Último release en GitHub detectado: $LATEST_TAG"
     REMOTE_MANIFEST="$(gh release download "$LATEST_TAG" -p "version_manifest.json" -O - 2>/dev/null || true)"
   else
-    echo "ℹ️ No se detectaron releases previos. Se inicializará el primer release del repositorio."
+    echo "No se detectaron releases previos. Se inicializará el primer release del repositorio."
   fi
 
   EVAL_ARGS=("--new-tag" "$TAG")
@@ -294,12 +293,12 @@ if command -v gh >/dev/null 2>&1; then
 
   if [[ "$ACTION" == "NOTHING_TO_DO" ]]; then
     echo "================================================================="
-    echo "🟢 VALIDACIÓN SSOT: TODOS LOS ARTEFACTOS ESTÁN AL DÍA"
+    echo "VALIDACIÓN: TODOS LOS ARTEFACTOS ESTÁN AL DÍA"
     echo "================================================================="
     echo "$REASON"
     echo ""
-    echo "🛑 Se cancela la publicación. No se requieren cambios ni duplicados."
-    echo "   (Para forzar una nueva versión, use: $0 --force)"
+    echo "Se cancela la publicación. No se requieren cambios ni duplicados."
+    echo "   Para forzar una nueva versión, use: $0 --force"
     echo "================================================================="
     exit 0
   fi
@@ -311,44 +310,44 @@ if command -v gh >/dev/null 2>&1; then
   NOTES_FILE="$(echo "$EVAL_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin).get('notes_path', ''))")"
 
   echo "================================================================="
-  echo "🚀 PUBLICANDO NUEVO RELEASE: $TAG (latest)"
+  echo "PUBLICANDO NUEVO RELEASE: $TAG como latest"
   echo "================================================================="
-  echo "  - Plataformas actualizadas (se suben ahora): ${UPDATED_PLATS:-ninguna}"
-  echo "  - Plataformas preservadas  (referenciadas):  ${PRESERVED_PLATS:-ninguna}"
-  echo "  - Archivos a transferir:                     ${#FILES_TO_UPLOAD[@]}"
+  echo "  - Plataformas actualizadas para subida:   ${UPDATED_PLATS:-ninguna}"
+  echo "  - Plataformas preservadas por referencia: ${PRESERVED_PLATS:-ninguna}"
+  echo "  - Archivos a transferir:                  ${#FILES_TO_UPLOAD[@]}"
   echo "================================================================="
 
   # ------------------------------------------------------------------------------
   # 4. Creación o actualización del Release en GitHub
   # ------------------------------------------------------------------------------
   if gh release view "$TAG" >/dev/null 2>&1; then
-    echo "ℹ️ El release $TAG ya existe en GitHub. Actualizando activos con --clobber..."
+    echo "El release $TAG ya existe en GitHub. Actualizando activos con --clobber..."
     gh release upload "$TAG" "${FILES_TO_UPLOAD[@]}" --clobber
     gh release edit "$TAG" --notes-file "$NOTES_FILE" --latest --title "HakkinLauncher v$TAG"
   else
-    echo "ℹ️ Creando nuevo release $TAG como 'latest'..."
+    echo "Creando nuevo release $TAG como 'latest'..."
     gh release create "$TAG" "${FILES_TO_UPLOAD[@]}" \
       --title "HakkinLauncher v$TAG" \
       --notes-file "$NOTES_FILE" \
       --latest
   fi
 
-  echo "✅ Release $TAG publicado exitosamente en GitHub:"
+  echo "Release $TAG publicado exitosamente en GitHub:"
   gh release view "$TAG" --web 2>/dev/null || gh release view "$TAG"
 
   # ------------------------------------------------------------------------------
   # 5. Sincronización del catálogo maestro local de HakkinLauncher
   # ------------------------------------------------------------------------------
-  echo "🔄 Sincronizando catálogo de HakkinLauncher..."
+  echo "Sincronizando catálogo de HakkinLauncher..."
   python3 "$HASH_MGR" sync-catalog
 
 else
   # Sin CLI de GitHub
   python3 "$HASH_MGR" eval-release --new-tag "$TAG" "${BINARY_FILES[@]}" >/dev/null
   python3 "$HASH_MGR" sync-catalog
-  echo "⚠️ Advertencia: 'gh' CLI no está autenticada o disponible en el PATH."
+  echo "Advertencia: 'gh' CLI no está autenticada o disponible en el PATH."
   echo "   Los binarios y 'version_manifest.json' están listos en 'build/release/'."
   echo "   Para publicar en GitHub: gh auth login && $0"
 fi
 
-echo "🎉 Proceso de Release SSOT finalizado con éxito."
+echo "Proceso de release finalizado con éxito."

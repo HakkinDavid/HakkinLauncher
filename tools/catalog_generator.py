@@ -144,7 +144,7 @@ def resolve_asset_metadata(url, direct_sha=None):
 
 class ManifestAdapter:
     """
-    Adapter Pattern: Adapts external manifest format (e.g. version_manifest.json)
+    Adapter Pattern: Adapts external manifest formats like version_manifest.json
     into HakkinLauncher canonical platform release structures.
     """
     PLATFORM_MAPPING = {
@@ -264,7 +264,7 @@ def generate_catalog(overrides_path, existing_catalog_path=None):
         existing_app = existing_apps_map.get(app_id)
 
         # -----------------------------------------------------------------
-        # Level 1 Strategy: Remote Manifest (Convention over Configuration)
+        # Level 1 Strategy: Remote Manifest
         # -----------------------------------------------------------------
         remote_manifest_versions = {}
         remote_manifest = fetch_remote_manifest(repo)
@@ -284,7 +284,7 @@ def generate_catalog(overrides_path, existing_catalog_path=None):
                 versions_list.append(v_entry)
                 seen_versions.add(v_entry["version"])
 
-            # 1. If explicit versions are defined in overrides (Override Strategy)
+            # 1. If explicit versions are defined in overrides
             if "versions" in plat_info and isinstance(plat_info["versions"], list):
                 for v_def in plat_info["versions"]:
                     v_str = v_def.get("version", "1.0.0")
@@ -416,7 +416,7 @@ def generate_catalog(overrides_path, existing_catalog_path=None):
 
         apps.append(app_entry)
 
-    # Launcher metadata definition (loaded dynamically from tools/launcher_meta.json if present)
+    # Launcher metadata definition from launcher_meta.json
     launcher_meta_path = os.path.join(os.path.dirname(overrides_path), "launcher_meta.json")
     launcher_meta = None
     if os.path.isfile(launcher_meta_path):

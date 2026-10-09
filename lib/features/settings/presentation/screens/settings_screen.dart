@@ -170,7 +170,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '¡Nueva versión de ${AppConstants.appName} disponible! (v${launcherMeta.latestVersion})',
+                            'Nueva versión de ${AppConstants.appName} disponible: v${launcherMeta.latestVersion}',
                             style: const TextStyle(
                               color: AppColors.platinum,
                               fontSize: 16,
@@ -200,7 +200,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               const SizedBox(height: 24),
             ],
 
-            // Sección 1: Catálogo Remoto
             _buildSection(
               title: 'Catálogo y Diccionario Remoto',
               description:
@@ -240,7 +239,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
             const SizedBox(height: 24),
 
-            // Sección 2: Directorio de Instalación de Aplicaciones
             _buildSection(
               title: 'Ruta de Instalación de Juegos y Software',
               description:
@@ -281,7 +279,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
             const SizedBox(height: 24),
 
-            // Sección 3: Segundo Plano y Comprobaciones
             _buildSection(
               title: 'Segundo Plano y Actualizaciones',
               description: 'Opciones de bandeja de sistema y sondeo automático.',
@@ -326,11 +323,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
             const SizedBox(height: 24),
 
-            // Sección 4: Housekeeping y Mantenimiento
             _buildSection(
-              title: 'Mantenimiento y Housekeeping',
+              title: 'Mantenimiento',
               description:
-                  'Limpieza de archivos residuales de descargas (.zip, .tmp, .hdiff) y rotación de registros.',
+                  'Limpieza de archivos residuales de descargas y rotación de registros.',
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -353,7 +349,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
             const SizedBox(height: 24),
 
-            // Sección 5: Información de Rutas
             _buildSection(
               title: 'Información del Sistema',
               description: 'Rutas locales utilizadas por HakkinLauncher.',

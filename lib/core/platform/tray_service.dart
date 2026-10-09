@@ -4,7 +4,7 @@ import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 import '../constants/app_constants.dart';
 
-/// Servicio para la bandeja del sistema (System Tray / Menu Bar)
+/// Servicio para la bandeja del sistema.
 class TrayService with TrayListener {
   static final TrayService instance = TrayService._();
   TrayService._();
@@ -18,7 +18,6 @@ class TrayService with TrayListener {
       instance.onCheckUpdatesRequested = onCheckUpdates;
       trayManager.addListener(instance);
 
-      // Icono por defecto de bandeja según la plataforma
       if (Platform.isWindows) {
         final localIco = File('windows/runner/resources/app_icon.ico');
         if (localIco.existsSync()) {

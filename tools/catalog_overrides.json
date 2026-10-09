@@ -63,7 +63,7 @@
     "category": "app",
     "developer": "Bonsanbec",
     "summary": "Herramienta comunitaria de apoyo y solidaridad digital nacida en Tijuana para conectar a personas migrantes con albergues, servicios y comedores.",
-    "description_markdown": "# Sistema de Apoyo Migrante\n\nEste proyecto nació al observar una necesidad urgente en las calles de Tijuana: personas migrantes buscando ayuda, orientación y un lugar seguro.\n\n### Propósito:\n- Conectar a personas en movilidad con esfuerzos colectivos de la comunidad, albergues, comedores y servicios médicos gratuitos (basado en directorios OIM/ACNUR).\n- Enfoque comunitario y solidario: hecho para acompañar, guiar y recordar que nadie camina solo.\n- Versión web y aplicación móvil Android offline-ready.",
+    "description_markdown": "# Sistema de Apoyo Migrante\n\nEste proyecto nació al observar una necesidad urgente en las calles de Tijuana: personas migrantes buscando ayuda, orientación y un lugar seguro.\n\n### Propósito:\n- Conectar a personas en movilidad con esfuerzos colectivos de la comunidad, albergues, comedores y servicios médicos gratuitos según directorios de OIM y ACNUR.\n- Enfoque comunitario y solidario: hecho para acompañar, guiar y recordar que nadie camina solo.\n- Versión web y aplicación móvil Android offline-ready.",
     "tags": ["Humanitarian", "Community", "Maps", "Solidarity", "Tijuana", "Android"],
     "assets": {
       "icon": "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=256&q=80",
@@ -114,11 +114,11 @@
   "HakkinDavid/PWMS": {
     "id": "com.hakkin.pwms",
     "slug": "platinum-world-management",
-    "title": "Platinum World Management System (PWMS)",
+    "title": "Platinum World Management System",
     "category": "app",
     "developer": "HakkinDavid",
-    "summary": "Gemelo digital personal, offline-first y autocontenido (4NF/Drift) para catalogar objetos físicos, seres vivos, herramientas y documentos con auditoría e inventario.",
-    "description_markdown": "# Platinum World Management System (PWMS)\n\nAplicación personal, offline-first y autocontenida desarrollada con Flutter, Riverpod, GoRouter y Drift (SQLite) diseñada para actuar como el gemelo digital completo del mundo del usuario.\n\n### Visión y Filosofía:\n- **Normalización 4NF**: Unifica objetos físicos, herramientas, seres vivos, documentos, proyectos e infraestructura digital en un modelo relacional en Cuarta Forma Normal.\n- **Local-First Estricto**: SQLite local como única fuente de verdad, sin servidores externos obligatorios.\n- **Historial y Trazabilidad**: Todo cambio de ubicación o edición genera eventos automáticos de auditoría.",
+    "summary": "Gemelo digital personal, offline-first y autocontenido con arquitectura 4NF y Drift para catalogar objetos físicos, seres vivos, herramientas y documentos con auditoría e inventario.",
+    "description_markdown": "# Platinum World Management System\n\nAplicación personal, offline-first y autocontenida desarrollada con Flutter, Riverpod, GoRouter y Drift sobre SQLite diseñada para actuar como el gemelo digital completo del mundo del usuario.\n\n### Visión y Filosofía:\n- **Normalización 4NF**: Unifica objetos físicos, herramientas, seres vivos, documentos, proyectos e infraestructura digital en un modelo relacional en Cuarta Forma Normal.\n- **Local-First Estricto**: SQLite local como única fuente de verdad, sin servidores externos obligatorios.\n- **Historial y Trazabilidad**: Todo cambio de ubicación o edición genera eventos automáticos de auditoría.",
     "tags": ["Digital Twin", "Offline-First", "Drift", "Inventory", "Auditing", "4NF"],
     "assets": {
       "icon": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=256&q=80",
@@ -197,7 +197,7 @@
     "category": "tool",
     "developer": "HakkinDavid",
     "summary": "Utilidad de terminal en espacio de usuario para macOS que traduce entradas de Nintendo Wiimote a pulsaciones de teclado mediante IOHIDManager.",
-    "description_markdown": "# Wiimote Userland Driver\n\nControlador ligero en espacio de usuario para macOS que permite utilizar un mando Nintendo Wiimote como dispositivo de entrada estándar para juegos y aplicaciones fuera del emulador Dolphin.\n\n### Aspectos Técnicos:\n- **Entrada Basada en IOHIDManager**: Lee reportes de entrada del Wiimote sin requerir extensiones de kernel (KEXTs).\n- **Soporte Completo de Botones**: D-Pad, A/B, 1/2, +, -, HOME y combinaciones simultáneas de teclas.\n- **Emulación de Teclado**: Mapea acciones del mando a keycodes nativos del sistema operativo.",
+    "description_markdown": "# Wiimote Userland Driver\n\nControlador ligero en espacio de usuario para macOS que permite utilizar un mando Nintendo Wiimote como dispositivo de entrada estándar para juegos y aplicaciones fuera del emulador Dolphin.\n\n### Aspectos Técnicos:\n- **Entrada Basada en IOHIDManager**: Lee reportes de entrada del Wiimote sin requerir extensiones de kernel KEXT.\n- **Soporte Completo de Botones**: D-Pad, A/B, 1/2, +, -, HOME y combinaciones simultáneas de teclas.\n- **Emulación de Teclado**: Mapea acciones del mando a keycodes nativos del sistema operativo.",
     "tags": ["Driver", "HID", "macOS", "Gaming", "Nintendo", "Wiimote"],
     "assets": {
       "icon": "https://images.unsplash.com/photo-1600080972464-8e5f35f63d08?w=256&q=80",
@@ -221,8 +221,8 @@
     "title": "Language Input Hotkey",
     "category": "tool",
     "developer": "HakkinDavid",
-    "summary": "Utilidad en segundo plano (AutoHotkey) para escribir caracteres especiales de español (tildes, ñ) y pinyin (tonos tonales) sin cambiar la distribución del teclado.",
-    "description_markdown": "# Language Input Hotkey\n\nUtilidad residente en segundo plano desarrollada con AutoHotkey para agilizar la entrada de caracteres especiales en español (acentos, virgulillas) y pinyin (tonos 1-4) imitando las combinaciones de acceso rápido de Microsoft Word.\n\n### Binarios Disponibles:\n- `spanish-v1.0.exe`: Entrada rápida de vocales acentuadas, diéresis y signos de interrogación/admiración invertidos.\n- `pinyin-v1.0.exe`: Mapeo tonal intuitivo para caracteres fonéticos en mandarín.",
+    "summary": "Utilidad residente con AutoHotkey para escribir caracteres especiales en español y tonos pinyin sin cambiar la distribución del teclado.",
+    "description_markdown": "# Language Input Hotkey\n\nUtilidad residente en segundo plano desarrollada con AutoHotkey para agilizar la entrada de caracteres especiales en español y pinyin del tono uno al cuatro imitando las combinaciones de acceso rápido de Microsoft Word.\n\n### Binarios Disponibles:\n- `spanish-v1.0.exe`: Entrada rápida de vocales acentuadas, diéresis y signos de interrogación y admiración invertidos.\n- `pinyin-v1.0.exe`: Mapeo tonal para caracteres fonéticos en mandarín.",
     "tags": ["Utility", "Typing", "Languages", "AutoHotkey", "Productivity", "Windows"],
     "assets": {
       "icon": "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=256&q=80",
@@ -262,7 +262,7 @@
     "title": "CAT Helper",
     "category": "tool",
     "developer": "HakkinDavid",
-    "summary": "Calculadora de física y estadística matemática con temática felina (dos modalidades: física y probabilidad).",
+    "summary": "Calculadora de física y estadística matemática con temática felina dividida en física y probabilidad.",
     "description_markdown": "# CAT Helper\n\nAplicación móvil Android concebida como asistente de cálculo en dos vertientes:\n\n### Modalidades:\n- **Calculadora de Física**: Resolución rápida de magnitudes mecánicas, cinemáticas y dinámicas.\n- **Calculadora Estadística y de Probabilidad**: Análisis combinatorio, distribuciones y cálculo probabilístico.\n- Todo integrado con una estética y temática felina distintiva.",
     "tags": ["Calculator", "Physics", "Statistics", "Cats", "Education", "Android"],
     "assets": {
@@ -284,11 +284,11 @@
   "HakkinDavid/CatifyMod-Forge": {
     "id": "com.hakkin.catify-mod",
     "slug": "catify-mod",
-    "title": "CatifyMod (Forge)",
+    "title": "CatifyMod Forge",
     "category": "tool",
     "developer": "HakkinDavid",
-    "summary": "Mod client-side para Minecraft 26.1 (Forge) que transforma el modelo del jugador en gato, con soporte para skins personalizadas y cambio de tamaño visual (/catsize).",
-    "description_markdown": "# Catify Mod (Forge)\n\nModificación puramente client-side para Minecraft 26.1 (port Forge) que transforma visualmente el modelo del jugador en un gato.\n\n### Características:\n- **Cambio de Aspecto Visual**: No altera colisiones ni físicas del jugador, garantizando juego limpio.\n- **Variantes y Skins Personalizadas**: Soporta 11 skins vanilla y adición de texturas personalizadas en `data/catify/cat_enitity_skins` con el comando `/catvariant <nombre>`.\n- **Ajuste de Tamaño**: Comando `/catsize <small/normal/large>` para alternar el tamaño del modelo felino.\n- **Compatibilidad**: Sincronización visual óptima en servidores multijugador.",
+    "summary": "Mod client-side para Minecraft 26.1 adaptado a Forge que transforma el modelo del jugador en gato, con soporte para skins personalizadas y el comando /catsize.",
+    "description_markdown": "# Catify Mod Forge\n\nModificación puramente client-side para Minecraft 26.1 adaptada a Forge que transforma visualmente el modelo del jugador en un gato.\n\n### Características:\n- **Cambio de Aspecto Visual**: No altera colisiones ni físicas del jugador, garantizando juego limpio.\n- **Variantes y Skins Personalizadas**: Soporta 11 skins vanilla y adición de texturas personalizadas en `data/catify/cat_enitity_skins` con el comando `/catvariant <nombre>`.\n- **Ajuste de Tamaño**: Comando `/catsize <small/normal/large>` para alternar el tamaño del modelo felino.\n- **Compatibilidad**: Sincronización visual en servidores multijugador.",
     "tags": ["Minecraft", "Mod", "Forge", "Cats", "Gaming", "Client-Side"],
     "assets": {
       "icon": "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=256&q=80",

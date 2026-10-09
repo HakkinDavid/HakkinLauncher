@@ -1,31 +1,26 @@
 import 'package:flutter/material.dart';
 
-/// Paleta de color oficial de HakkinLauncher: "Platino & Noche Lunar"
-/// Inspirada en la estética industrial oscura de la Epic Games Store y acentos de platino.
+/// Paleta de colores de HakkinLauncher.
 class AppColors {
   AppColors._();
 
-  // Fondos y Superficies (Noche Profunda & Obsidiana)
-  static const Color background = Color(0xFF090C12); // Fondo base ultra oscuro
-  static const Color surface = Color(0xFF111622); // Paneles y tarjetas
-  static const Color surfaceElevated = Color(0xFF181F2E); // Elementos elevados / hover
-  static const Color surfaceBorder = Color(0xFF232B3E); // Bordes sutiles
+  static const Color background = Color(0xFF090C12);
+  static const Color surface = Color(0xFF111622);
+  static const Color surfaceElevated = Color(0xFF181F2E);
+  static const Color surfaceBorder = Color(0xFF232B3E);
 
-  // Acentos Platino & Lunares
-  static const Color platinum = Color(0xFFE2E8F0); // Platino puro brillante
-  static const Color platinumSheen = Color(0xFFF1F5F9); // Reflejo blanco platino
-  static const Color platinumMuted = Color(0xFF94A3B8); // Plata lunar secundaria
-  static const Color platinumDark = Color(0xFF64748B); // Gris platino apagado
+  static const Color platinum = Color(0xFFE2E8F0);
+  static const Color platinumSheen = Color(0xFFF1F5F9);
+  static const Color platinumMuted = Color(0xFF94A3B8);
+  static const Color platinumDark = Color(0xFF64748B);
 
-  // Acentos Celestiales / Interactivos
-  static const Color celestialBlue = Color(0xFF38BDF8); // Enlaces, progreso y foco
+  static const Color celestialBlue = Color(0xFF38BDF8);
   static const Color celestialBlueDark = Color(0xFF0284C7);
 
-  // Estados
-  static const Color success = Color(0xFF10B981); // Listo para jugar / Instalado
-  static const Color warning = Color(0xFFF59E0B); // Actualización disponible
-  static const Color error = Color(0xFFEF4444); // Fallo de hash / Error
-  static const Color info = Color(0xFF6366F1); // Información / Staging
+  static const Color success = Color(0xFF10B981);
+  static const Color warning = Color(0xFFF59E0B);
+  static const Color error = Color(0xFFEF4444);
+  static const Color info = Color(0xFF6366F1);
 
   // Degradados
   static const LinearGradient heroGradient = LinearGradient(

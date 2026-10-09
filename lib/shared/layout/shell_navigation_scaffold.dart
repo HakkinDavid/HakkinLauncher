@@ -20,7 +20,6 @@ class ShellNavigationScaffold extends StatelessWidget {
       backgroundColor: AppColors.background,
       body: Row(
         children: [
-          // Barra lateral de navegación (Sidebar estilo EGS)
           Container(
             width: 240,
             decoration: const BoxDecoration(
@@ -32,7 +31,6 @@ class ShellNavigationScaffold extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Cabecera con Logotipo Platino
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
                   child: Row(
@@ -91,7 +89,6 @@ class ShellNavigationScaffold extends StatelessWidget {
                 const Divider(),
                 const SizedBox(height: 12),
 
-                // Elementos de Navegación
                 _buildNavItem(
                   context: context,
                   icon: Icons.storefront_outlined,
@@ -119,7 +116,6 @@ class ShellNavigationScaffold extends StatelessWidget {
 
                 const Spacer(),
 
-                // Pie de la barra lateral: Información de plataforma
                 Padding(
                   padding: const EdgeInsets.all(20),
                   child: Container(
@@ -169,7 +165,6 @@ class ShellNavigationScaffold extends StatelessWidget {
             ),
           ),
 
-          // Área de Contenido Principal
           Expanded(
             child: child,
           ),

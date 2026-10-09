@@ -58,7 +58,6 @@ class _AppCardState extends State<AppCard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Poster Art de la Aplicación
               Expanded(
                 child: ClipRRect(
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(11)),
@@ -75,7 +74,6 @@ class _AppCardState extends State<AppCard> {
                       else
                         _buildPlaceholder(),
 
-                      // Gradiente de sombra
                       const DecoratedBox(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
@@ -89,14 +87,12 @@ class _AppCardState extends State<AppCard> {
                         ),
                       ),
 
-                      // Status Badge en esquina superior derecha
                       Positioned(
                         top: 10,
                         right: 10,
                         child: _buildStatusPill(),
                       ),
 
-                      // Categoría en esquina superior izquierda
                       Positioned(
                         top: 10,
                         left: 10,
@@ -107,7 +103,6 @@ class _AppCardState extends State<AppCard> {
                 ),
               ),
 
-              // Metadatos y Título
               Padding(
                 padding: const EdgeInsets.all(12),
                 child: Column(
@@ -135,7 +130,6 @@ class _AppCardState extends State<AppCard> {
                     ),
                     const SizedBox(height: 8),
 
-                    // Barra inferior de compatibilidad
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [

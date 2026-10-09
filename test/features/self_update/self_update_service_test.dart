@@ -17,7 +17,7 @@ void main() {
       expect(SelfUpdateService.isNewerVersion('1.0.0', '1.0.0'), isFalse);
       expect(SelfUpdateService.isNewerVersion('v1.0.0', '1.0.0'), isFalse);
 
-      // Versión anterior (no debe auto-actualizar como novedad)
+      // Versión anterior
       expect(SelfUpdateService.isNewerVersion('0.9.9', '1.0.0'), isFalse);
       expect(SelfUpdateService.isNewerVersion('0.1.0', '1.0.0'), isFalse);
     });

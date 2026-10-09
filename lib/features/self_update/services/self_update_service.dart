@@ -69,12 +69,10 @@ class SelfUpdateService {
     final key = platformKey ?? OsPaths.getCurrentPlatformKey();
     final releases = launcherMeta.releases;
 
-    // 1. Coincidencia exacta
     if (releases.containsKey(key)) {
       return releases[key];
     }
 
-    // 2. Fallbacks ordenados según SO y arquitectura
     final candidateFallbacks = <String>[];
     if (key.startsWith('macos')) {
       candidateFallbacks.addAll(['macos-universal', 'macos', 'macos-arm64', 'macos-x64']);
@@ -115,7 +113,7 @@ mkdir -p "\$(dirname "\$LOG_FILE")"
 exec > >(tee -a "\$LOG_FILE") 2>&1
 echo "=== HakkinLauncher macOS Auto-Update: \$(date) ==="
 
-echo "Esperando a que HakkinLauncher (PID \$CURRENT_PID) finalice..."
+echo "Esperando a que HakkinLauncher finalice, PID: \$CURRENT_PID..."
 COUNT=0
 while kill -0 "\$CURRENT_PID" 2>/dev/null; do
     sleep 0.5
@@ -131,7 +129,7 @@ STAGING_DIR="\$(mktemp -d -t hakkin_staging_XXXXXX)"
 echo "Directorio staging: \$STAGING_DIR"
 
 rollback() {
-    echo "⚠️ ERROR durante la actualización. Activando ROLLBACK de seguridad..."
+    echo "ERROR durante la actualización. Activando rollback de seguridad..."
     if [ -d "\$BACKUP_APP" ]; then
         rm -rf "\$TARGET_APP" 2>/dev/null || true
         cp -R "\$BACKUP_APP" "\$TARGET_APP" 2>/dev/null || mv "\$BACKUP_APP" "\$TARGET_APP"
@@ -256,7 +254,7 @@ echo === Auto-Update Windows Exitoso === >> "%LOG_FILE%"
 exit /b 0
 
 :rollback
-echo ⚠️ ERROR: Fallo durante la actualización. Restaurando desde backup... >> "%LOG_FILE%"
+echo ERROR: Fallo durante la actualización. Restaurando desde backup... >> "%LOG_FILE%"
 if exist "%BACKUP_DIR%" (
     xcopy "%BACKUP_DIR%" "%APP_DIR%\\" /E /I /H /Y /Q >> "%LOG_FILE%" 2>&1
 )
@@ -302,7 +300,7 @@ done
 STAGING_DIR="\$(mktemp -d -t hakkin_staging_XXXXXX)"
 
 rollback() {
-    echo "⚠️ ERROR: Falla al actualizar. Restaurando respaldo de seguridad..."
+    echo "ERROR: Falla al actualizar. Restaurando respaldo de seguridad..."
     if [ -d "\$BACKUP_DIR" ]; then
         rm -rf "\$APP_DIR" 2>/dev/null || true
         cp -a "\$BACKUP_DIR" "\$APP_DIR" 2>/dev/null || mv "\$BACKUP_DIR" "\$APP_DIR"
@@ -380,7 +378,6 @@ rm -f "\$0" 2>/dev/null || true
       return;
     }
 
-    // 1. Descarga del paquete de actualización
     final downloadsDir = await OsPaths.getDownloadsDirectory();
     final updateZipPath = p.join(downloadsDir.path, 'HakkinLauncher_update.zip');
     final zipFile = File(updateZipPath);
@@ -409,7 +406,6 @@ rm -f "\$0" 2>/dev/null || true
         onProgress: (p) {},
       );
 
-      // 2. Verificación criptográfica
       yield const SelfUpdateStatus(
         stage: SelfUpdateStage.verifyingChecksum,
         message: 'Verificando integridad del nuevo lanzador...',
@@ -431,7 +427,6 @@ rm -f "\$0" 2>/dev/null || true
         }
       }
 
-      // 3. Preparación del script de reemplazo y reinicio autónomo
       yield const SelfUpdateStatus(
         stage: SelfUpdateStage.readyToRestart,
         message: 'Preparando reinicio del lanzador...',

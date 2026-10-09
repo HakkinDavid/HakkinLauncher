@@ -27,7 +27,7 @@ class DownloadProgress {
   String get percentageFormatted => '${(progress * 100).toStringAsFixed(1)}%';
 }
 
-/// Servicio de descarga de paquetes y parches con soporte para reanudación HTTP (Range) y métricas.
+/// Servicio de descarga de paquetes y parches con soporte para reanudación HTTP y métricas.
 class DownloaderService {
   final Dio _dio;
 

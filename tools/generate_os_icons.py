@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Herramienta de generación y sincronización de íconos de HakkinLauncher
-para todos los sistemas operativos soportados (macOS, Windows, Linux, Android, iOS).
+para todos los sistemas operativos soportados: macOS, Windows, Linux, Android e iOS.
 
 Fuente de verdad: assets/hakkinlauncher.png
 """
@@ -29,7 +29,7 @@ def resize_png(src_path: Path, dst_path: Path, width: int, height: int):
 def build_ico(png_sizes_map: dict, output_ico_path: Path):
     """
     Construye un archivo .ico de Windows conteniendo múltiples resoluciones PNG.
-    Formato estándar soportado desde Windows Vista / 7 / 10 / 11.
+    Formato estándar soportado en Windows.
     """
     count = len(png_sizes_map)
     header = struct.pack("<HHH", 0, 1, count)
@@ -37,7 +37,6 @@ def build_ico(png_sizes_map: dict, output_ico_path: Path):
     entries = []
     data_blobs = []
     
-    # El offset inicial de datos viene después del header (6 bytes) y los entries (16 bytes cada uno)
     current_offset = 6 + (16 * count)
     
     for size in sorted(png_sizes_map.keys(), reverse=True):
@@ -71,9 +70,9 @@ def main():
     if not SOURCE_ICON.exists():
         raise FileNotFoundError(f"No se encontró el ícono fuente en {SOURCE_ICON}")
 
-    print(f"🎨 Generando íconos para SOs a partir de: {SOURCE_ICON.relative_to(WORKSPACE_ROOT)}")
+    print(f"Generando íconos para sistemas operativos a partir de: {SOURCE_ICON.relative_to(WORKSPACE_ROOT)}")
 
-    # 1. macOS Icons (macos/Runner/Assets.xcassets/AppIcon.appiconset)
+    # 1. macOS Icons
     macos_dir = WORKSPACE_ROOT / "macos" / "Runner" / "Assets.xcassets" / "AppIcon.appiconset"
     macos_sizes = {
         "app_icon_16.png": 16,
@@ -89,7 +88,7 @@ def main():
         resize_png(SOURCE_ICON, dst, sz, sz)
         print(f"  [macOS] {filename} ({sz}x{sz})")
 
-    # 2. iOS Icons (ios/Runner/Assets.xcassets/AppIcon.appiconset)
+    # 2. iOS Icons
     ios_dir = WORKSPACE_ROOT / "ios" / "Runner" / "Assets.xcassets" / "AppIcon.appiconset"
     ios_sizes = {
         "Icon-App-20x20@1x.png": 20,
@@ -113,7 +112,7 @@ def main():
         resize_png(SOURCE_ICON, dst, sz, sz)
         print(f"  [iOS] {filename} ({sz}x{sz})")
 
-    # 3. Android Mipmaps (android/app/src/main/res/mipmap-*/ic_launcher.png)
+    # 3. Android Mipmaps
     android_res = WORKSPACE_ROOT / "android" / "app" / "src" / "main" / "res"
     android_sizes = {
         "mipmap-mdpi": 48,
@@ -127,7 +126,7 @@ def main():
         resize_png(SOURCE_ICON, dst, sz, sz)
         print(f"  [Android] {folder}/ic_launcher.png ({sz}x{sz})")
 
-    # 4. Windows .ico (windows/runner/resources/app_icon.ico y assets/hakkinlauncher.ico)
+    # 4. Windows .ico
     ico_sizes = [256, 128, 64, 48, 32, 16]
     ico_png_map = {}
     with tempfile.TemporaryDirectory() as tmp_dir:
@@ -145,7 +144,7 @@ def main():
         build_ico(ico_png_map, assets_ico_dst)
         print(f"  [Assets] hakkinlauncher.ico -> {assets_ico_dst.relative_to(WORKSPACE_ROOT)}")
 
-    print("✅ Todos los íconos del sistema operativo fueron generados con éxito.")
+    print("Todos los íconos del sistema operativo fueron generados con éxito.")
 
 if __name__ == "__main__":
     main()

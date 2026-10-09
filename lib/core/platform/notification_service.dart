@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:local_notifier/local_notifier.dart';
 
-/// Servicio centralizado de notificaciones nativas de escritorio (macOS, Windows, Linux).
+/// Servicio centralizado de notificaciones nativas de escritorio.
 class NotificationService {
   NotificationService._();
 
@@ -55,7 +55,7 @@ class NotificationService {
   /// Notificación de instalación completada.
   static Future<void> notifyInstallCompleted(String appTitle) async {
     await showNotification(
-      title: '¡Instalación completada!',
+      title: 'Instalación completada',
       body: '$appTitle está listo para ejecutarse.',
     );
   }
@@ -63,7 +63,7 @@ class NotificationService {
   /// Notificación de actualización completada.
   static Future<void> notifyUpdateCompleted(String appTitle, String version) async {
     await showNotification(
-      title: '¡Actualización completada!',
+      title: 'Actualización completada',
       body: '$appTitle se ha actualizado con éxito a la versión v$version.',
     );
   }

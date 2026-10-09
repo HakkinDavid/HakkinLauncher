@@ -2,21 +2,21 @@
 """
 scripts/release_hash_manager.py
 --------------------------------
-Gestor criptográfico y Single Source of Truth (SSOT) para releases de HakkinLauncher.
+Gestor criptográfico para releases de HakkinLauncher.
 
 Responsabilidades:
-1. Hash de Fuentes: Calcula el hash SHA-256 compuesto de las fuentes Flutter (lib/, pubspec.yaml, runner nativo).
+1. Hash de Fuentes: Calcula el hash SHA-256 compuesto de las fuentes Flutter.
 2. Caché Local: Evita re-compilar binarios si el artefacto empaquetado existe y las fuentes no cambiaron.
-3. Evaluación y Manifiesto de Release (SSOT):
-   - Descarga e inspecciona `version_manifest.json` del último release en GitHub.
+3. Evaluación y Manifiesto de Release:
+   - Descarga e inspecciona version_manifest.json del último release en GitHub.
    - Compara los hashes locales contra los remotos por cada plataforma.
-   - Si NADA cambió: Cancela la operación sin subir duplicados (NOTHING_TO_DO).
-   - Si cambiaron binarios (o se añadieron nuevos):
+   - Si no hubo cambios: Cancela la operación sin subir duplicados.
+   - Si cambiaron binarios o se añadieron nuevos:
      - Crea la nueva versión con el tag especificado.
-     - Identifica los binarios que SÍ cambiaron para subirlos (UPDATED).
-     - Identifica los binarios intactos para referenciarlos a su release de origen (PRESERVED).
-     - Genera `build/release/version_manifest.json` y `build/release/release_notes.md`.
-     - Sincroniza `tools/launcher_meta.json` y regenera el catálogo (`docs/catalog.json`).
+     - Identifica los binarios actualizados para subirlos.
+     - Identifica los binarios intactos para referenciarlos a su release de origen.
+     - Genera build/release/version_manifest.json y build/release/release_notes.md.
+     - Sincroniza tools/launcher_meta.json y regenera el catálogo.
 """
 
 import os
@@ -39,22 +39,22 @@ TARGET_CONFIG = {
     "macos-arm64": {
         "filename": "HakkinLauncher-macos-arm64.zip",
         "path": os.path.join(BUILD_DIR, "HakkinLauncher-macos-arm64.zip"),
-        "display_name": "macOS (Apple Silicon arm64)",
+        "display_name": "macOS arm64",
     },
     "macos-x64": {
         "filename": "HakkinLauncher-macos-x64.zip",
         "path": os.path.join(BUILD_DIR, "HakkinLauncher-macos-x64.zip"),
-        "display_name": "macOS (Intel x86_64)",
+        "display_name": "macOS x64",
     },
     "windows-x64": {
         "filename": "HakkinLauncher-windows-x64.zip",
         "path": os.path.join(BUILD_DIR, "HakkinLauncher-windows-x64.zip"),
-        "display_name": "Windows (x86_64 Desktop)",
+        "display_name": "Windows x64",
     },
     "linux-x64": {
         "filename": "HakkinLauncher-linux-x64.zip",
         "path": os.path.join(BUILD_DIR, "HakkinLauncher-linux-x64.zip"),
-        "display_name": "Linux (x86_64 Desktop)",
+        "display_name": "Linux x64",
     },
 }
 
@@ -77,7 +77,7 @@ def compute_source_hash(target=None):
     Calcula un hash compuesto de todo el contenido relevante de Flutter:
     - lib/
     - pubspec.yaml, pubspec.lock
-    - carpeta de plataforma nativa correspondiente (macos/, windows/, linux/)
+    - carpeta de plataforma nativa correspondiente: macos, windows, linux
     """
     h = hashlib.sha256()
     search_dirs = [os.path.join(WORKSPACE_ROOT, "lib")]
@@ -244,7 +244,7 @@ def get_git_commit():
 
 def evaluate_release(local_files, remote_manifest_text, new_tag, force=False):
     """
-    Función central de evaluación de release basada en version_manifest.json (SSOT).
+    Función central de evaluación de release basada en version_manifest.json.
     Compara los binarios locales con el manifiesto del último release.
     """
     os.makedirs(BUILD_DIR, exist_ok=True)
@@ -331,7 +331,7 @@ def evaluate_release(local_files, remote_manifest_text, new_tag, force=False):
         action = "CREATE_RELEASE"
         reason = f"Se publicará el release {new_tag} con {len(updated_platforms)} binario(s) actualizado(s) y {len(preserved_platforms)} preservado(s)."
 
-    # Construir el nuevo version_manifest.json (SSOT)
+    # Construir el nuevo version_manifest.json
     manifest_data = {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "format_version": "1.0",
@@ -375,9 +375,9 @@ def evaluate_release(local_files, remote_manifest_text, new_tag, force=False):
         sha_short = b["sha256"][:12] + "..." if b["sha256"] else "N/A"
         
         if b["status"] == "UPDATED":
-            link_label = f"Descargar ({display_tag})"
+            link_label = f"Descargar {display_tag}"
         else:
-            link_label = f"Descargar ({b['origin_release']})"
+            link_label = f"Descargar {b['origin_release']}"
 
         url = b.get("download_url", "#")
         notes_lines.append(
@@ -415,7 +415,7 @@ def sync_catalog():
             check=True,
             cwd=WORKSPACE_ROOT
         )
-        print("✅ Catálogo de HakkinLauncher sincronizado exitosamente con la nueva versión.")
+        print("Catálogo de HakkinLauncher sincronizado exitosamente con la nueva versión.")
         return True
     except Exception as e:
         print(f"Error sincronizando catálogo: {e}", file=sys.stderr)
@@ -423,7 +423,7 @@ def sync_catalog():
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Gestor criptográfico y SSOT para releases de HakkinLauncher.")
+    parser = argparse.ArgumentParser(description="Gestor criptográfico para releases de HakkinLauncher.")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     # Subcomando: source-hash
@@ -439,7 +439,7 @@ def main():
     p_upd.add_argument("--target", required=True, choices=["macos-arm64", "macos-x64", "windows-x64", "linux-x64", "macos", "windows", "linux"])
 
     # Subcomando: eval-release
-    p_eval = subparsers.add_parser("eval-release", help="Evalúa el release contra el version_manifest remoto (SSOT)")
+    p_eval = subparsers.add_parser("eval-release", help="Evalúa el release contra el version_manifest remoto")
     p_eval.add_argument("--remote-manifest", default="", help="Texto o ruta de version_manifest.json del release anterior")
     p_eval.add_argument("--new-tag", required=True, help="Nuevo tag de versión")
     p_eval.add_argument("--force", action="store_true", help="Fuerza actualización de todas las plataformas")
@@ -450,7 +450,7 @@ def main():
 
     args = parser.parse_args()
 
-    # Normalizar targets simplificados (e.g. macos -> macos-arm64 o macos-x64)
+    # Normalizar targets simplificados: macos a macos-arm64 o macos-x64
     def normalize_target(t):
         if t == "macos":
             import platform

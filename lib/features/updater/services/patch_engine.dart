@@ -40,8 +40,8 @@ class UpdateStatus {
   });
 }
 
-/// Motor de instalación y actualización inteligente con soporte para Catálogo Histórico v2.0,
-/// Delta Patching unidireccional y Flujo de Instalación Limpia para versiones anteriores.
+/// Motor de instalación y actualización con soporte para catálogo de versiones,
+/// parches diferenciales e instalación limpia para versiones anteriores.
 class PatchEngine {
   final DownloaderService _downloader;
   final LibraryRepository _libraryRepository;
@@ -103,16 +103,14 @@ class PatchEngine {
       customInstallPath ?? installed?.installDirectory ?? p.join(defaultAppsDir.path, app.slug),
     );
 
-    // Detección de instalación de versión anterior (Downgrade)
     final isOlderTarget = installed != null &&
         _isOlderVersion(targetVersionStr, installed.installedVersion);
     final requiresCleanInstall = isCleanInstall || isOlderTarget;
 
-    // 1. FLUJO DE INSTALACIÓN LIMPIA (Obligatorio para versiones anteriores o solicitado)
     if (requiresCleanInstall) {
       yield UpdateStatus(
         stage: UpdateStage.preservingUserData,
-        message: 'Iniciando instalación limpia de v$targetVersionStr (protegiendo datos)...',
+        message: 'Iniciando instalación limpia de v$targetVersionStr y protegiendo datos...',
         progress: 0.1,
       );
 
@@ -208,12 +206,12 @@ class PatchEngine {
         await CleanerService.cleanTemporaryFiles();
 
         await NotificationService.notifyInstallCompleted(
-          '${app.title} (Instalación Limpia v$targetVersionStr)',
+          '${app.title} - Instalación limpia v$targetVersionStr',
         );
 
         yield UpdateStatus(
           stage: UpdateStage.completed,
-          message: '¡Instalación limpia de v$targetVersionStr completada con éxito!',
+          message: 'Instalación limpia de v$targetVersionStr completada con éxito.',
           progress: 1.0,
         );
         return;
@@ -227,7 +225,6 @@ class PatchEngine {
       }
     }
 
-    // 2. ACTUALIZACIÓN HACIA ADELANTE (Intentar Delta Update si aplica)
     bool shouldAttemptDelta = false;
     DeltaUpdate? matchedDelta;
 
@@ -333,16 +330,15 @@ class PatchEngine {
 
         yield const UpdateStatus(
           stage: UpdateStage.completed,
-          message: '¡Actualización diferencial completada con éxito!',
+          message: 'Actualización diferencial completada con éxito.',
           progress: 1.0,
         );
         return;
       }
 
-      debugPrint('Activando descarga limpia de paquete completo (Fallback)');
+      debugPrint('Activando descarga limpia de paquete completo como alternativa.');
     }
 
-    // 3. DESCARGA DE PAQUETE COMPLETO (Instalación limpia inicial o Fallback)
     final pkg = targetRelease.package;
     yield UpdateStatus(
       stage: UpdateStage.downloading,
@@ -461,7 +457,7 @@ class PatchEngine {
 
       yield const UpdateStatus(
         stage: UpdateStage.completed,
-        message: '¡Instalación completada correctamente!',
+        message: 'Instalación completada correctamente.',
         progress: 1.0,
       );
     } catch (e) {

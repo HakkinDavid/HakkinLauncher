@@ -29,7 +29,6 @@ class HeroCarousel extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            // Imagen de fondo del Hero
             if (featuredApp.assets.banner != null &&
                 featuredApp.assets.banner!.startsWith('http'))
               Image.network(
@@ -40,7 +39,6 @@ class HeroCarousel extends StatelessWidget {
             else
               _buildPlaceholder(),
 
-            // Gradientes cinematográficos
             const DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -57,7 +55,6 @@ class HeroCarousel extends StatelessWidget {
               ),
             ),
 
-            // Contenido textual y CTA
             Padding(
               padding: const EdgeInsets.all(36),
               child: Column(

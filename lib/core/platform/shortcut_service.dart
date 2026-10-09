@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 
-/// Servicio para registrar aplicaciones en el sistema operativo (Accesos directos, Menú Inicio, .desktop).
+/// Servicio para registrar accesos directos de aplicaciones en el sistema operativo.
 class ShortcutService {
   ShortcutService._();
 
@@ -33,7 +33,6 @@ class ShortcutService {
         );
       } else if (Platform.isMacOS) {
         final desktopPath = p.join(userHome, 'Desktop', appTitle);
-        // En macOS, crear symlink
         final link = Link(desktopPath);
         if (await link.exists()) await link.delete();
         await link.create(executablePath);
@@ -45,7 +44,7 @@ class ShortcutService {
     return false;
   }
 
-  /// Crea un acceso directo en el Menú Inicio (Windows) o en ~/.local/share/applications/ (Linux).
+  /// Crea un acceso directo en el menú de aplicaciones del sistema.
   static Future<bool> createStartMenuEntry({
     required String appTitle,
     required String executablePath,

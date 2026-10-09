@@ -1,7 +1,7 @@
 import 'dart:io';
 import '../platform/os_paths.dart';
 
-/// Servicio de Higiene y Mantenimiento (Housekeeping) del sistema.
+/// Servicio de mantenimiento del sistema.
 class CleanerService {
   CleanerService._();
 
@@ -25,9 +25,7 @@ class CleanerService {
           }
         }
       }
-    } catch (_) {
-      // Registrar en log pero no interrumpir flujo
-    }
+    } catch (_) {}
     return deletedCount;
   }
 

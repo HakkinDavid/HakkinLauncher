@@ -33,7 +33,6 @@ class LibraryScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Título de la Biblioteca
             const Text(
               'Mi Biblioteca',
               style: TextStyle(
@@ -52,8 +51,6 @@ class LibraryScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 24),
-
-            // Contenido de la Biblioteca
             Expanded(
               child: installedAppsAsync.when(
                 loading: () => const Center(
@@ -117,7 +114,6 @@ class LibraryScreen extends ConsumerWidget {
                         ),
                         child: Row(
                           children: [
-                            // Icono
                             Container(
                               width: 56,
                               height: 56,
@@ -133,7 +129,6 @@ class LibraryScreen extends ConsumerWidget {
                             ),
                             const SizedBox(width: 16),
 
-                            // Información de la App
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -159,7 +154,7 @@ class LibraryScreen extends ConsumerWidget {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    'Versión instalada: v${installedApp.installedVersion}${hasUpdate ? " (Nueva v${catalogApp.latestVersion} disponible)" : ""}',
+                                    'Versión instalada: v${installedApp.installedVersion}${hasUpdate ? " - Actualización v${catalogApp.latestVersion} disponible" : ""}',
                                     style: TextStyle(
                                       color: hasUpdate
                                           ? AppColors.warning
@@ -183,7 +178,6 @@ class LibraryScreen extends ConsumerWidget {
                               ),
                             ),
 
-                            // Acciones
                             if (hasUpdate && catalogApp != null) ...[
                               HakkinButton(
                                 text: 'Actualizar',
@@ -208,7 +202,6 @@ class LibraryScreen extends ConsumerWidget {
                             ),
                             const SizedBox(width: 10),
 
-                            // Menú de opciones avanzadas
                             PopupMenuButton<String>(
                               icon: const Icon(Icons.more_vert, color: AppColors.platinumMuted),
                               color: AppColors.surfaceElevated,

@@ -199,7 +199,7 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
                                                     return DropdownMenuItem<String>(
                                                       value: v,
                                                       child: Text(
-                                                        isLatest ? 'v$v (Reciente)' : 'v$v',
+                                                        isLatest ? 'v$v - Reciente' : 'v$v',
                                                         style: const TextStyle(
                                                           color: AppColors.platinum,
                                                           fontSize: 12,
@@ -494,7 +494,7 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
                                 _buildMetaRow(
                                   'Soporte Diferencial',
                                   selectedRelease.deltaPatches.isNotEmpty
-                                      ? 'Disponible (${selectedRelease.deltaPatches.length} parches)'
+                                      ? 'Disponible: ${selectedRelease.deltaPatches.length} parches'
                                       : 'Solo descarga completa',
                                 ),
                                 _buildMetaRow(
@@ -556,10 +556,9 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
     }
 
     if (isInstalled && installedApp != null) {
-      // 1. Misma versión instalada
       if (selectedVersionStr == installedApp.installedVersion) {
         return HakkinButton(
-          text: 'Jugar / Abrir (v$selectedVersionStr)',
+          text: 'Jugar / Abrir - v$selectedVersionStr',
           icon: Icons.play_arrow,
           variant: HakkinButtonVariant.successPlay,
           onPressed: () {
@@ -568,10 +567,9 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
         );
       }
 
-      // 2. Versión anterior seleccionada: INSTALACIÓN LIMPIA CON ADVERTENCIA
       if (_isOlder(selectedVersionStr, installedApp.installedVersion)) {
         return HakkinButton(
-          text: 'Instalación Limpia (v$selectedVersionStr)',
+          text: 'Instalación Limpia - v$selectedVersionStr',
           icon: Icons.warning_amber_rounded,
           variant: HakkinButtonVariant.secondary,
           onPressed: () {
@@ -584,7 +582,6 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
         );
       }
 
-      // 3. Versión posterior seleccionada: ACTUALIZAR
       return HakkinButton(
         text: 'Actualizar a v$selectedVersionStr',
         icon: Icons.arrow_circle_up,
@@ -598,7 +595,6 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
       );
     }
 
-    // No instalado
     return HakkinButton(
       text: 'Instalar v$selectedVersionStr',
       icon: Icons.download,
@@ -638,7 +634,7 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
         content: Text(
           'Tienes instalada la versión $currentVersion.\n\n'
           'HakkinLauncher no permite degradar versiones sobre la instalación activa. '
-          'Para cambiar a la versión anterior ($targetVersion), se realizará una instalación limpia desde cero.\n\n'
+          'Para cambiar a la versión anterior, v$targetVersion, se realizará una instalación limpia desde cero.\n\n'
           'Tus datos de usuario y partidas guardadas serán aislados y restaurados automáticamente.\n\n'
           '¿Deseas proceder?',
           style: const TextStyle(color: AppColors.platinumMuted, fontSize: 13, height: 1.4),

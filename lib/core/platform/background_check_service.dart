@@ -39,7 +39,6 @@ class BackgroundCheckService {
       final manifest = await _catalogRepository.fetchCatalog(forceRefresh: true);
       final installedApps = await _libraryRepository.getInstalledApps();
 
-      // 1. Comprobar actualizaciones de aplicaciones y juegos
       for (final installed in installedApps) {
         final catalogApp = manifest.apps.where((a) => a.id == installed.id).firstOrNull;
         if (catalogApp != null && catalogApp.latestVersion != installed.installedVersion) {
@@ -53,7 +52,6 @@ class BackgroundCheckService {
         }
       }
 
-      // 2. Comprobar si el propio lanzador tiene actualización
       if (manifest.launcherMeta != null) {
         final latestLauncher = manifest.launcherMeta!.latestVersion;
         if (SelfUpdateService.isNewerVersion(latestLauncher, AppConstants.appVersion)) {
@@ -70,7 +68,7 @@ class BackgroundCheckService {
       if (!silent) {
         if (updatesFound.isNotEmpty) {
           final summary = updatesFound.entries
-              .map((e) => '${e.key} (v${e.value})')
+              .map((e) => '${e.key} v${e.value}')
               .join(', ');
           await NotificationService.showNotification(
             title: 'Actualizaciones encontradas',

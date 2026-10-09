@@ -53,13 +53,11 @@ class StoreScreen extends ConsumerWidget {
 
           return CustomScrollView(
             slivers: [
-              // Barra Superior con Buscador y Filtros
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(32, 28, 32, 20),
                   child: Row(
                     children: [
-                      // Buscador
                       Expanded(
                         child: TextField(
                           onChanged: (val) =>
@@ -72,7 +70,6 @@ class StoreScreen extends ConsumerWidget {
                       ),
                       const SizedBox(width: 16),
 
-                      // Chips de Categoría
                       _buildCategoryChip(ref, 'all', 'Todos'),
                       const SizedBox(width: 8),
                       _buildCategoryChip(ref, 'game', 'Juegos'),
@@ -83,7 +80,6 @@ class StoreScreen extends ConsumerWidget {
                 ),
               ),
 
-              // Hero Destacado
               if (featured != null && ref.watch(searchQueryProvider).isEmpty)
                 SliverToBoxAdapter(
                   child: Padding(
@@ -95,7 +91,6 @@ class StoreScreen extends ConsumerWidget {
                   ),
                 ),
 
-              // Cabecera de la Grilla
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(32, 24, 32, 16),
@@ -130,7 +125,6 @@ class StoreScreen extends ConsumerWidget {
                 ),
               ),
 
-              // Grilla de Aplicaciones / Juegos estilo EGS
               SliverPadding(
                 padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
                 sliver: SliverGrid(

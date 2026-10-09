@@ -15,7 +15,7 @@ class HashValidator {
     return output.toString().toLowerCase();
   }
 
-  /// Verifica si el archivo coincide con el hash esperado (ignorando mayúsculas/minúsculas).
+  /// Verifica si el archivo coincide con el hash esperado.
   static Future<bool> verifySha256(File file, String expectedSha256) async {
     final actual = await calculateSha256(file);
     return actual.trim().toLowerCase() == expectedSha256.trim().toLowerCase();

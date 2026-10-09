@@ -2,11 +2,10 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 
-/// Servicio para la ejecución y monitorización de procesos (juegos, apps, scripts).
+/// Servicio para la ejecución y monitorización de procesos.
 class ProcessLauncher {
   ProcessLauncher._();
 
-  // Registro de procesos activos en ejecución mapeados por ID de app
   static final Map<String, Process> _runningProcesses = {};
   static final StreamController<Map<String, bool>> _runningStateController =
       StreamController<Map<String, bool>>.broadcast();
@@ -38,7 +37,6 @@ class ProcessLauncher {
         return false;
       }
 
-      // Asegurar permisos de ejecución en Unix
       if (Platform.isMacOS || Platform.isLinux) {
         await Process.run('chmod', ['+x', executablePath]);
       }
@@ -55,7 +53,6 @@ class ProcessLauncher {
       _runningProcesses[appId] = process;
       _notifyStateChange();
 
-      // Escuchar el cierre del proceso
       process.exitCode.then((exitCode) {
         debugPrint('App $appId finalizó con código: $exitCode');
         _runningProcesses.remove(appId);
@@ -71,7 +68,7 @@ class ProcessLauncher {
     }
   }
 
-  /// Ejecuta un script pre o post instalación (soporta .bat/.ps1 en Windows, .sh en Unix).
+  /// Ejecuta un script previo o posterior a la instalación.
   static Future<bool> runScript({
     required String scriptPath,
     required String workingDirectory,

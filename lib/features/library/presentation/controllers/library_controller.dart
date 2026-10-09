@@ -55,7 +55,7 @@ class InstalledAppsNotifier extends StateNotifier<AsyncValue<List<InstalledApp>>
     }
   }
 
-  /// Verifica la integridad de la aplicación instalada (estilo Steam / Epic).
+  /// Verifica la integridad de la aplicación instalada.
   Future<Map<String, dynamic>> verifyAppIntegrity(String id) async {
     final app = await _repo.getInstalledApp(id);
     if (app == null) {
@@ -70,7 +70,6 @@ class InstalledAppsNotifier extends StateNotifier<AsyncValue<List<InstalledApp>>
       };
     }
 
-    // Consultar el hash esperado en el catálogo
     final manifestAsync = _ref.read(catalogManifestProvider);
     final manifest = manifestAsync.value;
     if (manifest != null) {
@@ -79,10 +78,9 @@ class InstalledAppsNotifier extends StateNotifier<AsyncValue<List<InstalledApp>>
       if (release != null) {
         final versionInfo = release.getRelease(app.installedVersion) ?? release.latestRelease;
         if (versionInfo.package.sha256.isNotEmpty) {
-          // En una verificación básica, corroboramos accesibilidad y tamaño
           final size = await exeFile.length();
           if (size == 0) {
-            return {'isValid': false, 'message': 'El archivo ejecutable está vacío (0 bytes)'};
+            return {'isValid': false, 'message': 'El archivo ejecutable está vacío'};
           }
         }
       }

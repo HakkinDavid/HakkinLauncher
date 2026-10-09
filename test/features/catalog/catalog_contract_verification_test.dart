@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hakkin_launcher/features/catalog/data/models/app_entry.dart';
 
 void main() {
-  group('Catalog Contract Verification Tests v2.0 (HakkinDavid & Bonsanbec)', () {
+  group('Catalog Contract Verification Tests v2.0', () {
     const catalogPath = 'docs/catalog.json';
     const examplePath = 'docs/catalog_example.json';
 
@@ -69,7 +69,7 @@ void main() {
         }
       }
 
-      // 1. Verificación de tecate-simulator (Videojuego social con soporte dual Windows y macOS)
+      // 1. Verificación de tecate-simulator
       final tecate = manifest.apps.firstWhere((a) => a.id == 'com.bonsanbec.tecate-simulator');
       expect(tecate.title, 'Tecate Simulator');
       expect(tecate.category, 'game');
@@ -95,18 +95,18 @@ void main() {
       expect(tecateMac.getRelease('0.0.1'), isNotNull);
       expect(tecateMac.getRelease('0.0.1')!.package.sizeBytes, 798030827);
 
-      // 2. Verificación de fractochales (Simulación de rayos con main.exe)
+      // 2. Verificación de fractochales
       final fracto = manifest.apps.firstWhere((a) => a.id == 'com.bonsanbec.fractochales');
       expect(fracto.title, 'Fractochales');
       final fractoWin = fracto.getPlatformRelease('windows-x64')!;
       expect(fractoWin.latestRelease.executableRelativePath, 'main.exe');
       expect(fractoWin.latestRelease.package.sizeBytes, 23238440);
 
-      // 3. Verificación de firefighter-form (Bomberos Tijuana con bomberos.exe)
+      // 3. Verificación de firefighter-form
       final bomberos = manifest.apps.firstWhere((a) => a.id == 'com.hakkin.firefighter-form');
       expect(bomberos.getPlatformRelease('windows-x64')!.latestRelease.executableRelativePath, 'bomberos.exe');
 
-      // 4. Verificación de smart-scheduler (Multi-versión con 2.5.0 y 2.0.0 y Delta Patch)
+      // 4. Verificación de smart-scheduler
       final scheduler = manifest.apps.firstWhere((a) => a.id == 'com.hakkin.smart-scheduler');
       final schedulerMac = scheduler.getPlatformRelease('macos-arm64')!;
       expect(schedulerMac.versions.length, 2, reason: 'smart-scheduler must contain 2 versions');
@@ -121,7 +121,7 @@ void main() {
       expect(schedulerDelta!.patchFormat, 'hdiff');
       expect(schedulerDelta.sizeBytes, 1420500);
 
-      // 5. Verificación de languages-autohotkey (Multi-versión con ejecutables dispares por versión)
+      // 5. Verificación de languages-autohotkey
       final languages = manifest.apps.firstWhere((a) => a.id == 'com.hakkin.languages-autohotkey');
       final languagesWin = languages.getPlatformRelease('windows-x64')!;
       expect(languagesWin.versions.length, 2, reason: 'languages-autohotkey must have 2 versions');

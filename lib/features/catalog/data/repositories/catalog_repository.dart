@@ -36,7 +36,6 @@ class CatalogRepository {
     final prefs = await SharedPreferences.getInstance();
     final url = await getCatalogUrl();
 
-    // 1. Intentar descargar en caliente
     try {
       final response = await _dio.get<String>(
         url,
@@ -45,19 +44,16 @@ class CatalogRepository {
 
       if (response.statusCode == 200 && response.data != null) {
         final jsonStr = response.data!;
-        // Validar que sea JSON parseable
         final decoded = jsonDecode(jsonStr) as Map<String, dynamic>;
         final manifest = CatalogManifest.fromJson(decoded);
 
-        // Guardar en caché local
         await prefs.setString(AppConstants.prefCachedCatalogJson, jsonStr);
         return manifest;
       }
     } catch (_) {
-      // Si falla la red, continuamos al fallback
+      // Continuar con caché local si la solicitud de red falla
     }
 
-    // 2. Fallback a caché local persistente
     final cached = prefs.getString(AppConstants.prefCachedCatalogJson);
     if (cached != null && cached.isNotEmpty) {
       try {
@@ -66,13 +62,11 @@ class CatalogRepository {
       } catch (_) {}
     }
 
-    // 3. Fallback a asset local precargado
     try {
       final bundledStr = await rootBundle.loadString('docs/catalog_example.json');
       final decoded = jsonDecode(bundledStr) as Map<String, dynamic>;
       return CatalogManifest.fromJson(decoded);
     } catch (e) {
-      // Manifiesto vacío de emergencia
       return const CatalogManifest(
         version: '1.0.0',
         catalogTimestamp: '',

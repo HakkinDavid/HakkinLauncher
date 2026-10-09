@@ -37,7 +37,6 @@ class UpdateProgressNotifier extends StateNotifier<Map<String, UpdateStatus>> {
       state = {...state, app.id: status};
 
       if (status.stage == UpdateStage.completed) {
-        // Refrescar biblioteca tras completar
         _ref.read(installedAppsProvider.notifier).loadApps();
       }
     }
