@@ -40,15 +40,7 @@ jobs:
         with:
           channel: 'stable'
           cache: true
-          cache-key-secret: ${{ runner.os }}-flutter
-
-      - name: Cache Pub Dependencies
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.LOCALAPPDATA }}\Pub\Cache
-          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pub-
+          pub-cache: true
 
       - name: Enable Windows Desktop & Precache
         run: |
@@ -99,15 +91,7 @@ jobs:
         with:
           channel: 'stable'
           cache: true
-          cache-key-secret: ${{ runner.os }}-flutter
-
-      - name: Cache Pub Dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.pub-cache
-          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pub-
+          pub-cache: true
 
       - name: Enable Linux Desktop & Precache
         run: |
@@ -150,15 +134,7 @@ jobs:
         with:
           channel: 'stable'
           cache: true
-          cache-key-secret: ${{ runner.os }}-flutter
-
-      - name: Cache Pub Dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.pub-cache
-          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pub-
+          pub-cache: true
 
       - name: Enable macOS Desktop & Precache
         run: |
