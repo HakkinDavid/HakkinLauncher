@@ -367,8 +367,6 @@ def evaluate_release(local_files, remote_manifest_text, new_tag, force=False):
     notes_lines = [
         f"Versión de release correspondiente a `{now_utc[:19]} UTC` (Commit: `{commit_sha[:10]}`).",
         "",
-        "### 📦 Binarios y Plataformas Disponibles",
-        "",
         "| Plataforma | Archivo | Tamaño | SHA-256 | Descarga |",
         "| :--- | :--- | :--- | :--- | :--- |"
     ]
