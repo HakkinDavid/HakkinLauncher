@@ -140,6 +140,7 @@ jobs:
       - name: Enable macOS Desktop & Precache
         run: |
           flutter config --enable-macos-desktop
+          flutter config --no-enable-swift-package-manager
           flutter precache --macos
 
       - name: Install Dependencies
