@@ -690,12 +690,15 @@ def generate_catalog(
             "summary": meta.get("summary", ""),
             "description_markdown": meta.get("description_markdown", ""),
             "tags": meta.get("tags", []),
-            "assets": meta.get("assets", {
-                "icon": None,
-                "poster": None,
-                "banner": None,
-                "screenshots": []
-            }),
+            "assets": {
+                "icon": (meta.get("assets", {}).get("icon") if meta.get("assets", {}).get("icon") and not any(p in meta.get("assets", {}).get("icon", "") for p in ["unsplash.com", "placeholder"]) else None),
+                "poster": (meta.get("assets", {}).get("poster") if meta.get("assets", {}).get("poster") and not any(p in meta.get("assets", {}).get("poster", "") for p in ["unsplash.com", "placeholder"]) else None),
+                "banner": (meta.get("assets", {}).get("banner") if meta.get("assets", {}).get("banner") and not any(p in meta.get("assets", {}).get("banner", "") for p in ["unsplash.com", "placeholder"]) else None),
+                "screenshots": [
+                    s for s in (meta.get("assets", {}).get("screenshots") or [])
+                    if s and not any(p in s for p in ["unsplash.com", "placeholder"])
+                ]
+            },
             "latest_version": app_latest_version or "1.0.0",
             "platforms": platforms_dict
         }
