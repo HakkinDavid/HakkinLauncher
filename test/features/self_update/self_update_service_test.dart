@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hakkin_launcher/core/constants/app_constants.dart';
 import 'package:hakkin_launcher/features/catalog/data/models/app_entry.dart';
@@ -114,10 +113,10 @@ void main() {
     test('generateMacOSUpdateScript contains staging, atomic swap, and rollback', () {
       final script = SelfUpdateService.generateMacOSUpdateScript(
         currentPid: 12345,
-        currentExePath: '/Applications/HakkinLauncher.app/Contents/MacOS/hakkin_launcher',
+        currentExePath: '/Applications/HakkinLauncher.app/Contents/MacOS/HakkinLauncher',
         targetAppPath: '/Applications/HakkinLauncher.app',
-        zipFilePath: '/tmp/downloads/hakkin_launcher_update.zip',
-        logFilePath: '/tmp/downloads/hakkin_self_update.log',
+        zipFilePath: '/tmp/downloads/HakkinLauncher_update.zip',
+        logFilePath: '/tmp/downloads/HakkinLauncher_self_update.log',
       );
 
       expect(script, contains('CURRENT_PID="12345"'));
@@ -138,7 +137,7 @@ void main() {
     test('generateWindowsUpdateScript contains staging, backup, and rollback', () {
       final script = SelfUpdateService.generateWindowsUpdateScript(
         currentPid: 54321,
-        currentExePath: r'C:\Hakkin\hakkin_launcher.exe',
+        currentExePath: r'C:\Hakkin\HakkinLauncher.exe',
         appDir: r'C:\Hakkin',
         zipFilePath: r'C:\Hakkin\Downloads\update.zip',
         logFilePath: r'C:\Hakkin\Downloads\update.log',
@@ -158,7 +157,7 @@ void main() {
     test('generateLinuxUpdateScript contains staging, backup, and rollback', () {
       final script = SelfUpdateService.generateLinuxUpdateScript(
         currentPid: 9876,
-        currentExePath: '/opt/hakkin/hakkin_launcher',
+        currentExePath: '/opt/hakkin/HakkinLauncher',
         appDir: '/opt/hakkin',
         zipFilePath: '/tmp/update.zip',
         logFilePath: '/tmp/update.log',

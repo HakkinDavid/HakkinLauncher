@@ -130,7 +130,9 @@ class HeroCarousel extends StatelessWidget {
   }
 
   Widget _buildPlaceholder() {
-    if (widget.featuredApp.id == 'com.hakkin.launcher' || widget.featuredApp.id == 'hakkin_launcher') {
+    if (featuredApp.id == 'dev.bonsanbec.hakkinlauncher' ||
+        featuredApp.id == 'hakkin_launcher' ||
+        featuredApp.id == 'HakkinLauncher') {
       return Image.asset(AppConstants.appIconPath, fit: BoxFit.cover);
     }
     return Container(

@@ -186,7 +186,9 @@ class _AppCardState extends State<AppCard> {
   }
 
   Widget _buildPlaceholder() {
-    if (widget.app.id == 'com.hakkin.launcher' || widget.app.id == 'hakkin_launcher') {
+    if (widget.app.id == 'dev.bonsanbec.hakkinlauncher' ||
+        widget.app.id == 'hakkin_launcher' ||
+        widget.app.id == 'HakkinLauncher') {
       return Image.asset(AppConstants.appIconPath, fit: BoxFit.cover);
     }
     return Container(

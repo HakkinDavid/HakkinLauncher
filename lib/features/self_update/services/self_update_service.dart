@@ -231,6 +231,7 @@ if errorlevel 1 goto rollback
 
 set STAGING_CONTENT=%STAGING_DIR%
 for /d %%D in ("%STAGING_DIR%\\*") do (
+    if exist "%%D\\HakkinLauncher.exe" set STAGING_CONTENT=%%D
     if exist "%%D\\hakkin_launcher.exe" set STAGING_CONTENT=%%D
 )
 
@@ -381,7 +382,7 @@ rm -f "\$0" 2>/dev/null || true
 
     // 1. Descarga del paquete de actualización
     final downloadsDir = await OsPaths.getDownloadsDirectory();
-    final updateZipPath = p.join(downloadsDir.path, 'hakkin_launcher_update.zip');
+    final updateZipPath = p.join(downloadsDir.path, 'HakkinLauncher_update.zip');
     final zipFile = File(updateZipPath);
 
     // Si ya existía un archivo de descarga con hash mismatch o corrupto, limpiarlo
@@ -464,7 +465,7 @@ rm -f "\$0" 2>/dev/null || true
     final currentExePath = Platform.resolvedExecutable;
     final appDir = File(currentExePath).parent.path;
     final downloadsDir = zipFile.parent.path;
-    final logFile = p.join(downloadsDir, 'hakkin_self_update.log');
+    final logFile = p.join(downloadsDir, 'HakkinLauncher_self_update.log');
 
     if (Platform.isMacOS) {
       String targetAppPath = currentExePath;

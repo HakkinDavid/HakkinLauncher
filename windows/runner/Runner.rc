@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.hakkin.launcher" "\0"
-            VALUE "FileDescription", "hakkin_launcher" "\0"
+            VALUE "CompanyName", "dev.bonsanbec.hakkinlauncher" "\0"
+            VALUE "FileDescription", "HakkinLauncher" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "hakkin_launcher" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.hakkin.launcher. All rights reserved." "\0"
-            VALUE "OriginalFilename", "hakkin_launcher.exe" "\0"
-            VALUE "ProductName", "hakkin_launcher" "\0"
+            VALUE "InternalName", "HakkinLauncher" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 dev.bonsanbec.hakkinlauncher. All rights reserved." "\0"
+            VALUE "OriginalFilename", "HakkinLauncher.exe" "\0"
+            VALUE "ProductName", "HakkinLauncher" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

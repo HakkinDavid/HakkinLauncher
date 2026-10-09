@@ -447,7 +447,9 @@ class LibraryScreen extends ConsumerWidget {
   }
 
   Widget _buildAppTileIcon(InstalledApp installedApp, AppEntry? catalogApp) {
-    if (installedApp.id == 'com.hakkin.launcher' || installedApp.id == 'hakkin_launcher') {
+    if (installedApp.id == 'dev.bonsanbec.hakkinlauncher' ||
+        installedApp.id == 'hakkin_launcher' ||
+        installedApp.id == 'HakkinLauncher') {
       return Image.asset(AppConstants.appIconPath, fit: BoxFit.cover);
     }
     if (catalogApp?.assets.icon != null && catalogApp!.assets.icon!.isNotEmpty) {

@@ -1,4 +1,4 @@
-# hakkin_launcher
+# HakkinLauncher
 
 A new Flutter project.
 

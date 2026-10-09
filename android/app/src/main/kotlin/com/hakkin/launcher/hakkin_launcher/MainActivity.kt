@@ -1,4 +1,4 @@
-package com.hakkin.launcher.hakkin_launcher
+package dev.bonsanbec.hakkinlauncher.hakkin_launcher
 
 import io.flutter.embedding.android.FlutterActivity
 
