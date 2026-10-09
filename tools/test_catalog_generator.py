@@ -14,6 +14,7 @@ from catalog_generator import (
     parse_version_tuple,
     validate_manifest,
     generate_catalog,
+    purge_orphaned_and_nonexistent_versions,
     KNOWN_ASSET_CACHE
 )
 
@@ -110,6 +111,155 @@ class TestCatalogGenerator(unittest.TestCase):
                     self.assertIn("26.09.11", versions)
                     self.assertIn("26.09.08", versions)
                     self.assertNotIn("1.0.0", versions)
+
+    def test_purge_orphaned_and_nonexistent_versions_removes_invalid_entries(self):
+        # Manifiesto con versión válida, versión con paquete corrupto, versión fantasma
+        # y parche delta apuntando a versión inexistente (huérfana)
+        mock_manifest = {
+            "version": "2.0.0",
+            "catalog_timestamp": "2026-10-09T00:00:00Z",
+            "launcher_meta": None,
+            "apps": [
+                {
+                    "id": "com.test.app",
+                    "slug": "test-app",
+                    "title": "Test App",
+                    "category": "app",
+                    "developer": "TestDev",
+                    "summary": "Summary",
+                    "description_markdown": "Desc",
+                    "tags": [],
+                    "assets": {},
+                    "latest_version": "99.0.0",
+                    "platforms": {
+                        "windows-x64": {
+                            "latest_version": "99.0.0",
+                            "protected_user_paths": [],
+                            "versions": [
+                                {
+                                    "version": "2.0.0",
+                                    "package": {
+                                        "url": "https://github.com/test/app/releases/download/v2.0.0/app.zip",
+                                        "size_bytes": 1000,
+                                        "sha256": "a" * 64
+                                    },
+                                    "delta_patches": [
+                                        # Parche válido desde 1.0.0
+                                        {
+                                            "from_version": "1.0.0",
+                                            "url": "https://github.com/test/app/releases/download/v2.0.0/patch_1_to_2.hdiff",
+                                            "size_bytes": 200,
+                                            "patch_sha256": "b" * 64,
+                                            "target_sha256": "a" * 64
+                                        },
+                                        # Parche huérfano desde versión inexistente 0.5.0
+                                        {
+                                            "from_version": "0.5.0",
+                                            "url": "https://github.com/test/app/releases/download/v2.0.0/patch_orphan.hdiff",
+                                            "size_bytes": 200,
+                                            "patch_sha256": "c" * 64,
+                                            "target_sha256": "a" * 64
+                                        },
+                                        # Parche reflexivo (hacia sí misma)
+                                        {
+                                            "from_version": "2.0.0",
+                                            "url": "https://github.com/test/app/releases/download/v2.0.0/patch_self.hdiff",
+                                            "size_bytes": 200,
+                                            "patch_sha256": "d" * 64,
+                                            "target_sha256": "a" * 64
+                                        }
+                                    ]
+                                },
+                                {
+                                    "version": "1.0.0",
+                                    "package": {
+                                        "url": "https://github.com/test/app/releases/download/v1.0.0/app.zip",
+                                        "size_bytes": 900,
+                                        "sha256": "e" * 64
+                                    },
+                                    "delta_patches": []
+                                },
+                                # Versión huérfana/fantasma 64.0.0
+                                {
+                                    "version": "64.0.0",
+                                    "package": {
+                                        "url": "https://github.com/test/app/releases/download/v1.0.0/app-arm64.zip",
+                                        "size_bytes": 900,
+                                        "sha256": "f" * 64
+                                    },
+                                    "delta_patches": []
+                                },
+                                # Versión inexistente con paquete corrupto (size_bytes <= 0)
+                                {
+                                    "version": "0.9.0",
+                                    "package": {
+                                        "url": "https://github.com/test/app/releases/download/v0.9.0/app.zip",
+                                        "size_bytes": 0,
+                                        "sha256": "g" * 64
+                                    },
+                                    "delta_patches": []
+                                },
+                                # Versión con sha256 inválido
+                                {
+                                    "version": "0.8.0",
+                                    "package": {
+                                        "url": "https://github.com/test/app/releases/download/v0.8.0/app.zip",
+                                        "size_bytes": 500,
+                                        "sha256": "invalid_short_hash"
+                                    },
+                                    "delta_patches": []
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+
+        purged = purge_orphaned_and_nonexistent_versions(mock_manifest)
+        plat = purged["apps"][0]["platforms"]["windows-x64"]
+        remaining_versions = [v["version"] for v in plat["versions"]]
+
+        # 1. Sólo 2.0.0 y 1.0.0 deben sobrevivir
+        self.assertEqual(remaining_versions, ["2.0.0", "1.0.0"])
+        self.assertNotIn("64.0.0", remaining_versions)
+        self.assertNotIn("0.9.0", remaining_versions)
+        self.assertNotIn("0.8.0", remaining_versions)
+
+        # 2. Latest version debe recalcularse a 2.0.0
+        self.assertEqual(plat["latest_version"], "2.0.0")
+        self.assertEqual(purged["apps"][0]["latest_version"], "2.0.0")
+
+        # 3. Delta patches en 2.0.0: sólo el parche desde 1.0.0 debe conservarse
+        patches_v2 = plat["versions"][0]["delta_patches"]
+        self.assertEqual(len(patches_v2), 1)
+        self.assertEqual(patches_v2[0]["from_version"], "1.0.0")
+        # El parche huérfano (from_version: 0.5.0) y el reflexivo (from_version: 2.0.0) fueron purgados completamente
+        from_versions = [p["from_version"] for p in patches_v2]
+        self.assertNotIn("0.5.0", from_versions)
+        self.assertNotIn("2.0.0", from_versions)
+
+    def test_catalog_has_no_orphaned_delta_references(self):
+        catalog_path = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "docs",
+            "catalog.json"
+        )
+        with open(catalog_path, "r", encoding="utf-8") as f:
+            cat = json.load(f)
+
+        for app in cat["apps"]:
+            for pkey, plat in app["platforms"].items():
+                valid_vers = {v["version"] for v in plat["versions"]}
+                # latest_version debe pertenecer a las versiones válidas
+                self.assertIn(plat["latest_version"], valid_vers)
+                for v in plat["versions"]:
+                    self.assertNotIn("64.0.0", v["version"])
+                    for dp in v.get("delta_patches", []):
+                        from_v = dp.get("from_version")
+                        # No debe haber referencias a versiones inexistentes/huérfanas
+                        self.assertIn(from_v, valid_vers)
+                        self.assertNotEqual(from_v, v["version"])
 
 
 if __name__ == "__main__":

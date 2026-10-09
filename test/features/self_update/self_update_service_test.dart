@@ -40,7 +40,7 @@ void main() {
       expect(service.isUpdateAvailable(olderMeta), isFalse);
 
       final newerMeta = const LauncherMeta(
-        latestVersion: '2.0.0',
+        latestVersion: '999.0.0',
         releases: {},
       );
       expect(service.isUpdateAvailable(newerMeta), isTrue);

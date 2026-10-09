@@ -1,31 +1,10 @@
 {
   "version": "2.0.0",
-  "catalog_timestamp": "2026-10-09T09:43:51.459317+00:00",
+  "catalog_timestamp": "2026-10-09T10:11:41.903548+00:00",
   "launcher_meta": {
-    "latest_version": "26.10.09-09",
+    "latest_version": "1.0.0",
     "min_required_launcher_version": "1.0.0",
-    "releases": {
-      "macos-arm64": {
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.09-09/HakkinLauncher-macos-arm64.zip",
-        "sha256": "2499d07975b3fcaded283013d34c40300b95c876bda71c73636ed18f818ffcac",
-        "size_bytes": 11575287
-      },
-      "macos-x64": {
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.09-09/HakkinLauncher-macos-x64.zip",
-        "sha256": "a2070178f8932ce61105a26f68ec20ba3d8a4bcdf66f1da3abc9f4e4f62742eb",
-        "size_bytes": 11575287
-      },
-      "windows-x64": {
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.09-09/HakkinLauncher-windows-x64.zip",
-        "sha256": "12734d6b27a4f8e514f9f6fce605e19fb7fc5b0f88d72d69814ff7c44384ce32",
-        "size_bytes": 12704901
-      },
-      "linux-x64": {
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.09-09/HakkinLauncher-linux-x64.zip",
-        "sha256": "a79ed5d626e4f20305d25b88dc7fa4bbbb956a3912b7e297ff7364df02bf0896",
-        "size_bytes": 10869052
-      }
-    }
+    "releases": {}
   },
   "apps": [
     {
@@ -822,9 +801,9 @@
               "changelog": "Versión 2.0: Primera versión con interfaz visual y soporte de restricciones.",
               "executable_relative_path": "Smart Scheduler.app/Contents/MacOS/Smart Scheduler",
               "package": {
-                "url": "https://github.com/HakkinDavid/smart-scheduler/releases/download/v2.0/smart-scheduler-macos-v2.0.zip",
-                "size_bytes": 31540120,
-                "sha256": "77e384bf8e999c011e0bc598e29bc11394a10ffc8821950ad0281b289cf291ae"
+                "url": "https://github.com/HakkinDavid/smart-scheduler/releases/download/v2.0/smart-scheduler-macos-arm64.zip",
+                "size_bytes": 32063818,
+                "sha256": "66d9600fa979f9cd95de695869c7c76fc4835a25de6d60137c2b049bb84b410b"
               },
               "delta_patches": [],
               "scripts": {

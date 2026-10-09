@@ -42,6 +42,15 @@ class StatusBadge extends StatelessWidget {
     );
   }
 
+  factory StatusBadge.anomaly() {
+    return const StatusBadge(
+      label: 'ANOMALÍA',
+      backgroundColor: Color(0x26EF4444),
+      textColor: Color(0xFFF87171),
+      icon: Icons.warning_amber_rounded,
+    );
+  }
+
   factory StatusBadge.tag(String tag) {
     return StatusBadge(
       label: tag.toUpperCase(),

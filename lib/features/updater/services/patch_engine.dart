@@ -104,16 +104,26 @@ class PatchEngine {
       customInstallPath ?? installed?.installDirectory ?? p.join(defaultAppsDir.path, app.slug),
     );
 
+    final isAnomalousInstalled = installed != null &&
+        platformRelease.isAnomalousVersion(installed.installedVersion);
     final isOlderTarget = installed != null &&
         _isOlderVersion(targetVersionStr, installed.installedVersion);
-    final requiresCleanInstall = isCleanInstall || isOlderTarget;
+    final requiresCleanInstall = isCleanInstall || isOlderTarget || isAnomalousInstalled;
 
     if (requiresCleanInstall) {
-      yield UpdateStatus(
-        stage: UpdateStage.preservingUserData,
-        message: 'Iniciando instalación limpia de v$targetVersionStr y protegiendo datos...',
-        progress: 0.1,
-      );
+      if (isAnomalousInstalled) {
+        yield UpdateStatus(
+          stage: UpdateStage.preservingUserData,
+          message: 'Anomalía detectada: versión v${installed.installedVersion} huérfana o inexistente en catálogo. Procediendo con actualización completa a v$targetVersionStr y protegiendo datos...',
+          progress: 0.1,
+        );
+      } else {
+        yield UpdateStatus(
+          stage: UpdateStage.preservingUserData,
+          message: 'Iniciando instalación limpia de v$targetVersionStr y protegiendo datos...',
+          progress: 0.1,
+        );
+      }
 
       final userBackups = <String, List<int>>{};
       if (await targetInstallDir.exists() && platformRelease.protectedUserPaths.isNotEmpty) {
@@ -217,13 +227,22 @@ class PatchEngine {
 
         await CleanerService.cleanTemporaryFiles();
 
-        await NotificationService.notifyInstallCompleted(
-          '${app.title} - Instalación limpia v$targetVersionStr',
-        );
+        if (isAnomalousInstalled) {
+          await NotificationService.notifyUpdateCompleted(
+            app.title,
+            '$targetVersionStr (actualización completa)',
+          );
+        } else {
+          await NotificationService.notifyInstallCompleted(
+            '${app.title} - Instalación limpia v$targetVersionStr',
+          );
+        }
 
         yield UpdateStatus(
           stage: UpdateStage.completed,
-          message: 'Instalación limpia de v$targetVersionStr completada con éxito.',
+          message: isAnomalousInstalled
+              ? 'Actualización completa a v$targetVersionStr completada con éxito (anomalía corregida).'
+              : 'Instalación limpia de v$targetVersionStr completada con éxito.',
           progress: 1.0,
         );
         return;
@@ -240,7 +259,11 @@ class PatchEngine {
     bool shouldAttemptDelta = false;
     DeltaUpdate? matchedDelta;
 
-    if (installed != null && installed.installedVersion != targetVersionStr) {
+    // Si la versión instalada es anómala o huérfana, jamás se debe intentar parchear;
+    // se debe actualizar de manera completa.
+    if (installed != null &&
+        installed.installedVersion != targetVersionStr &&
+        !isAnomalousInstalled) {
       matchedDelta = platformRelease.findDeltaFor(
         installed.installedVersion,
         targetVersionStr,

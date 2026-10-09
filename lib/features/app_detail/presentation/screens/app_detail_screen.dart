@@ -389,6 +389,53 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
                   ),
                 ),
 
+              // Aviso de detección de anomalía (versión instalada huérfana o inexistente en el catálogo)
+              if (installedApp != null &&
+                  platformRelease != null &&
+                  platformRelease.isAnomalousVersion(installedApp.installedVersion))
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: AppColors.warning.withValues(alpha: 0.8)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.warning_amber_rounded, color: AppColors.warning, size: 28),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Anomalía de versión detectada',
+                                  style: TextStyle(
+                                    color: AppColors.platinum,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'La versión instalada v${installedApp.installedVersion} es huérfana o inexistente en el catálogo actual. Debe ser actualizada de manera completa.',
+                                  style: const TextStyle(
+                                    color: AppColors.platinumMuted,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
               // Galería de Capturas de Pantalla
               if (app.assets.screenshots.isNotEmpty)
                 SliverToBoxAdapter(
@@ -638,6 +685,24 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
     }
 
     if (isInstalled && installedApp != null) {
+      final isAnomalous = platformRelease != null &&
+          platformRelease.isAnomalousVersion(installedApp.installedVersion);
+
+      if (isAnomalous) {
+        return HakkinButton(
+          text: 'Actualizar Completamente - v$selectedVersionStr',
+          icon: Icons.system_update_alt,
+          variant: HakkinButtonVariant.primaryPlatinum,
+          onPressed: () {
+            ref.read(updateProgressProvider.notifier).startInstallOrUpdate(
+                  app,
+                  targetVersion: selectedVersionStr,
+                  isCleanInstall: true,
+                );
+          },
+        );
+      }
+
       if (selectedVersionStr == installedApp.installedVersion) {
         return HakkinButton(
           text: 'Jugar / Abrir - v$selectedVersionStr',

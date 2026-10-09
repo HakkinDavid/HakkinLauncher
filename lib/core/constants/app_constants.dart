@@ -3,7 +3,16 @@ class AppConstants {
   AppConstants._();
 
   static const String appName = 'HakkinLauncher';
-  static const String appVersion = '1.0.0';
+
+  /// Versión base sincronizada con el catálogo y releases oficiales.
+  static const String defaultAppVersion = '1.0.0';
+
+  /// Versión activa del lanzador inyectada en tiempo de compilación con `--dart-define=APP_VERSION=...`.
+  /// Si no se especifica en la compilación, recurre a [defaultAppVersion].
+  static const String appVersion = String.fromEnvironment(
+    'APP_VERSION',
+    defaultValue: defaultAppVersion,
+  );
 
   static const String defaultCatalogUrl =
       'https://raw.githubusercontent.com/HakkinDavid/HakkinLauncher/main/docs/catalog_example.json';

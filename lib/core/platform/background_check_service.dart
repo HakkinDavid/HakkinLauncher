@@ -5,6 +5,7 @@ import '../../features/library/data/repositories/library_repository.dart';
 import '../../features/self_update/services/self_update_service.dart';
 import '../constants/app_constants.dart';
 import 'notification_service.dart';
+import 'os_paths.dart';
 
 /// Servicio en segundo plano para el sondeo periódico de actualizaciones del catálogo,
 /// aplicaciones instaladas y del propio HakkinLauncher.
@@ -41,13 +42,22 @@ class BackgroundCheckService {
 
       for (final installed in installedApps) {
         final catalogApp = manifest.apps.where((a) => a.id == installed.id).firstOrNull;
-        if (catalogApp != null && catalogApp.latestVersion != installed.installedVersion) {
-          updatesFound[installed.title] = catalogApp.latestVersion;
-          if (silent) {
-            await NotificationService.notifyUpdateAvailable(
-              installed.title,
-              catalogApp.latestVersion,
-            );
+        if (catalogApp != null) {
+          final targetPlatKey = installed.platformKey.isNotEmpty
+              ? installed.platformKey
+              : OsPaths.getCurrentPlatformKey();
+          final hasUpdate = catalogApp.needsUpdate(
+            platformKey: targetPlatKey,
+            installedVersion: installed.installedVersion,
+          );
+          if (hasUpdate) {
+            updatesFound[installed.title] = catalogApp.latestVersion;
+            if (silent) {
+              await NotificationService.notifyUpdateAvailable(
+                installed.title,
+                catalogApp.latestVersion,
+              );
+            }
           }
         }
       }

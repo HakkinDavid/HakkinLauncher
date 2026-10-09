@@ -95,6 +95,9 @@ echo "  Objetivo export:   $TARGET"
 echo "  Modo forzado:      $FORCE"
 echo "================================================================="
 
+# Sincronizar versión base en app_constants.dart
+python3 "$HASH_MGR" set-version --version "$TAG"
+
 mkdir -p build/release
 
 # Determinar plataformas a procesar
@@ -120,7 +123,7 @@ for t in "${TARGETS_TO_PROCESS[@]}"; do
       macos)
         if [[ "$HOST_OS" == "darwin" ]]; then
           echo "   Compilando bundle macOS nativo con Flutter..."
-          flutter build macos --release
+          flutter build macos --release --dart-define=APP_VERSION="$TAG" --build-name="$TAG"
 
           APP_PATH=""
           for candidate in build/macos/Build/Products/Release/*.app; do
@@ -157,7 +160,7 @@ for t in "${TARGETS_TO_PROCESS[@]}"; do
         ZIP_DEST="build/release/HakkinLauncher-windows-x64.zip"
         if [[ "$HOST_OS" =~ msys|mingw|cygwin ]]; then
           echo "   Compilando nativo Windows con Flutter..."
-          flutter build windows --release
+          flutter build windows --release --dart-define=APP_VERSION="$TAG" --build-name="$TAG"
           WIN_RELEASE_DIR="build/windows/x64/runner/Release"
           rm -f "$ZIP_DEST"
           (cd "$WIN_RELEASE_DIR" && zip -r -q "$WORKSPACE_ROOT/$ZIP_DEST" .)
@@ -202,7 +205,7 @@ for t in "${TARGETS_TO_PROCESS[@]}"; do
         ZIP_DEST="build/release/HakkinLauncher-linux-x64.zip"
         if [[ "$HOST_OS" =~ linux ]]; then
           echo "   Compilando nativo Linux con Flutter..."
-          flutter build linux --release
+          flutter build linux --release --dart-define=APP_VERSION="$TAG" --build-name="$TAG"
           LINUX_RELEASE_DIR="build/linux/x64/release/bundle"
           rm -f "$ZIP_DEST"
           (cd "$LINUX_RELEASE_DIR" && zip -r -q "$WORKSPACE_ROOT/$ZIP_DEST" .)

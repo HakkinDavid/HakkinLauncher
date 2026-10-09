@@ -142,6 +142,26 @@ class AppEntry {
   PlatformRelease? getPlatformRelease(String platformKey) {
     return platforms[platformKey];
   }
+
+  /// Comprueba si la versión instalada en la plataforma indicada constituye una anomalía
+  /// (es decir, una versión huérfana o inexistente en el catálogo actual).
+  bool isAnomalousInstalledVersion(String platformKey, String installedVersion) {
+    final release = getPlatformRelease(platformKey);
+    if (release == null) return false;
+    return release.isAnomalousVersion(installedVersion);
+  }
+
+  /// Determina si una versión instalada requiere actualización (ya sea por existir una
+  /// versión más reciente o por tratarse de una versión anómala/huérfana que debe corregirse).
+  bool needsUpdate({
+    required String platformKey,
+    required String installedVersion,
+  }) {
+    final release = getPlatformRelease(platformKey);
+    if (release == null) return false;
+    if (release.isAnomalousVersion(installedVersion)) return true;
+    return release.latestVersion != installedVersion;
+  }
 }
 
 class AppAssets {
@@ -226,6 +246,17 @@ class PlatformRelease {
 
   /// Lista ordenada de nombres de versión disponibles
   List<String> get availableVersions => versions.map((v) => v.version).toList();
+
+  /// Comprueba si una versión está registrada formalmente en el catálogo para esta plataforma.
+  bool hasVersion(String version) {
+    return versions.any((v) => v.version == version);
+  }
+
+  /// Detecta si una versión dada constituye una anomalía (es decir, una versión
+  /// huérfana o inexistente en el catálogo).
+  bool isAnomalousVersion(String version) {
+    return !hasVersion(version);
+  }
 
   /// Encuentra si hay un parche delta aplicable desde una versión instalada específica hacia una versión destino
   DeltaUpdate? findDeltaFor(String fromVersion, String toVersion) {

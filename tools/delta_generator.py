@@ -41,22 +41,39 @@ def compute_sha256(filepath):
     return h.hexdigest()
 
 
-PACKAGE_CACHE_DIR = os.path.join(tempfile.gettempdir(), "hakkin_pkg_cache")
-os.makedirs(PACKAGE_CACHE_DIR, exist_ok=True)
+def get_package_cache_dir():
+    """Retorna el directorio de caché para descargas de paquetes (soporta HAKKIN_PKG_CACHE_DIR)."""
+    pkg_cache_env = os.environ.get("HAKKIN_PKG_CACHE_DIR")
+    if pkg_cache_env:
+        cache_dir = os.path.abspath(pkg_cache_env)
+    else:
+        cache_dir = os.path.join(tempfile.gettempdir(), "hakkin_pkg_cache")
+    os.makedirs(cache_dir, exist_ok=True)
+    return cache_dir
+
+
+PACKAGE_CACHE_DIR = get_package_cache_dir()
 
 
 def download_file_with_cache(url, expected_sha=None):
     """Descarga un archivo con caché persistente y reporte de progreso."""
+    cache_dir = get_package_cache_dir()
     if expected_sha and len(expected_sha) == 64:
-        cache_file = os.path.join(PACKAGE_CACHE_DIR, f"{expected_sha}.pkg")
+        cache_file = os.path.join(cache_dir, f"{expected_sha}.pkg")
         if os.path.isfile(cache_file) and os.path.getsize(cache_file) > 0:
             if compute_sha256(cache_file) == expected_sha:
                 print(f"    [Caché Local] Usando paquete en caché: {os.path.basename(cache_file)} ({os.path.getsize(cache_file):,} bytes)")
                 return cache_file
+    elif not expected_sha:
+        url_hash = hashlib.sha256(url.encode()).hexdigest()[:16]
+        cache_file = os.path.join(cache_dir, f"{url_hash}.pkg")
+        if os.path.isfile(cache_file) and os.path.getsize(cache_file) > 0:
+            print(f"    [Caché Local] Usando paquete en caché (URL hash): {os.path.basename(cache_file)} ({os.path.getsize(cache_file):,} bytes)")
+            return cache_file
 
     url_hash = hashlib.sha256(url.encode()).hexdigest()[:16]
-    temp_target = os.path.join(PACKAGE_CACHE_DIR, f"dl_{url_hash}.part")
-    final_target = os.path.join(PACKAGE_CACHE_DIR, f"{expected_sha or url_hash}.pkg")
+    temp_target = os.path.join(cache_dir, f"dl_{url_hash}.part")
+    final_target = os.path.join(cache_dir, f"{expected_sha or url_hash}.pkg")
 
     req = urllib.request.Request(
         url,
@@ -317,10 +334,14 @@ def main():
     parser.add_argument("--from-ver", help="Versión de origen")
     parser.add_argument("--to-ver", help="Versión de destino")
     parser.add_argument("--deltas-repo", default=DEFAULT_DELTAS_REPO, help="Repositorio satélite de deltas")
+    parser.add_argument("--pkg-cache-dir", default=None, help="Directorio de caché de paquetes (anula HAKKIN_PKG_CACHE_DIR)")
     parser.add_argument("--dry-run", action="store_true", help="Simulación sin publicar a GitHub")
     parser.add_argument("--format-tag-only", action="store_true", help="Imprime el tag formateado y termina")
 
     args = parser.parse_args()
+
+    if args.pkg_cache_dir:
+        os.environ["HAKKIN_PKG_CACHE_DIR"] = args.pkg_cache_dir
 
     if args.format_tag_only:
         if not (args.slug and args.from_ver and args.to_ver):

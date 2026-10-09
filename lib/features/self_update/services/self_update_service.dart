@@ -57,9 +57,10 @@ class SelfUpdateService {
   }
 
   /// Comprueba si hay una nueva versión disponible del propio lanzador estrictamente más reciente.
-  bool isUpdateAvailable(LauncherMeta? launcherMeta) {
+  bool isUpdateAvailable(LauncherMeta? launcherMeta, [String? currentVersion]) {
     if (launcherMeta == null) return false;
-    return isNewerVersion(launcherMeta.latestVersion, AppConstants.appVersion);
+    final current = currentVersion ?? AppConstants.appVersion;
+    return isNewerVersion(launcherMeta.latestVersion, current);
   }
 
   /// Resuelve la entrada de release adecuada para la plataforma con estrategia de fallback.

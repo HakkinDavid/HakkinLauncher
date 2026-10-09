@@ -57,10 +57,6 @@ KNOWN_ASSET_CACHE = {
         "size_bytes": 32060507,
         "sha256": "8805c43e262b29e4baf75fa9d4d7b3458c9b1214aaace63574f20cc6f5fa7ca1"
     },
-    "https://github.com/HakkinDavid/smart-scheduler/releases/download/v2.0/smart-scheduler-macos-v2.0.zip": {
-        "size_bytes": 31540120,
-        "sha256": "77e384bf8e999c011e0bc598e29bc11394a10ffc8821950ad0281b289cf291ae"
-    },
     "https://github.com/HakkinDavid/smart-scheduler/releases/download/v2.0/smart-scheduler-macos-arm64.zip": {
         "size_bytes": 32063818,
         "sha256": "66d9600fa979f9cd95de695869c7c76fc4835a25de6d60137c2b049bb84b410b"
@@ -608,19 +604,26 @@ def generate_catalog(
 
             # Strategy 3: Merge previously recorded versions for this platform (filtering corrupted ghosts)
             if existing_app and "platforms" in existing_app and plat_key in existing_app["platforms"]:
-                existing_plat = existing_app["platforms"][plat_key]
-                for old_v in existing_plat.get("versions", []):
-                    old_ver = old_v.get("version")
-                    old_url = old_v.get("package", {}).get("url", "")
-                    # Filter out ghost 64.0.0 and duplicate 1.0.0 pointing to 26.xx packages
-                    if old_ver == "64.0.0":
-                        continue
-                    if old_ver == "1.0.0" and any(x in old_url for x in ["26.", "v26."]):
-                        continue
-                    if old_ver and old_ver not in seen_versions and old_url not in seen_urls:
-                        versions_list.append(old_v)
-                        seen_versions.add(old_ver)
-                        seen_urls.add(old_url)
+                has_explicit_versions = "versions" in plat_info and isinstance(plat_info["versions"], list)
+                if not has_explicit_versions:
+                    existing_plat = existing_app["platforms"][plat_key]
+                    for old_v in existing_plat.get("versions", []):
+                        old_ver = old_v.get("version")
+                        old_pkg = old_v.get("package", {})
+                        old_url = old_pkg.get("url", "") if isinstance(old_pkg, dict) else ""
+                        # Filter out ghost 64.0.0 and duplicate 1.0.0 pointing to 26.xx packages
+                        if old_ver == "64.0.0":
+                            continue
+                        if old_ver == "1.0.0" and any(x in old_url for x in ["26.", "v26."]):
+                            continue
+                        if not isinstance(old_pkg, dict) or not old_url.startswith("https://"):
+                            continue
+                        if old_pkg.get("size_bytes", 0) <= 0 or len(old_pkg.get("sha256", "")) != 64:
+                            continue
+                        if old_ver and old_ver not in seen_versions and old_url not in seen_urls:
+                            versions_list.append(old_v)
+                            seen_versions.add(old_ver)
+                            seen_urls.add(old_url)
 
             if not versions_list:
                 continue
@@ -719,18 +722,7 @@ def generate_catalog(
         launcher_meta = {
             "latest_version": "1.0.0",
             "min_required_launcher_version": "1.0.0",
-            "releases": {
-                "windows-x64": {
-                    "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/v1.0.0/HakkinLauncher-windows-x64.zip",
-                    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-                    "size_bytes": 45000000
-                },
-                "macos-arm64": {
-                    "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/v1.0.0/HakkinLauncher-macos-arm64.zip",
-                    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-                    "size_bytes": 48000000
-                }
-            }
+            "releases": {}
         }
 
     manifest = {
@@ -739,6 +731,100 @@ def generate_catalog(
         "launcher_meta": launcher_meta,
         "apps": apps
     }
+
+    manifest = purge_orphaned_and_nonexistent_versions(manifest)
+
+    return manifest
+
+def purge_orphaned_and_nonexistent_versions(manifest):
+    """
+    Purga completamente las versiones huérfanas o inexistentes del catálogo y
+    elimina absolutamente cualquier referencia hacia ellas (como alias, parches delta huérfanos, etc.).
+    Garantiza que:
+    1. Se eliminen versiones con paquetes inválidos, sin URL https, tamaño <= 0 o hash SHA-256 no válido (distinto de 64 caracteres hex).
+    2. Se descarten versiones identificadas como artefactos/fantasmas (e.g. 64.0.0 o fallback 1.0.0 que apunten a paquetes de 26.xx).
+    3. Se descarten versiones duplicadas o alias de un mismo binario (conservando únicamente la canónica).
+    4. Si una versión es eliminada, se borren completamente de los parches delta todas las referencias a ella
+       (parches con from_version que ya no existe en el catálogo, parches reflexivos from_version == version, etc.).
+    5. Se recalculen platform.latest_version y app.latest_version de forma consistente.
+    """
+    apps = manifest.get("apps", [])
+    for app in apps:
+        platforms = app.get("platforms", {})
+        empty_platforms = []
+        for plat_key, plat_data in list(platforms.items()):
+            raw_versions = plat_data.get("versions", [])
+            valid_versions = []
+            seen_pkg_urls = set()
+            seen_ver_names = set()
+
+            for v in raw_versions:
+                v_str = str(v.get("version", "")).strip()
+                # 1. Descartar versiones vacías o identificadas como artefactos/fantasmas (e.g. 64.0.0)
+                if not v_str or v_str == "64.0.0":
+                    continue
+
+                pkg = v.get("package")
+                if not isinstance(pkg, dict):
+                    continue
+
+                url = pkg.get("url", "")
+                size_bytes = pkg.get("size_bytes", 0)
+                sha256 = pkg.get("sha256", "")
+
+                # 2. Descartar versiones con paquete inválido, tamaño no positivo o hash corrupto
+                if not url.startswith("https://") or size_bytes <= 0 or len(sha256) != 64:
+                    continue
+
+                # 3. Descartar versiones fantasma 1.0.0 que apunten a paquetes de 26.xx
+                if v_str == "1.0.0" and any(x in url for x in ["26.", "v26."]):
+                    continue
+
+                # 4. Descartar URLs o versiones duplicadas (manteniendo la primera versión canónica)
+                if url in seen_pkg_urls or v_str in seen_ver_names:
+                    continue
+
+                valid_versions.append(v)
+                seen_pkg_urls.add(url)
+                seen_ver_names.add(v_str)
+
+            # Ordenar versiones válidas de la más nueva a la más antigua
+            valid_versions.sort(key=lambda x: parse_version_tuple(x["version"]), reverse=True)
+            valid_version_strings = {v["version"] for v in valid_versions}
+
+            # 5. Eliminar COMPLETAMENTE cualquier referencia a versiones inexistentes o huérfanas en delta_patches
+            for v in valid_versions:
+                raw_patches = v.get("delta_patches", [])
+                cleaned_patches = []
+                for p in raw_patches:
+                    from_v = p.get("from_version")
+                    # El from_version debe existir en las versiones válidas del catálogo y ser distinto de la versión destino
+                    if (
+                        from_v
+                        and from_v in valid_version_strings
+                        and from_v != v["version"]
+                        and p.get("url", "").startswith("https://")
+                        and len(p.get("patch_sha256", "")) == 64
+                    ):
+                        cleaned_patches.append(p)
+                v["delta_patches"] = cleaned_patches
+
+            plat_data["versions"] = valid_versions
+            if valid_versions:
+                plat_data["latest_version"] = valid_versions[0]["version"]
+            else:
+                empty_platforms.append(plat_key)
+
+        for ep in empty_platforms:
+            del platforms[ep]
+
+        # Recalcular latest_version de la app según las plataformas restantes
+        if platforms:
+            app["latest_version"] = max(
+                (p["latest_version"] for p in platforms.values()),
+                key=parse_version_tuple,
+                default="1.0.0"
+            )
 
     return manifest
 
@@ -763,8 +849,12 @@ def validate_manifest(manifest, schema_path):
             assert "latest_version" in pval, f"Platform {pkey} missing latest_version"
             assert "versions" in pval and isinstance(pval["versions"], list) and len(pval["versions"]) > 0, \
                 f"Platform {pkey} missing versions array"
+            valid_vers = {v["version"] for v in pval["versions"]}
+            assert pval["latest_version"] in valid_vers, \
+                f"Platform {pkey} latest_version {pval['latest_version']} not in versions {valid_vers}"
             for v_obj in pval["versions"]:
                 assert "version" in v_obj and v_obj["version"], f"Platform {pkey} missing version string"
+                assert v_obj["version"] != "64.0.0", f"Corrupt phantom version 64.0.0 found in {app['id']} {pkey}"
                 assert "executable_relative_path" in v_obj and v_obj["executable_relative_path"], \
                     f"Platform {pkey} missing executable_relative_path"
                 assert "package" in v_obj, f"Platform {pkey} missing package"
@@ -772,6 +862,13 @@ def validate_manifest(manifest, schema_path):
                 assert "url" in pkg and pkg["url"].startswith("https://"), f"Invalid package url in {pkey}"
                 assert "sha256" in pkg and len(pkg["sha256"]) == 64, f"Invalid sha256 in {pkey}: {pkg['sha256']}"
                 assert "size_bytes" in pkg and pkg["size_bytes"] > 0, f"Invalid size_bytes in {pkey}: {pkg['size_bytes']}"
+
+                # Comprobar que ningún parche delta apunte a versiones huérfanas
+                for dp in v_obj.get("delta_patches", []):
+                    assert dp.get("from_version") in valid_vers, \
+                        f"Delta patch in {app['id']} {pkey} v{v_obj['version']} references orphaned from_version {dp.get('from_version')}"
+                    assert dp.get("from_version") != v_obj["version"], \
+                        f"Delta patch in {app['id']} {pkey} v{v_obj['version']} has reflexive from_version"
 
     print(f"Validation successful: {len(manifest['apps'])} applications validated against schema v2.0.0 contract.")
     return True
@@ -785,8 +882,12 @@ def main():
     parser.add_argument("--generate-deltas", action="store_true", help="Generar parches diferenciales para saltos de versión")
     parser.add_argument("--deltas-repo", default=DEFAULT_DELTAS_REPO, help="Repositorio satélite de deltas (default: HakkinDavid/hakkin-launcher-deltas)")
     parser.add_argument("--dry-run-deltas", action="store_true", help="Simular generación de deltas sin publicar en GitHub")
+    parser.add_argument("--pkg-cache-dir", default=None, help="Directorio de caché de paquetes para generación de deltas")
 
     args = parser.parse_args()
+
+    if args.pkg_cache_dir:
+        os.environ["HAKKIN_PKG_CACHE_DIR"] = args.pkg_cache_dir
 
     manifest = generate_catalog(
         args.overrides,

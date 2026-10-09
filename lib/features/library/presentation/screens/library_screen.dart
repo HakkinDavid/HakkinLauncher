@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/platform/os_paths.dart';
 import '../../../../core/platform/shortcut_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/widgets/hakkin_button.dart';
@@ -102,8 +103,12 @@ class LibraryScreen extends ConsumerWidget {
                       final installedApp = apps[index];
                       final catalogApp = catalogAppsMap[installedApp.id];
                       final isRunning = runningMap[installedApp.id] ?? false;
-                      final hasUpdate = catalogApp != null &&
-                          catalogApp.latestVersion != installedApp.installedVersion;
+                      final platformRelease = catalogApp?.platforms[installedApp.platformKey] ??
+                          catalogApp?.getPlatformRelease(OsPaths.getCurrentPlatformKey());
+                      final isAnomalous = platformRelease != null &&
+                          platformRelease.isAnomalousVersion(installedApp.installedVersion);
+                      final hasUpdate = isAnomalous || (catalogApp != null &&
+                          catalogApp.latestVersion != installedApp.installedVersion);
 
                       return Container(
                         padding: const EdgeInsets.all(16),
@@ -146,6 +151,8 @@ class LibraryScreen extends ConsumerWidget {
                                       const SizedBox(width: 10),
                                       if (isRunning)
                                         StatusBadge.running()
+                                      else if (isAnomalous)
+                                        StatusBadge.anomaly()
                                       else if (hasUpdate)
                                         StatusBadge.updateAvailable()
                                       else
@@ -154,7 +161,9 @@ class LibraryScreen extends ConsumerWidget {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    'Versión instalada: v${installedApp.installedVersion}${hasUpdate ? " - Actualización v${catalogApp.latestVersion} disponible" : ""}',
+                                    isAnomalous
+                                        ? 'Anomalía: v${installedApp.installedVersion} huérfana en catálogo • Requiere actualización completa a v${catalogApp?.latestVersion ?? platformRelease.latestVersion}'
+                                        : 'Versión instalada: v${installedApp.installedVersion}${hasUpdate ? " - Actualización v${catalogApp?.latestVersion} disponible" : ""}',
                                     style: TextStyle(
                                       color: hasUpdate
                                           ? AppColors.warning
@@ -180,8 +189,8 @@ class LibraryScreen extends ConsumerWidget {
 
                             if (hasUpdate && catalogApp != null) ...[
                               HakkinButton(
-                                text: 'Actualizar',
-                                icon: Icons.arrow_circle_up,
+                                text: isAnomalous ? 'Actualizar Completa' : 'Actualizar',
+                                icon: isAnomalous ? Icons.system_update_alt : Icons.arrow_circle_up,
                                 variant: HakkinButtonVariant.primaryPlatinum,
                                 onPressed: isRunning
                                     ? null

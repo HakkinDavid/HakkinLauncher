@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/platform/os_paths.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/hero_carousel.dart';
@@ -140,7 +141,10 @@ class StoreScreen extends ConsumerWidget {
                       final installedApp = installedMap[app.id];
                       final isInstalled = installedApp != null;
                       final hasUpdate = isInstalled &&
-                          installedApp.installedVersion != app.latestVersion;
+                          app.needsUpdate(
+                            platformKey: OsPaths.getCurrentPlatformKey(),
+                            installedVersion: installedApp.installedVersion,
+                          );
                       final isRunning = runningMap[app.id] ?? false;
 
                       return AppCard(

@@ -26,6 +26,7 @@ import hashlib
 import argparse
 import subprocess
 import re
+import urllib.request
 from datetime import datetime, timezone
 
 WORKSPACE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -373,17 +374,21 @@ def evaluate_release(local_files, remote_manifest_text, new_tag, force=False):
     launcher_meta_data = {
         "latest_version": clean_version_tag,
         "min_required_launcher_version": existing_meta.get("min_required_launcher_version", "1.0.0"),
-        "releases": existing_meta.get("releases", {})
-    }
-    for pid, b in new_binaries.items():
-        launcher_meta_data["releases"][pid] = {
-            "url": b["download_url"],
-            "sha256": b["sha256"],
-            "size_bytes": b["size_bytes"]
+        "releases": {
+            pid: {
+                "url": b["download_url"],
+                "sha256": b["sha256"],
+                "size_bytes": b.get("size_bytes", 0)
+            }
+            for pid, b in new_binaries.items()
+            if b.get("download_url") and b.get("sha256") and b.get("size_bytes", 0) > 0
         }
+    }
 
     with open(LAUNCHER_META_FILE, "w", encoding="utf-8") as f:
         json.dump(launcher_meta_data, f, indent=2)
+
+    update_app_constants_version(clean_version_tag)
 
     # Generar Release Notes en Markdown con enlaces cruzados
     notes_lines = [
@@ -425,8 +430,143 @@ def evaluate_release(local_files, remote_manifest_text, new_tag, force=False):
     }
 
 
+def update_app_constants_version(version_tag):
+    """Actualiza defaultAppVersion en lib/core/constants/app_constants.dart."""
+    clean_tag = re.sub(r'^v+', '', version_tag)
+    constants_file = os.path.join(WORKSPACE_ROOT, "lib", "core", "constants", "app_constants.dart")
+    if not os.path.isfile(constants_file):
+        return False
+    with open(constants_file, "r", encoding="utf-8") as f:
+        content = f.read()
+    new_content = re.sub(
+        r"static const String defaultAppVersion = '[^']*';",
+        f"static const String defaultAppVersion = '{clean_tag}';",
+        content
+    )
+    if new_content != content:
+        with open(constants_file, "w", encoding="utf-8") as f:
+            f.write(new_content)
+        print(f"Versión base en app_constants.dart sincronizada con: {clean_tag}")
+    else:
+        print(f"Versión base en app_constants.dart ya está al día ({clean_tag}).")
+def sync_launcher_meta_from_remote(repo=None):
+    """
+    Inspecciona GitHub Releases para HakkinLauncher y regenera tools/launcher_meta.json.
+    - Si no hay ningún release publicado en GitHub (ej. todas las versiones fueron borradas):
+      Genera launcher_meta seguro y resiliente con releases: {}.
+    - Si hay un release publicado:
+      Descarga e inspecciona version_manifest.json (o los assets del release) y genera
+      tools/launcher_meta.json con las URLs, hashes y tamaños reales publicados.
+    """
+    repo = repo or get_repo_slug()
+    print(f"🔍 Sincronizando launcher_meta desde GitHub Releases para {repo}...")
+
+    latest_tag = None
+    manifest_data = None
+
+    # 1. Intentar obtener el último release con gh CLI
+    try:
+        res = subprocess.run(
+            ["gh", "release", "view", "--repo", repo, "--json", "tagName,assets"],
+            capture_output=True, text=True
+        )
+        if res.returncode == 0:
+            rel_info = json.loads(res.stdout)
+            latest_tag = rel_info.get("tagName")
+            assets = rel_info.get("assets", [])
+            has_manifest = any(a.get("name") == "version_manifest.json" for a in assets)
+            if has_manifest and latest_tag:
+                dl_res = subprocess.run(
+                    ["gh", "release", "download", latest_tag, "--repo", repo, "-p", "version_manifest.json", "-O", "-"],
+                    capture_output=True, text=True
+                )
+                if dl_res.returncode == 0 and dl_res.stdout.strip():
+                    try:
+                        manifest_data = json.loads(dl_res.stdout)
+                    except Exception:
+                        pass
+    except Exception as e:
+        print(f"Aviso: gh CLI no disponible o falló: {e}", file=sys.stderr)
+
+    # 2. Si gh no obtuvo manifest_data, intentar via urllib con API de GitHub
+    if not manifest_data:
+        token = os.environ.get("GITHUB_TOKEN")
+        headers = {"User-Agent": "HakkinLauncher-ReleaseHashManager/1.0"}
+        if token:
+            headers["Authorization"] = f"Bearer {token}"
+        api_url = f"https://api.github.com/repos/{repo}/releases?per_page=1"
+        try:
+            req = urllib.request.Request(api_url, headers=headers)
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                if resp.status == 200:
+                    releases = json.loads(resp.read().decode("utf-8"))
+                    if isinstance(releases, list) and len(releases) > 0:
+                        rel = releases[0]
+                        latest_tag = rel.get("tag_name")
+                        for asset in rel.get("assets", []):
+                            if asset.get("name") == "version_manifest.json":
+                                m_url = asset.get("browser_download_url")
+                                m_req = urllib.request.Request(m_url, headers=headers)
+                                with urllib.request.urlopen(m_req, timeout=10) as m_resp:
+                                    if m_resp.status == 200:
+                                        manifest_data = json.loads(m_resp.read().decode("utf-8"))
+                                break
+        except Exception as e:
+            print(f"Aviso: Consulta API de GitHub falló o sin conexión: {e}", file=sys.stderr)
+
+    # 3. Construir launcher_meta_data resiliente
+    if manifest_data and isinstance(manifest_data, dict):
+        clean_tag = re.sub(r'^v+', '', str(manifest_data.get("release_version", latest_tag or "1.0.0")))
+        releases_dict = {}
+        for pid, b in manifest_data.get("binaries", {}).items():
+            if isinstance(b, dict) and b.get("download_url") and b.get("sha256"):
+                releases_dict[pid] = {
+                    "url": b["download_url"],
+                    "sha256": b["sha256"],
+                    "size_bytes": b.get("size_bytes", 0)
+                }
+
+        meta = {
+            "latest_version": clean_tag,
+            "min_required_launcher_version": "1.0.0",
+            "releases": releases_dict
+        }
+        print(f"✅ Se sincronizó launcher_meta con el release {clean_tag} ({len(releases_dict)} binarios)")
+    elif latest_tag:
+        clean_tag = re.sub(r'^v+', '', str(latest_tag))
+        meta = {
+            "latest_version": clean_tag,
+            "min_required_launcher_version": "1.0.0",
+            "releases": {}
+        }
+        print(f"⚠️ Tag {latest_tag} localizado sin version_manifest.json; releases inicializado vacío.")
+    else:
+        # No hay ningún release en GitHub (todas las versiones fueron borradas)
+        meta = {
+            "latest_version": "1.0.0",
+            "min_required_launcher_version": "1.0.0",
+            "releases": {}
+        }
+        print("ℹ️ No hay versiones publicadas en GitHub (todas borradas). launcher_meta restablecido de forma segura y resiliente.")
+
+    os.makedirs(os.path.dirname(LAUNCHER_META_FILE), exist_ok=True)
+    with open(LAUNCHER_META_FILE, "w", encoding="utf-8") as f:
+        json.dump(meta, f, indent=2)
+    return meta
+
+
 def sync_catalog():
     """Ejecuta catalog_generator.py para actualizar docs/catalog.json y catalog_example.json."""
+    if os.path.isfile(LAUNCHER_META_FILE):
+        try:
+            with open(LAUNCHER_META_FILE, "r", encoding="utf-8") as f:
+                l_meta = json.load(f)
+                latest_ver = l_meta.get("latest_version")
+                if latest_ver:
+                    update_app_constants_version(latest_ver)
+        except Exception:
+            pass
+
     cat_gen = os.path.join(WORKSPACE_ROOT, "tools", "catalog_generator.py")
     if not os.path.isfile(cat_gen):
         print("Aviso: tools/catalog_generator.py no encontrado.", file=sys.stderr)
@@ -469,6 +609,14 @@ def main():
 
     # Subcomando: sync-catalog
     subparsers.add_parser("sync-catalog", help="Sincroniza docs/catalog.json con tools/launcher_meta.json")
+
+    # Subcomando: sync-launcher-meta
+    p_meta = subparsers.add_parser("sync-launcher-meta", help="Regenera tools/launcher_meta.json desde el release remoto de GitHub")
+    p_meta.add_argument("--repo", default=None, help="Repositorio owner/repo (opcional)")
+
+    # Subcomando: set-version
+    p_ver = subparsers.add_parser("set-version", help="Sincroniza defaultAppVersion en app_constants.dart")
+    p_ver.add_argument("--version", required=True, help="Versión de versión a sincronizar")
 
     args = parser.parse_args()
 
@@ -523,6 +671,14 @@ def main():
 
     elif args.command == "sync-catalog":
         ok = sync_catalog()
+        sys.exit(0 if ok else 1)
+
+    elif args.command == "sync-launcher-meta":
+        sync_launcher_meta_from_remote(repo=args.repo)
+        sys.exit(0)
+
+    elif args.command == "set-version":
+        ok = update_app_constants_version(args.version)
         sys.exit(0 if ok else 1)
 
 

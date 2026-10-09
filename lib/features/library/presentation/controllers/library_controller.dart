@@ -76,6 +76,14 @@ class InstalledAppsNotifier extends StateNotifier<AsyncValue<List<InstalledApp>>
       final catalogApp = manifest.apps.where((a) => a.id == id).firstOrNull;
       final release = catalogApp?.getPlatformRelease(app.platformKey);
       if (release != null) {
+        if (release.isAnomalousVersion(app.installedVersion)) {
+          return {
+            'isValid': false,
+            'isAnomalous': true,
+            'message':
+                'Anomalía detectada: la versión v${app.installedVersion} es huérfana o inexistente en el catálogo. Requiere actualización completa a v${release.latestVersion}.',
+          };
+        }
         final versionInfo = release.getRelease(app.installedVersion) ?? release.latestRelease;
         if (versionInfo.package.sha256.isNotEmpty) {
           final size = await exeFile.length();

@@ -180,9 +180,9 @@
             "changelog": "Versión 2.0: Primera versión con interfaz visual y soporte de restricciones.",
             "executable_relative_path": "Smart Scheduler.app/Contents/MacOS/Smart Scheduler",
             "package": {
-              "url": "https://github.com/HakkinDavid/smart-scheduler/releases/download/v2.0/smart-scheduler-macos-v2.0.zip",
-              "size_bytes": 31540120,
-              "sha256": "77e384bf8e999c011e0bc598e29bc11394a10ffc8821950ad0281b289cf291ae"
+              "url": "https://github.com/HakkinDavid/smart-scheduler/releases/download/v2.0/smart-scheduler-macos-arm64.zip",
+              "size_bytes": 32063818,
+              "sha256": "66d9600fa979f9cd95de695869c7c76fc4835a25de6d60137c2b049bb84b410b"
             },
             "delta_patches": []
           }

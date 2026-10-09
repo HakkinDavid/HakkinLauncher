@@ -158,7 +158,7 @@ void main() {
       final service = SelfUpdateService();
 
       const metaWithNewer = LauncherMeta(
-        latestVersion: '2.0.0',
+        latestVersion: '999.0.0',
         releases: {},
       );
       expect(service.isUpdateAvailable(metaWithNewer), isTrue);

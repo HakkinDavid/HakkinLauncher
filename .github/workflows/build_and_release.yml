@@ -24,10 +24,31 @@ permissions:
 
 jobs:
   # ============================================================================
+  # 0. Determinación Centralizada de Versión (SSOT)
+  # ============================================================================
+  prepare-version:
+    name: Prepare Version Tag
+    runs-on: ubuntu-latest
+    outputs:
+      version_tag: ${{ steps.version.outputs.tag }}
+    steps:
+      - name: Determine Version Tag
+        id: version
+        run: |
+          if [ -n "${{ github.event.inputs.version_tag }}" ]; then
+            TAG="${{ github.event.inputs.version_tag }}"
+          else
+            TAG="$(date +"%y.%m.%d-%H")"
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "Determined Version Tag: $TAG"
+
+  # ============================================================================
   # 1. Compilación Nativa Windows (Paralelo)
   # ============================================================================
   build-windows:
     name: Build Windows x64
+    needs: [prepare-version]
     runs-on: windows-latest
     steps:
       - name: Checkout Repository
@@ -51,7 +72,7 @@ jobs:
         run: flutter pub get
 
       - name: Build Windows Release
-        run: flutter build windows --release
+        run: flutter build windows --release --dart-define=APP_VERSION=${{ needs.prepare-version.outputs.version_tag }} --build-name=${{ needs.prepare-version.outputs.version_tag }}
 
       - name: Package Windows Binary
         shell: pwsh
@@ -72,6 +93,7 @@ jobs:
   # ============================================================================
   build-linux:
     name: Build Linux x64
+    needs: [prepare-version]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -103,7 +125,7 @@ jobs:
         run: flutter pub get
 
       - name: Build Linux Release
-        run: flutter build linux --release
+        run: flutter build linux --release --dart-define=APP_VERSION=${{ needs.prepare-version.outputs.version_tag }} --build-name=${{ needs.prepare-version.outputs.version_tag }}
 
       - name: Package Linux Binary
         run: |
@@ -123,6 +145,7 @@ jobs:
   # ============================================================================
   build-macos:
     name: Build macOS
+    needs: [prepare-version]
     runs-on: macos-latest
     steps:
       - name: Checkout Repository
@@ -147,7 +170,7 @@ jobs:
         run: flutter pub get
 
       - name: Build macOS Release
-        run: flutter build macos --release
+        run: flutter build macos --release --dart-define=APP_VERSION=${{ needs.prepare-version.outputs.version_tag }} --build-name=${{ needs.prepare-version.outputs.version_tag }}
 
       - name: Package macOS Binaries
         run: |
@@ -170,7 +193,7 @@ jobs:
   # ============================================================================
   release:
     name: Publish Release & Sync SSOT
-    needs: [build-windows, build-linux, build-macos]
+    needs: [prepare-version, build-windows, build-linux, build-macos]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository (Full History)
@@ -199,12 +222,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Determinar Tag
-          if [ -n "${{ github.event.inputs.version_tag }}" ]; then
-            TAG="${{ github.event.inputs.version_tag }}"
-          else
-            TAG="$(date +"%y.%m.%d-%H")"
-          fi
+          # Determinar Tag centralizado desde prepare-version
+          TAG="${{ needs.prepare-version.outputs.version_tag }}"
           echo "Release Tag: $TAG"
 
           # Descargar manifest previo si existe
@@ -249,16 +268,19 @@ jobs:
             echo "🟢 Todos los binarios están al día. Omitiendo duplicación de release."
           fi
 
-          # Sincronizar catálogo
+          # Regenerar launcher_meta.json posterior a publicar la versión en GitHub Releases
+          python3 scripts/release_hash_manager.py sync-launcher-meta
+
+          # Sincronizar catálogo en el agregador
           python3 scripts/release_hash_manager.py sync-catalog
 
       - name: Commit Updated Catalog & Metadata back to repository
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add tools/launcher_meta.json docs/catalog.json docs/catalog_example.json
+          git add tools/launcher_meta.json docs/catalog.json docs/catalog_example.json lib/core/constants/app_constants.dart
           if ! git diff --staged --quiet; then
-            git commit -m "chore(release): sincronizar catálogo y launcher_meta [skip ci]"
+            git commit -m "chore(release): sincronizar catálogo y versión de lanzador [skip ci]"
             git push origin HEAD:${{ github.ref_name }}
           else
             echo "No hay cambios en el catálogo para commitear."

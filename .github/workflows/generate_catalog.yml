@@ -35,6 +35,8 @@ jobs:
   generate-catalog:
     name: Generate Catalog & Sync Schema
     runs-on: ubuntu-latest
+    env:
+      HAKKIN_PKG_CACHE_DIR: ${{ github.workspace }}/.cache/hakkin_pkg_cache
 
     steps:
       - name: Checkout Repository (Full History)
@@ -47,8 +49,16 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install HDiffPatch Binaries (hdiffz & hpatchz)
+      - name: Cache HDiffPatch Binaries
         if: ${{ github.event.inputs.generate_deltas == 'true' }}
+        id: cache-hdiffpatch
+        uses: actions/cache@v4
+        with:
+          path: tools/bin
+          key: hdiffpatch-v5.1.3-${{ runner.os }}
+
+      - name: Install HDiffPatch Binaries (hdiffz & hpatchz)
+        if: ${{ github.event.inputs.generate_deltas == 'true' && steps.cache-hdiffpatch.outputs.cache-hit != 'true' }}
         run: |
           mkdir -p tools/bin /tmp/hdiff_extract
           echo "⬇️ Descargando HDiffPatch v5.1.3 para Linux x64..."
@@ -57,9 +67,24 @@ jobs:
           find /tmp/hdiff_extract -name "hdiffz" -type f -exec cp {} tools/bin/ \;
           find /tmp/hdiff_extract -name "hpatchz" -type f -exec cp {} tools/bin/ \;
           chmod +x tools/bin/hdiffz tools/bin/hpatchz
+
+      - name: Configure and Verify HDiffPatch
+        if: ${{ github.event.inputs.generate_deltas == 'true' }}
+        run: |
+          chmod +x tools/bin/hdiffz tools/bin/hpatchz
           echo "$(pwd)/tools/bin" >> $GITHUB_PATH
-          echo "✅ HDiffPatch instalado correctamente:"
+          echo "✅ HDiffPatch configurado y verificado:"
           tools/bin/hdiffz -v
+
+      - name: Cache Application Packages for Deltas
+        if: ${{ github.event.inputs.generate_deltas == 'true' }}
+        uses: actions/cache@v4
+        with:
+          path: .cache/hakkin_pkg_cache
+          key: deltas-pkg-${{ runner.os }}-${{ hashFiles('tools/catalog_overrides.json', 'docs/catalog.json') }}-${{ github.run_id }}
+          restore-keys: |
+            deltas-pkg-${{ runner.os }}-${{ hashFiles('tools/catalog_overrides.json', 'docs/catalog.json') }}-
+            deltas-pkg-${{ runner.os }}-
 
       - name: Run Unit Tests for Catalog & Deltas
         run: |
@@ -84,12 +109,16 @@ jobs:
               DELTAS_TARGET="HakkinDavid/hakkin-launcher-deltas"
             fi
             EXTRA_ARGS+=("--deltas-repo" "$DELTAS_TARGET")
+            EXTRA_ARGS+=("--pkg-cache-dir" "$HAKKIN_PKG_CACHE_DIR")
             if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
               EXTRA_ARGS+=("--dry-run-deltas")
             fi
           fi
 
-          echo "🚀 Generando catálogo de aplicaciones..."
+          echo "🔄 Sincronizando y regenerando launcher_meta desde GitHub Releases..."
+          python3 scripts/release_hash_manager.py sync-launcher-meta
+
+          echo "🚀 Generando catálogo de aplicaciones en el agregador..."
           python3 tools/catalog_generator.py "${EXTRA_ARGS[@]}"
 
       - name: Upload Catalog Artifacts
@@ -97,6 +126,7 @@ jobs:
         with:
           name: catalog-artifacts
           path: |
+            tools/launcher_meta.json
             docs/catalog.json
             docs/catalog_example.json
           retention-days: 7
@@ -106,11 +136,11 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/catalog.json docs/catalog_example.json
+          git add tools/launcher_meta.json docs/catalog.json docs/catalog_example.json
           if ! git diff --staged --quiet; then
-            git commit -m "chore(catalog): sincronizar catálogo de aplicaciones [skip ci]"
+            git commit -m "chore(catalog): sincronizar catálogo y launcher_meta [skip ci]"
             git push origin HEAD:${{ github.ref_name }}
-            echo "✅ Catálogo actualizado y subido al repositorio."
+            echo "✅ Catálogo y launcher_meta actualizados y subidos al repositorio."
           else
-            echo "🟢 No hay cambios pendientes en el catálogo."
+            echo "🟢 No hay cambios pendientes en el catálogo ni en launcher_meta."
           fi
