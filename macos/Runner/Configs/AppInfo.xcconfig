@@ -8,7 +8,7 @@
 PRODUCT_NAME = HakkinLauncher
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = dev.bonsanbec.hakkinlauncher.hakkinLauncher
+PRODUCT_BUNDLE_IDENTIFIER = dev.bonsanbec.hakkinlauncher
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2026 dev.bonsanbec.hakkinlauncher. All rights reserved.
