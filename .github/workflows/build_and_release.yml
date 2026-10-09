@@ -42,8 +42,18 @@ jobs:
           cache: true
           cache-key-secret: ${{ runner.os }}-flutter
 
-      - name: Enable Windows Desktop
-        run: flutter config --enable-windows-desktop
+      - name: Cache Pub Dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.LOCALAPPDATA }}\Pub\Cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
+      - name: Enable Windows Desktop & Precache
+        run: |
+          flutter config --enable-windows-desktop
+          flutter precache --windows
 
       - name: Install Dependencies
         run: flutter pub get
@@ -91,8 +101,18 @@ jobs:
           cache: true
           cache-key-secret: ${{ runner.os }}-flutter
 
-      - name: Enable Linux Desktop
-        run: flutter config --enable-linux-desktop
+      - name: Cache Pub Dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
+      - name: Enable Linux Desktop & Precache
+        run: |
+          flutter config --enable-linux-desktop
+          flutter precache --linux
 
       - name: Install Dependencies
         run: flutter pub get
@@ -132,8 +152,18 @@ jobs:
           cache: true
           cache-key-secret: ${{ runner.os }}-flutter
 
-      - name: Enable macOS Desktop
-        run: flutter config --enable-macos-desktop
+      - name: Cache Pub Dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
+      - name: Enable macOS Desktop & Precache
+        run: |
+          flutter config --enable-macos-desktop
+          flutter precache --macos
 
       - name: Install Dependencies
         run: flutter pub get
