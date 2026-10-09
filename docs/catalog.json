@@ -45,13 +45,10 @@
         "3D"
       ],
       "assets": {
-        "icon": "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=256&q=80",
-        "poster": "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600&q=80",
-        "banner": "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1600&q=80",
-        "screenshots": [
-          "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1280&q=80",
-          "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1280&q=80"
-        ]
+        "icon": null,
+        "poster": null,
+        "banner": null,
+        "screenshots": []
       },
       "latest_version": "26.10.08-13",
       "platforms": {
@@ -170,13 +167,10 @@
         "3D"
       ],
       "assets": {
-        "icon": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=256&q=80",
-        "poster": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&q=80",
-        "banner": "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=1600&q=80",
-        "screenshots": [
-          "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1280&q=80",
-          "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=1280&q=80"
-        ]
+        "icon": null,
+        "poster": null,
+        "banner": null,
+        "screenshots": []
       },
       "latest_version": "1.64",
       "platforms": {
@@ -221,12 +215,10 @@
         "Android"
       ],
       "assets": {
-        "icon": "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=256&q=80",
-        "poster": "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600&q=80",
-        "banner": "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=1600&q=80",
-        "screenshots": [
-          "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1280&q=80"
-        ]
+        "icon": null,
+        "poster": null,
+        "banner": null,
+        "screenshots": []
       },
       "latest_version": "3.0",
       "platforms": {
@@ -287,12 +279,10 @@
         "Offline-First"
       ],
       "assets": {
-        "icon": "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=256&q=80",
-        "poster": "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&q=80",
-        "banner": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=1600&q=80",
-        "screenshots": [
-          "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1280&q=80"
-        ]
+        "icon": null,
+        "poster": null,
+        "banner": null,
+        "screenshots": []
       },
       "latest_version": "26.08.04",
       "platforms": {
@@ -663,12 +653,10 @@
         "4NF"
       ],
       "assets": {
-        "icon": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=256&q=80",
-        "poster": "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&q=80",
-        "banner": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1600&q=80",
-        "screenshots": [
-          "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1280&q=80"
-        ]
+        "icon": null,
+        "poster": null,
+        "banner": null,
+        "screenshots": []
       },
       "latest_version": "26.09.11",
       "platforms": {
@@ -792,12 +780,10 @@
         "macOS"
       ],
       "assets": {
-        "icon": "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=256&q=80",
-        "poster": "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=600&q=80",
-        "banner": "https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=1600&q=80",
-        "screenshots": [
-          "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=1280&q=80"
-        ]
+        "icon": null,
+        "poster": null,
+        "banner": null,
+        "screenshots": []
       },
       "latest_version": "2.5.0",
       "platforms": {
@@ -867,12 +853,10 @@
         "Wiimote"
       ],
       "assets": {
-        "icon": "https://images.unsplash.com/photo-1600080972464-8e5f35f63d08?w=256&q=80",
-        "poster": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&q=80",
-        "banner": "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1600&q=80",
-        "screenshots": [
-          "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1280&q=80"
-        ]
+        "icon": null,
+        "poster": null,
+        "banner": null,
+        "screenshots": []
       },
       "latest_version": "1.0",
       "platforms": {
@@ -917,12 +901,10 @@
         "Windows"
       ],
       "assets": {
-        "icon": "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=256&q=80",
-        "poster": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&q=80",
-        "banner": "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=1600&q=80",
-        "screenshots": [
-          "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=1280&q=80"
-        ]
+        "icon": null,
+        "poster": null,
+        "banner": null,
+        "screenshots": []
       },
       "latest_version": "1.1.0",
       "platforms": {
@@ -993,12 +975,10 @@
         "Android"
       ],
       "assets": {
-        "icon": "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=256&q=80",
-        "poster": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80",
-        "banner": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1600&q=80",
-        "screenshots": [
-          "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1280&q=80"
-        ]
+        "icon": null,
+        "poster": null,
+        "banner": null,
+        "screenshots": []
       },
       "latest_version": "1.2",
       "platforms": {
@@ -1075,12 +1055,10 @@
         "Client-Side"
       ],
       "assets": {
-        "icon": "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=256&q=80",
-        "poster": "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?w=600&q=80",
-        "banner": "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=1600&q=80",
-        "screenshots": [
-          "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?w=1280&q=80"
-        ]
+        "icon": null,
+        "poster": null,
+        "banner": null,
+        "screenshots": []
       },
       "latest_version": "1.1.1",
       "platforms": {
