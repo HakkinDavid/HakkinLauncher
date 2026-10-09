@@ -26,6 +26,11 @@ static void my_application_activate(GApplication* application) {
   GtkWindow* window =
       GTK_WINDOW(gtk_application_window_new(GTK_APPLICATION(application)));
 
+  // Establecer icono de la ventana en Linux
+  if (!gtk_window_set_icon_from_file(window, "data/flutter_assets/assets/hakkinlauncher.png", nullptr)) {
+    gtk_window_set_icon_from_file(window, "assets/hakkinlauncher.png", nullptr);
+  }
+
   // Use a header bar when running in GNOME as this is the common style used
   // by applications and is the setup most users will be using (e.g. Ubuntu
   // desktop).

@@ -23,4 +23,8 @@ class AppConstants {
   // Dimensiones por defecto de la ventana
   static const double windowMinWidth = 1080;
   static const double windowMinHeight = 680;
+
+  // Iconos oficiales de la aplicación
+  static const String appIconPath = 'assets/hakkinlauncher.png';
+  static const String appIconIcoPath = 'assets/hakkinlauncher.ico';
 }

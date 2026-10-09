@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
+import '../constants/app_constants.dart';
 
 /// Servicio para la bandeja del sistema (System Tray / Menu Bar)
 class TrayService with TrayListener {
@@ -18,12 +19,15 @@ class TrayService with TrayListener {
       trayManager.addListener(instance);
 
       // Icono por defecto de bandeja según la plataforma
-      final iconPath = Platform.isWindows
-          ? 'windows/runner/resources/app_icon.ico'
-          : 'macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_32.png';
-
-      if (File(iconPath).existsSync()) {
-        await trayManager.setIcon(iconPath);
+      if (Platform.isWindows) {
+        final localIco = File('windows/runner/resources/app_icon.ico');
+        if (localIco.existsSync()) {
+          await trayManager.setIcon(localIco.absolute.path);
+        } else {
+          await trayManager.setIcon(AppConstants.appIconIcoPath);
+        }
+      } else {
+        await trayManager.setIcon(AppConstants.appIconPath);
       }
 
       final menu = Menu(
