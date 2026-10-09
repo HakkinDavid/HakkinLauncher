@@ -383,6 +383,9 @@ def evaluate_release(local_files, remote_manifest_text, new_tag, force=False):
         notes_lines.append(
             f"| **{b.get('display_name', pid)}** | `{b['filename']}` | {size_mb} | `{sha_short}` | [{link_label}]({url}) |"
         )
+    
+    with open(RELEASE_NOTES_FILE, "w", encoding="utf-8") as f:
+        f.write("\n".join(notes_lines) + "\n")
 
     if action == "CREATE_RELEASE":
         files_to_upload.append(VERSION_MANIFEST_FILE)
