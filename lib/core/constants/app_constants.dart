@@ -15,7 +15,7 @@ class AppConstants {
   );
 
   static const String defaultCatalogUrl =
-      'https://raw.githubusercontent.com/HakkinDavid/HakkinLauncher/main/docs/catalog_example.json';
+      'https://raw.githubusercontent.com/HakkinDavid/HakkinLauncher/master/docs/catalog_example.json';
 
   static const String prefCatalogUrlKey = 'hakkin_catalog_url';
   static const String prefCustomInstallPathKey = 'hakkin_install_path';
