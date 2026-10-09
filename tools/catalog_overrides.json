@@ -7,14 +7,20 @@
     "developer": "Bonsanbec",
     "summary": "Videojuego social ambientado en una reconstrucción histórica 1:1 de Tecate de 2009. Minijuegos, vehículos, personajes, topografía, geografía y edificios fidedignos.",
     "description_markdown": "# Tecate Simulator\n\nVideojuego social cuyo mapa y lore es una reconstrucción fidedigna histórica del Tecate, Baja California, de 2009.\n\n### Características:\n- **Reconstrucción 1:1**: Topografía, geografía y arquitectura fidedigna del municipio basada en fotogrametría y registros históricos.\n- **Mundo Social e Interactivo**: Minijuegos, vehículos conducibles, personajes y misiones de exploración urbana.\n- **Soporte Multiplataforma**: Compilaciones nativas optimizadas para Windows x64 y macOS Apple Silicon.",
-    "tags": ["Game", "Social", "Simulation", "Historical", "Open World", "3D"],
+    "tags": [
+      "Game",
+      "Social",
+      "Simulation",
+      "Historical",
+      "Open World",
+      "3D"
+    ],
     "assets": {
-      "icon": "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=256&q=80",
-      "poster": "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600&q=80",
-      "banner": "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1600&q=80",
+      "icon": "https://raw.githubusercontent.com/Bonsanbec/tecate-simulator/master/godot_project/branding/icon.png",
+      "poster": "https://raw.githubusercontent.com/Bonsanbec/tecate-simulator/master/godot_project/branding/icon.png",
+      "banner": "https://raw.githubusercontent.com/Bonsanbec/tecate-simulator/master/godot_project/branding/icon.png",
       "screenshots": [
-        "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1280&q=80",
-        "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1280&q=80"
+        "https://raw.githubusercontent.com/Bonsanbec/tecate-simulator/master/godot_project/branding/icon.png"
       ]
     },
     "platforms": {
@@ -38,14 +44,23 @@
     "developer": "Bonsanbec",
     "summary": "Simulación y renderizado 3D de rayos y arcos eléctricos siguiendo trayectorias de menor resistencia y autosimilitud fractal.",
     "description_markdown": "# Fractochales\n\nProgram that simulates the behavior of electric bolts through various environments, focusing on their tendencies to follow the path of least resistance and appear self-similar.\n\n### Características:\n- **Física de Rayos**: Renderizado 3D dinámico que modela la propagación eléctrica y las estructuras fractales de descarga.\n- **Personalización y Gamificación**: Múltiples opciones de configuración de entorno, conductividad y modos lúdicos.\n- **Investigación Científica**: Útil para comprender la física de la electricidad y realizar experimentación sobre descargas atmosféricas.\n- Desarrollado en C++ con SFML y OpenAL.",
-    "tags": ["Simulation", "Physics", "Electricity", "Fractals", "Science", "3D"],
+    "tags": [
+      "Simulation",
+      "Physics",
+      "Electricity",
+      "Fractals",
+      "Science",
+      "3D"
+    ],
     "assets": {
-      "icon": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=256&q=80",
-      "poster": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&q=80",
-      "banner": "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=1600&q=80",
+      "icon": "https://raw.githubusercontent.com/Bonsanbec/fractochales/main/images/fractochales.png",
+      "poster": "https://raw.githubusercontent.com/Bonsanbec/fractochales/main/images/skyscraper.png",
+      "banner": "https://raw.githubusercontent.com/Bonsanbec/fractochales/main/images/lightning.png",
       "screenshots": [
-        "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1280&q=80",
-        "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=1280&q=80"
+        "https://raw.githubusercontent.com/Bonsanbec/fractochales/main/images/lightning.png",
+        "https://raw.githubusercontent.com/Bonsanbec/fractochales/main/images/skyscraper.png",
+        "https://raw.githubusercontent.com/Bonsanbec/fractochales/main/images/city.jpg",
+        "https://raw.githubusercontent.com/Bonsanbec/fractochales/main/images/space.jpg"
       ]
     },
     "platforms": {
@@ -64,13 +79,21 @@
     "developer": "Bonsanbec",
     "summary": "Herramienta comunitaria de apoyo y solidaridad digital nacida en Tijuana para conectar a personas migrantes con albergues, servicios y comedores.",
     "description_markdown": "# Sistema de Apoyo Migrante\n\nEste proyecto nació al observar una necesidad urgente en las calles de Tijuana: personas migrantes buscando ayuda, orientación y un lugar seguro.\n\n### Propósito:\n- Conectar a personas en movilidad con esfuerzos colectivos de la comunidad, albergues, comedores y servicios médicos gratuitos según directorios de OIM y ACNUR.\n- Enfoque comunitario y solidario: hecho para acompañar, guiar y recordar que nadie camina solo.\n- Versión web y aplicación móvil Android offline-ready.",
-    "tags": ["Humanitarian", "Community", "Maps", "Solidarity", "Tijuana", "Android"],
+    "tags": [
+      "Humanitarian",
+      "Community",
+      "Maps",
+      "Solidarity",
+      "Tijuana",
+      "Android"
+    ],
     "assets": {
-      "icon": "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=256&q=80",
-      "poster": "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600&q=80",
-      "banner": "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=1600&q=80",
+      "icon": "https://raw.githubusercontent.com/Bonsanbec/migrant-aid-map/main/assets/icon-only.png",
+      "poster": "https://raw.githubusercontent.com/Bonsanbec/migrant-aid-map/main/assets/splash.png",
+      "banner": "https://raw.githubusercontent.com/Bonsanbec/migrant-aid-map/main/assets/splash.png",
       "screenshots": [
-        "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1280&q=80"
+        "https://raw.githubusercontent.com/Bonsanbec/migrant-aid-map/main/assets/splash.png",
+        "https://raw.githubusercontent.com/Bonsanbec/migrant-aid-map/main/icons/icon-512.webp"
       ]
     },
     "platforms": {
@@ -89,13 +112,24 @@
     "developer": "HakkinDavid",
     "summary": "Sistema para digitalizar, optimizar y centralizar el registro y consulta de atenciones médicas e incidentes del cuerpo de bomberos de Tijuana.",
     "description_markdown": "# Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos\n\nProyecto dirigido a digitalizar, optimizar y centralizar el registro, almacenamiento y consulta de información sobre incidentes y atenciones médicas realizadas por el cuerpo de bomberos de Tijuana.\n\n### Objetivos Principales:\n- **Validez Legal y Digitalización**: Formatos prehospitalarios estandarizados con folios únicos y firmas digitales.\n- **Offline-First**: Operación garantizada en zonas sin cobertura celular con sincronización automática posterior.\n- **Reportes y Estadísticas**: Generación y exportación de reportes PDF e interoperabilidad con sistemas institucionales.",
-    "tags": ["Emergency", "Firefighters", "Tijuana", "Medical", "Productivity", "Offline-First"],
+    "tags": [
+      "Emergency",
+      "Firefighters",
+      "Tijuana",
+      "Medical",
+      "Productivity",
+      "Offline-First"
+    ],
     "assets": {
-      "icon": "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=256&q=80",
-      "poster": "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&q=80",
-      "banner": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=1600&q=80",
+      "icon": "https://raw.githubusercontent.com/HakkinDavid/firefighter-form/master/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_1024.png",
+      "poster": "https://raw.githubusercontent.com/HakkinDavid/firefighter-form/master/design/app.png",
+      "banner": "https://raw.githubusercontent.com/HakkinDavid/firefighter-form/master/design/general.png",
       "screenshots": [
-        "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1280&q=80"
+        "https://raw.githubusercontent.com/HakkinDavid/firefighter-form/master/design/app.png",
+        "https://raw.githubusercontent.com/HakkinDavid/firefighter-form/master/design/forms.png",
+        "https://raw.githubusercontent.com/HakkinDavid/firefighter-form/master/design/general.png",
+        "https://raw.githubusercontent.com/HakkinDavid/firefighter-form/master/design/sync.png",
+        "https://raw.githubusercontent.com/HakkinDavid/firefighter-form/master/design/supabase.png"
       ]
     },
     "platforms": {
@@ -119,13 +153,21 @@
     "developer": "HakkinDavid",
     "summary": "Gemelo digital personal, offline-first y autocontenido con arquitectura 4NF y Drift para catalogar objetos físicos, seres vivos, herramientas y documentos con auditoría e inventario.",
     "description_markdown": "# Platinum World Management System\n\nAplicación personal, offline-first y autocontenida desarrollada con Flutter, Riverpod, GoRouter y Drift sobre SQLite diseñada para actuar como el gemelo digital completo del mundo del usuario.\n\n### Visión y Filosofía:\n- **Normalización 4NF**: Unifica objetos físicos, herramientas, seres vivos, documentos, proyectos e infraestructura digital en un modelo relacional en Cuarta Forma Normal.\n- **Local-First Estricto**: SQLite local como única fuente de verdad, sin servidores externos obligatorios.\n- **Historial y Trazabilidad**: Todo cambio de ubicación o edición genera eventos automáticos de auditoría.",
-    "tags": ["Digital Twin", "Offline-First", "Drift", "Inventory", "Auditing", "4NF"],
+    "tags": [
+      "Digital Twin",
+      "Offline-First",
+      "Drift",
+      "Inventory",
+      "Auditing",
+      "4NF"
+    ],
     "assets": {
-      "icon": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=256&q=80",
-      "poster": "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&q=80",
-      "banner": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1600&q=80",
+      "icon": "https://raw.githubusercontent.com/HakkinDavid/PWMS/master/assets/PWMS.png",
+      "poster": "https://raw.githubusercontent.com/HakkinDavid/PWMS/master/assets/PWMS.png",
+      "banner": "https://raw.githubusercontent.com/HakkinDavid/PWMS/master/assets/PWMS.png",
       "screenshots": [
-        "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1280&q=80"
+        "https://raw.githubusercontent.com/HakkinDavid/PWMS/master/assets/PWMS.png",
+        "https://raw.githubusercontent.com/HakkinDavid/PWMS/master/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_1024.png"
       ]
     },
     "platforms": {
@@ -144,13 +186,19 @@
     "developer": "HakkinDavid",
     "summary": "Generador y optimizador de horarios académicos sin traslapes y con ranking por comodidad percibida.",
     "description_markdown": "# Smart Scheduler\n\nGenerador inteligente y optimizador de combinaciones de horarios académicos y universitarios.\n\n### Características:\n- **Sin Traslapes**: Resolución de restricciones temporales para garantizar combinaciones de materias compatibles.\n- **Ranking de Comodidad Percibida**: Clasificación de combinaciones según cercanía de clases, minimización de huecos libres y preferencias horarias del estudiante.\n- Empaquetado nativo para macOS Apple Silicon en bundle `.app`.",
-    "tags": ["Productivity", "Education", "Scheduler", "Optimization", "macOS"],
+    "tags": [
+      "Productivity",
+      "Education",
+      "Scheduler",
+      "Optimization",
+      "macOS"
+    ],
     "assets": {
-      "icon": "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=256&q=80",
-      "poster": "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=600&q=80",
-      "banner": "https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=1600&q=80",
+      "icon": "https://raw.githubusercontent.com/HakkinDavid/smart-scheduler/main/smart-scheduler.png",
+      "poster": "https://raw.githubusercontent.com/HakkinDavid/smart-scheduler/main/smart-scheduler.png",
+      "banner": "https://raw.githubusercontent.com/HakkinDavid/smart-scheduler/main/smart-scheduler.png",
       "screenshots": [
-        "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=1280&q=80"
+        "https://raw.githubusercontent.com/HakkinDavid/smart-scheduler/main/smart-scheduler.png"
       ]
     },
     "platforms": {
@@ -198,14 +246,19 @@
     "developer": "HakkinDavid",
     "summary": "Utilidad de terminal en espacio de usuario para macOS que traduce entradas de Nintendo Wiimote a pulsaciones de teclado mediante IOHIDManager.",
     "description_markdown": "# Wiimote Userland Driver\n\nControlador ligero en espacio de usuario para macOS que permite utilizar un mando Nintendo Wiimote como dispositivo de entrada estándar para juegos y aplicaciones fuera del emulador Dolphin.\n\n### Aspectos Técnicos:\n- **Entrada Basada en IOHIDManager**: Lee reportes de entrada del Wiimote sin requerir extensiones de kernel KEXT.\n- **Soporte Completo de Botones**: D-Pad, A/B, 1/2, +, -, HOME y combinaciones simultáneas de teclas.\n- **Emulación de Teclado**: Mapea acciones del mando a keycodes nativos del sistema operativo.",
-    "tags": ["Driver", "HID", "macOS", "Gaming", "Nintendo", "Wiimote"],
+    "tags": [
+      "Driver",
+      "HID",
+      "macOS",
+      "Gaming",
+      "Nintendo",
+      "Wiimote"
+    ],
     "assets": {
-      "icon": "https://images.unsplash.com/photo-1600080972464-8e5f35f63d08?w=256&q=80",
-      "poster": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&q=80",
-      "banner": "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1600&q=80",
-      "screenshots": [
-        "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1280&q=80"
-      ]
+      "icon": null,
+      "poster": null,
+      "banner": null,
+      "screenshots": []
     },
     "platforms": {
       "macos-arm64": {
@@ -223,13 +276,21 @@
     "developer": "HakkinDavid",
     "summary": "Utilidad residente con AutoHotkey para escribir caracteres especiales en español y tonos pinyin sin cambiar la distribución del teclado.",
     "description_markdown": "# Language Input Hotkey\n\nUtilidad residente en segundo plano desarrollada con AutoHotkey para agilizar la entrada de caracteres especiales en español y pinyin del tono uno al cuatro imitando las combinaciones de acceso rápido de Microsoft Word.\n\n### Binarios Disponibles:\n- `spanish-v1.0.exe`: Entrada rápida de vocales acentuadas, diéresis y signos de interrogación y admiración invertidos.\n- `pinyin-v1.0.exe`: Mapeo tonal para caracteres fonéticos en mandarín.",
-    "tags": ["Utility", "Typing", "Languages", "AutoHotkey", "Productivity", "Windows"],
+    "tags": [
+      "Utility",
+      "Typing",
+      "Languages",
+      "AutoHotkey",
+      "Productivity",
+      "Windows"
+    ],
     "assets": {
-      "icon": "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=256&q=80",
-      "poster": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&q=80",
-      "banner": "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=1600&q=80",
+      "icon": "https://raw.githubusercontent.com/HakkinDavid/languages-autohotkey/main/icon/spain.ico",
+      "poster": "https://raw.githubusercontent.com/HakkinDavid/languages-autohotkey/main/icon/spain.ico",
+      "banner": "https://raw.githubusercontent.com/HakkinDavid/languages-autohotkey/main/icon/spain.ico",
       "screenshots": [
-        "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=1280&q=80"
+        "https://raw.githubusercontent.com/HakkinDavid/languages-autohotkey/main/icon/spain.ico",
+        "https://raw.githubusercontent.com/HakkinDavid/languages-autohotkey/main/icon/pinyinromaji.ico"
       ]
     },
     "platforms": {
@@ -264,13 +325,23 @@
     "developer": "HakkinDavid",
     "summary": "Calculadora de física y estadística matemática con temática felina dividida en física y probabilidad.",
     "description_markdown": "# CAT Helper\n\nAplicación móvil Android concebida como asistente de cálculo en dos vertientes:\n\n### Modalidades:\n- **Calculadora de Física**: Resolución rápida de magnitudes mecánicas, cinemáticas y dinámicas.\n- **Calculadora Estadística y de Probabilidad**: Análisis combinatorio, distribuciones y cálculo probabilístico.\n- Todo integrado con una estética y temática felina distintiva.",
-    "tags": ["Calculator", "Physics", "Statistics", "Cats", "Education", "Android"],
+    "tags": [
+      "Calculator",
+      "Physics",
+      "Statistics",
+      "Cats",
+      "Education",
+      "Android"
+    ],
     "assets": {
-      "icon": "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=256&q=80",
-      "poster": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80",
-      "banner": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1600&q=80",
+      "icon": "https://raw.githubusercontent.com/HakkinDavid/cathelper/main/icons/icon-512.webp",
+      "poster": "https://raw.githubusercontent.com/HakkinDavid/cathelper/main/src/assets/CATHelper.png",
+      "banner": "https://raw.githubusercontent.com/HakkinDavid/cathelper/main/assets/logo.png",
       "screenshots": [
-        "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1280&q=80"
+        "https://raw.githubusercontent.com/HakkinDavid/cathelper/main/assets/logo.png",
+        "https://raw.githubusercontent.com/HakkinDavid/cathelper/main/src/assets/CATHelperPinch.png",
+        "https://raw.githubusercontent.com/HakkinDavid/cathelper/main/src/assets/CATHelperZZZ.png",
+        "https://raw.githubusercontent.com/HakkinDavid/cathelper/main/src/assets/CATHelper.png"
       ]
     },
     "platforms": {
@@ -289,13 +360,24 @@
     "developer": "HakkinDavid",
     "summary": "Mod client-side para Minecraft 26.1 adaptado a Forge que transforma el modelo del jugador en gato, con soporte para skins personalizadas y el comando /catsize.",
     "description_markdown": "# Catify Mod Forge\n\nModificación puramente client-side para Minecraft 26.1 adaptada a Forge que transforma visualmente el modelo del jugador en un gato.\n\n### Características:\n- **Cambio de Aspecto Visual**: No altera colisiones ni físicas del jugador, garantizando juego limpio.\n- **Variantes y Skins Personalizadas**: Soporta 11 skins vanilla y adición de texturas personalizadas en `data/catify/cat_enitity_skins` con el comando `/catvariant <nombre>`.\n- **Ajuste de Tamaño**: Comando `/catsize <small/normal/large>` para alternar el tamaño del modelo felino.\n- **Compatibilidad**: Sincronización visual en servidores multijugador.",
-    "tags": ["Minecraft", "Mod", "Forge", "Cats", "Gaming", "Client-Side"],
+    "tags": [
+      "Minecraft",
+      "Mod",
+      "Forge",
+      "Cats",
+      "Gaming",
+      "Client-Side"
+    ],
     "assets": {
-      "icon": "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=256&q=80",
-      "poster": "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?w=600&q=80",
-      "banner": "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=1600&q=80",
+      "icon": "https://raw.githubusercontent.com/HakkinDavid/CatifyMod-Forge/master/src/main/resources/assets/catify/icon.png",
+      "poster": "https://raw.githubusercontent.com/HakkinDavid/CatifyMod-Forge/master/images/catStanding.png",
+      "banner": "https://raw.githubusercontent.com/HakkinDavid/CatifyMod-Forge/master/images/catInvisibilityOptions.png",
       "screenshots": [
-        "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?w=1280&q=80"
+        "https://raw.githubusercontent.com/HakkinDavid/CatifyMod-Forge/master/images/catStanding.png",
+        "https://raw.githubusercontent.com/HakkinDavid/CatifyMod-Forge/master/images/catStanding2.png",
+        "https://raw.githubusercontent.com/HakkinDavid/CatifyMod-Forge/master/images/catHand1.png",
+        "https://raw.githubusercontent.com/HakkinDavid/CatifyMod-Forge/master/images/catVariants.png",
+        "https://raw.githubusercontent.com/HakkinDavid/CatifyMod-Forge/master/images/catHitbox.png"
       ]
     },
     "platforms": {
