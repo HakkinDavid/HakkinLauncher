@@ -417,7 +417,7 @@ def evaluate_release(local_files, remote_manifest_text, new_tag, force=False):
     if action == "CREATE_RELEASE":
         files_to_upload.append(VERSION_MANIFEST_FILE)
 
-    return {
+    eval_result = {
         "action": action,
         "reason": reason,
         "release_tag": new_tag,
@@ -428,6 +428,17 @@ def evaluate_release(local_files, remote_manifest_text, new_tag, force=False):
         "notes_path": RELEASE_NOTES_FILE,
         "launcher_meta_path": LAUNCHER_META_FILE,
     }
+
+    try:
+        os.makedirs(BUILD_DIR, exist_ok=True)
+        eval_summary_file = os.path.join(BUILD_DIR, "eval_summary.json")
+        with open(eval_summary_file, "w", encoding="utf-8") as f:
+            json.dump(eval_result, f, indent=2)
+        eval_result["eval_summary_path"] = eval_summary_file
+    except Exception as e:
+        print(f"Aviso: No se pudo guardar eval_summary.json: {e}", file=sys.stderr)
+
+    return eval_result
 
 
 def update_app_constants_version(version_tag):
@@ -446,9 +457,12 @@ def update_app_constants_version(version_tag):
     if new_content != content:
         with open(constants_file, "w", encoding="utf-8") as f:
             f.write(new_content)
-        print(f"Versión base en app_constants.dart sincronizada con: {clean_tag}")
+        print(f"Versión base en app_constants.dart sincronizada con: {clean_tag}", file=sys.stderr)
     else:
-        print(f"Versión base en app_constants.dart ya está al día ({clean_tag}).")
+        print(f"Versión base en app_constants.dart ya está al día ({clean_tag}).", file=sys.stderr)
+    return True
+
+
 def sync_launcher_meta_from_remote(repo=None):
     """
     Inspecciona GitHub Releases para HakkinLauncher y regenera tools/launcher_meta.json.

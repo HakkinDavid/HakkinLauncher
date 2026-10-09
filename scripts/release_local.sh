@@ -311,8 +311,8 @@ if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
   EVAL_STATUS=$?
   set -e
 
-  ACTION="$(echo "$EVAL_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin).get('action', ''))")"
-  REASON="$(echo "$EVAL_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin).get('reason', ''))")"
+  ACTION="$(python3 -c "import sys, json, os; p='build/release/eval_summary.json'; d=json.load(open(p)) if os.path.isfile(p) else (json.loads(s[s.find('{'):]) if (s:=sys.stdin.read()) and '{' in s else {}); print(d.get('action', ''))" <<< "$EVAL_JSON")"
+  REASON="$(python3 -c "import sys, json, os; p='build/release/eval_summary.json'; d=json.load(open(p)) if os.path.isfile(p) else (json.loads(s[s.find('{'):]) if (s:=sys.stdin.read()) and '{' in s else {}); print(d.get('reason', ''))" <<< "$EVAL_JSON")"
 
   if [[ "$ACTION" == "NOTHING_TO_DO" ]]; then
     echo "================================================================="
@@ -327,10 +327,10 @@ if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
   fi
 
   # Extraer datos de la evaluación
-  FILES_TO_UPLOAD=($(echo "$EVAL_JSON" | python3 -c "import sys, json; print(' '.join(json.load(sys.stdin).get('files_to_upload', [])))"))
-  UPDATED_PLATS="$(echo "$EVAL_JSON" | python3 -c "import sys, json; print(', '.join(json.load(sys.stdin).get('updated_platforms', [])))")"
-  PRESERVED_PLATS="$(echo "$EVAL_JSON" | python3 -c "import sys, json; print(', '.join(json.load(sys.stdin).get('preserved_platforms', [])))")"
-  NOTES_FILE="$(echo "$EVAL_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin).get('notes_path', ''))")"
+  FILES_TO_UPLOAD=($(python3 -c "import sys, json, os; p='build/release/eval_summary.json'; d=json.load(open(p)) if os.path.isfile(p) else (json.loads(s[s.find('{'):]) if (s:=sys.stdin.read()) and '{' in s else {}); print(' '.join(d.get('files_to_upload', [])))" <<< "$EVAL_JSON"))
+  UPDATED_PLATS="$(python3 -c "import sys, json, os; p='build/release/eval_summary.json'; d=json.load(open(p)) if os.path.isfile(p) else (json.loads(s[s.find('{'):]) if (s:=sys.stdin.read()) and '{' in s else {}); print(', '.join(d.get('updated_platforms', [])))" <<< "$EVAL_JSON")"
+  PRESERVED_PLATS="$(python3 -c "import sys, json, os; p='build/release/eval_summary.json'; d=json.load(open(p)) if os.path.isfile(p) else (json.loads(s[s.find('{'):]) if (s:=sys.stdin.read()) and '{' in s else {}); print(', '.join(d.get('preserved_platforms', [])))" <<< "$EVAL_JSON")"
+  NOTES_FILE="$(python3 -c "import sys, json, os; p='build/release/eval_summary.json'; d=json.load(open(p)) if os.path.isfile(p) else (json.loads(s[s.find('{'):]) if (s:=sys.stdin.read()) and '{' in s else {}); print(d.get('notes_path', ''))" <<< "$EVAL_JSON")"
 
   echo "================================================================="
   echo "PUBLICANDO NUEVO RELEASE: $TAG como latest"

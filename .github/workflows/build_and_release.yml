@@ -247,9 +247,9 @@ jobs:
           echo "Evaluación SSOT:"
           echo "$EVAL_JSON"
 
-          ACTION="$(echo "$EVAL_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin).get('action', ''))")"
-          NOTES_FILE="$(echo "$EVAL_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin).get('notes_path', ''))")"
-          FILES_TO_UPLOAD=($(echo "$EVAL_JSON" | python3 -c "import sys, json; print(' '.join(json.load(sys.stdin).get('files_to_upload', [])))"))
+          ACTION="$(python3 -c "import sys, json, os; p='build/release/eval_summary.json'; d=json.load(open(p)) if os.path.isfile(p) else (json.loads(s[s.find('{'):]) if (s:=sys.stdin.read()) and '{' in s else {}); print(d.get('action', ''))" <<< "$EVAL_JSON")"
+          NOTES_FILE="$(python3 -c "import sys, json, os; p='build/release/eval_summary.json'; d=json.load(open(p)) if os.path.isfile(p) else (json.loads(s[s.find('{'):]) if (s:=sys.stdin.read()) and '{' in s else {}); print(d.get('notes_path', ''))" <<< "$EVAL_JSON")"
+          FILES_TO_UPLOAD=($(python3 -c "import sys, json, os; p='build/release/eval_summary.json'; d=json.load(open(p)) if os.path.isfile(p) else (json.loads(s[s.find('{'):]) if (s:=sys.stdin.read()) and '{' in s else {}); print(' '.join(d.get('files_to_upload', [])))" <<< "$EVAL_JSON"))
 
           if [ "$ACTION" = "CREATE_RELEASE" ] || [ "${{ github.event.inputs.force }}" = "true" ]; then
             if gh release view "$TAG" >/dev/null 2>&1; then
