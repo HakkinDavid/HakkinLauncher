@@ -30,7 +30,7 @@
         "protected_user_paths": []
       },
       "macos-arm64": {
-        "executable_relative_path": "tecate.app/Contents/MacOS/tecate",
+        "executable_relative_path": "tecate.app/Contents/MacOS/Tecate- Pueblo Mágico y Social",
         "asset_pattern": "tecate-macos.*\\.zip",
         "protected_user_paths": []
       }

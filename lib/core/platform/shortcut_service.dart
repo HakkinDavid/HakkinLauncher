@@ -32,10 +32,16 @@ class ShortcutService {
           iconPath: iconPath,
         );
       } else if (Platform.isMacOS) {
+        var targetToLink = executablePath;
+        final appBundleIdx = executablePath.indexOf('.app');
+        if (appBundleIdx != -1) {
+          targetToLink = executablePath.substring(0, appBundleIdx + 4);
+        }
+
         final desktopPath = p.join(userHome, 'Desktop', appTitle);
         final link = Link(desktopPath);
         if (await link.exists()) await link.delete();
-        await link.create(executablePath);
+        await link.create(targetToLink);
         return true;
       }
     } catch (e) {

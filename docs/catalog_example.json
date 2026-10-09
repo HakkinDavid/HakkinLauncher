@@ -110,7 +110,7 @@
               "version": "26.10.08-13",
               "release_date": "2026-10-08T20:22:34.508643+00:00",
               "changelog": "Lanzamiento de Tecate Simulator v26.10.08-13.",
-              "executable_relative_path": "tecate.app/Contents/MacOS/tecate",
+              "executable_relative_path": "tecate.app/Contents/MacOS/Tecate- Pueblo Mágico y Social",
               "package": {
                 "url": "https://github.com/Bonsanbec/tecate-simulator/releases/download/26.10.08-13/tecate-macos.zip",
                 "size_bytes": 1111734578,
@@ -136,7 +136,7 @@
               "version": "0.0.1",
               "release_date": "2026-09-28T06:01:26Z",
               "changelog": "**Full Changelog**: https://github.com/Bonsanbec/tecate-simulator/commits/latest",
-              "executable_relative_path": "tecate.app/Contents/MacOS/tecate",
+              "executable_relative_path": "tecate.app/Contents/MacOS/Tecate- Pueblo Mágico y Social",
               "package": {
                 "url": "https://github.com/Bonsanbec/tecate-simulator/releases/download/latest/tecate-macos-v0.0.1-release.zip",
                 "size_bytes": 798030827,

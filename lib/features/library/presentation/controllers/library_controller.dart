@@ -33,9 +33,17 @@ class InstalledAppsNotifier extends StateNotifier<AsyncValue<List<InstalledApp>>
       args.addAll(app.launchArguments!.trim().split(RegExp(r'\s+')));
     }
 
+    var exePath = app.executablePath;
+    final resolved = ProcessLauncher.resolveExecutablePath(exePath, app.installDirectory);
+    if (resolved != null && resolved != exePath) {
+      exePath = resolved;
+      final updated = app.copyWith(executablePath: exePath);
+      await _repo.saveInstalledApp(updated);
+    }
+
     final success = await ProcessLauncher.launchApp(
       appId: app.id,
-      executablePath: app.executablePath,
+      executablePath: exePath,
       arguments: args,
       workingDirectory: app.installDirectory,
     );
@@ -62,7 +70,13 @@ class InstalledAppsNotifier extends StateNotifier<AsyncValue<List<InstalledApp>>
       return {'isValid': false, 'message': 'Aplicación no registrada localmente'};
     }
 
-    final exeFile = File(app.executablePath);
+    var exePath = app.executablePath;
+    final resolved = ProcessLauncher.resolveExecutablePath(exePath, app.installDirectory);
+    if (resolved != null) {
+      exePath = resolved;
+    }
+
+    final exeFile = File(exePath);
     if (!await exeFile.exists()) {
       return {
         'isValid': false,

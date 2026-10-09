@@ -574,6 +574,28 @@ class PatchEngine {
     Directory targetDirectory,
     String executableRelativePath,
   ) async {
+    // 1. En macOS, utilizar ditto: preserva permisos POSIX, symlinks, atributos
+    // y no carga archivos masivos en memoria heap de Dart.
+    if (Platform.isMacOS) {
+      try {
+        final dittoResult = await Process.run('ditto', ['-xk', downloadedFile.path, targetDirectory.path]);
+        if (dittoResult.exitCode == 0) {
+          return;
+        }
+      } catch (_) {}
+    }
+
+    // 2. En Linux, intentar unzip nativo
+    if (Platform.isLinux) {
+      try {
+        final unzipResult = await Process.run('unzip', ['-q', '-o', downloadedFile.path, '-d', targetDirectory.path]);
+        if (unzipResult.exitCode == 0) {
+          return;
+        }
+      } catch (_) {}
+    }
+
+    // 3. Fallback o Windows: lectura de bytes o ZipDecoder
     final bytes = await downloadedFile.readAsBytes();
     final isZip = bytes.length >= 4 &&
         bytes[0] == 0x50 &&
@@ -609,9 +631,32 @@ class PatchEngine {
     required Directory targetInstallDir,
     required String platformKey,
   }) async {
-    final exePath = p.join(targetInstallDir.path, versionRelease.executableRelativePath);
+    var exePath = p.join(targetInstallDir.path, versionRelease.executableRelativePath);
 
-    if (Platform.isMacOS || Platform.isLinux) {
+    if (Platform.isMacOS) {
+      // 1. Eliminar cuarentena de Gatekeeper en todo el directorio instalado y bundles .app
+      try {
+        await Process.run('xattr', ['-cr', targetInstallDir.path]);
+      } catch (_) {}
+
+      // 2. Si la ruta configurada en catálogo no existe, auto-resolver el binario real dentro de .app
+      final resolved = ProcessLauncher.resolveExecutablePath(exePath, targetInstallDir.path);
+      if (resolved != null) {
+        exePath = resolved;
+      }
+
+      // 3. Otorgar permisos +x al ejecutable y a cualquier binario dentro de Contents/MacOS
+      try {
+        await Process.run('chmod', ['+x', exePath]);
+        final appIdx = exePath.indexOf('.app');
+        if (appIdx != -1) {
+          final bundlePath = exePath.substring(0, appIdx + 4);
+          await Process.run('xattr', ['-cr', bundlePath]);
+          final macosDir = p.join(bundlePath, 'Contents', 'MacOS');
+          await Process.run('chmod', ['-R', '+x', macosDir]);
+        }
+      } catch (_) {}
+    } else if (Platform.isLinux) {
       try {
         await Process.run('chmod', ['+x', exePath]);
       } catch (_) {}

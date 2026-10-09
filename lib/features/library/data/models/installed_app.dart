@@ -59,6 +59,8 @@ class InstalledApp {
 
   InstalledApp copyWith({
     String? installedVersion,
+    String? executablePath,
+    String? installDirectory,
     DateTime? lastLaunchedAt,
     int? sizeBytes,
     String? launchArguments,
@@ -67,8 +69,8 @@ class InstalledApp {
       id: id,
       title: title,
       installedVersion: installedVersion ?? this.installedVersion,
-      executablePath: executablePath,
-      installDirectory: installDirectory,
+      executablePath: executablePath ?? this.executablePath,
+      installDirectory: installDirectory ?? this.installDirectory,
       installedAt: installedAt,
       lastLaunchedAt: lastLaunchedAt ?? this.lastLaunchedAt,
       sizeBytes: sizeBytes ?? this.sizeBytes,

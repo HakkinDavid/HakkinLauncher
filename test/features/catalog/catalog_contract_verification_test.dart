@@ -88,7 +88,7 @@ void main() {
 
       final tecateMac = tecate.getPlatformRelease('macos-arm64')!;
       expect(tecateMac.latestRelease.version, '26.10.08-13');
-      expect(tecateMac.latestRelease.executableRelativePath, 'tecate.app/Contents/MacOS/tecate');
+      expect(tecateMac.latestRelease.executableRelativePath, 'tecate.app/Contents/MacOS/Tecate- Pueblo Mágico y Social');
       expect(tecateMac.latestRelease.package.sizeBytes, 1111734578);
       expect(tecateMac.latestRelease.package.sha256, 'a5ff201a1cfc14bce9fe53bfb1f1e02acb349deaef0ae3a34392fa2a34faa98d');
       // Versión histórica preservada en el catálogo v2.0
@@ -100,7 +100,7 @@ void main() {
       expect(fracto.title, 'Fractochales');
       final fractoWin = fracto.getPlatformRelease('windows-x64')!;
       expect(fractoWin.latestRelease.executableRelativePath, 'main.exe');
-      expect(fractoWin.latestRelease.package.sizeBytes, 23238440);
+      expect(fractoWin.latestRelease.package.sizeBytes, 29001895);
 
       // 3. Verificación de firefighter-form
       final bomberos = manifest.apps.firstWhere((a) => a.id == 'com.hakkin.firefighter-form');
