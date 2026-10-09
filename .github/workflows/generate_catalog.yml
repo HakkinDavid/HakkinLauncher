@@ -1,0 +1,116 @@
+name: Generate & Sync Catalog
+
+on:
+  workflow_dispatch:
+    inputs:
+      sync_example:
+        description: 'Sincronizar docs/catalog_example.json (fallback offline)'
+        type: boolean
+        required: false
+        default: true
+      generate_deltas:
+        description: 'Generar también parches diferenciales HDiffPatch'
+        type: boolean
+        required: false
+        default: false
+      deltas_repo:
+        description: 'Repositorio satélite de deltas (solo si se activan deltas)'
+        type: string
+        required: false
+        default: 'HakkinDavid/hakkin-launcher-deltas'
+      dry_run:
+        description: 'Modo simulación (no commitear cambios al repositorio)'
+        type: boolean
+        required: false
+        default: false
+
+concurrency:
+  group: catalog-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  generate-catalog:
+    name: Generate Catalog & Sync Schema
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository (Full History)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install HDiffPatch Binaries (hdiffz & hpatchz)
+        if: ${{ github.event.inputs.generate_deltas == 'true' }}
+        run: |
+          mkdir -p tools/bin /tmp/hdiff_extract
+          echo "⬇️ Descargando HDiffPatch v5.1.3 para Linux x64..."
+          curl -fsSL -o /tmp/hdiffpatch.zip "https://github.com/sisong/HDiffPatch/releases/download/v5.1.3/hdiffpatch_v5.1.3_bin_linux64.zip"
+          unzip -q -o /tmp/hdiffpatch.zip -d /tmp/hdiff_extract
+          find /tmp/hdiff_extract -name "hdiffz" -type f -exec cp {} tools/bin/ \;
+          find /tmp/hdiff_extract -name "hpatchz" -type f -exec cp {} tools/bin/ \;
+          chmod +x tools/bin/hdiffz tools/bin/hpatchz
+          echo "$(pwd)/tools/bin" >> $GITHUB_PATH
+          echo "✅ HDiffPatch instalado correctamente:"
+          tools/bin/hdiffz -v
+
+      - name: Run Unit Tests for Catalog & Deltas
+        run: |
+          python3 tools/test_catalog_generator.py
+          if [ "${{ github.event.inputs.generate_deltas }}" = "true" ]; then
+            python3 tools/test_delta_generator.py
+          fi
+
+      - name: Generate Catalog
+        env:
+          GITHUB_TOKEN: ${{ secrets.DELTAS_REPO_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          EXTRA_ARGS=()
+          if [ "${{ github.event.inputs.sync_example }}" != "false" ]; then
+            EXTRA_ARGS+=("--update-example")
+          fi
+
+          if [ "${{ github.event.inputs.generate_deltas }}" = "true" ]; then
+            EXTRA_ARGS+=("--generate-deltas")
+            DELTAS_TARGET="${{ github.event.inputs.deltas_repo }}"
+            if [ -z "$DELTAS_TARGET" ]; then
+              DELTAS_TARGET="HakkinDavid/hakkin-launcher-deltas"
+            fi
+            EXTRA_ARGS+=("--deltas-repo" "$DELTAS_TARGET")
+            if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+              EXTRA_ARGS+=("--dry-run-deltas")
+            fi
+          fi
+
+          echo "🚀 Generando catálogo de aplicaciones..."
+          python3 tools/catalog_generator.py "${EXTRA_ARGS[@]}"
+
+      - name: Upload Catalog Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: catalog-artifacts
+          path: |
+            docs/catalog.json
+            docs/catalog_example.json
+          retention-days: 7
+
+      - name: Commit and Push Updated Catalog
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/catalog.json docs/catalog_example.json
+          if ! git diff --staged --quiet; then
+            git commit -m "chore(catalog): sincronizar catálogo de aplicaciones [skip ci]"
+            git push origin HEAD:${{ github.ref_name }}
+            echo "✅ Catálogo actualizado y subido al repositorio."
+          else
+            echo "🟢 No hay cambios pendientes en el catálogo."
+          fi
