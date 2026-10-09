@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:path/path.dart' as p;
 import '../../../core/constants/app_constants.dart';
 import '../../../core/crypto/hash_validator.dart';
@@ -454,9 +455,27 @@ rm -f "\$0" 2>/dev/null || true
         progress: 1.0,
       );
     } catch (e) {
+      String errorMessage = 'Error durante la auto-actualización: $e';
+      if (e is DioException) {
+        final statusCode = e.response?.statusCode;
+        if (statusCode == 404) {
+          errorMessage =
+              'No se encontró el paquete de actualización en el servidor (HTTP 404 Not Found). Verifica que el release de la versión esté disponible en GitHub.';
+        } else if (e.type == DioExceptionType.connectionTimeout ||
+            e.type == DioExceptionType.receiveTimeout) {
+          errorMessage =
+              'Tiempo de espera agotado al descargar la actualización. Comprueba tu conexión a internet.';
+        } else if (e.type == DioExceptionType.connectionError) {
+          errorMessage =
+              'Error de red o sin conexión al servidor de descargas.';
+        } else {
+          errorMessage =
+              'Error de red durante la descarga (${e.message ?? e.toString()})';
+        }
+      }
       yield SelfUpdateStatus(
         stage: SelfUpdateStage.error,
-        message: 'Error durante la auto-actualización: $e',
+        message: errorMessage,
         error: e.toString(),
       );
     }
