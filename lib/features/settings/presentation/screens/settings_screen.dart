@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hakkin_launcher/core/constants/app_constants.dart';
 import 'package:hakkin_launcher/core/housekeeping/cleaner_service.dart';
 import 'package:hakkin_launcher/core/platform/background_check_service.dart';
+import 'package:hakkin_launcher/core/platform/component_manager.dart';
 import 'package:hakkin_launcher/core/platform/os_paths.dart';
 import 'package:hakkin_launcher/core/platform/window_service.dart';
 import 'package:hakkin_launcher/core/theme/app_colors.dart';
@@ -23,6 +24,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   final _customInstallPathController = TextEditingController();
   bool _closeToTray = true;
   String _baseDir = '';
+  String _toolsDir = '';
+  String _hpatchzStatus = '';
+  bool _isVerifyingComponents = false;
   int _deletedFiles = -1;
   bool _isCheckingUpdates = false;
   String? _selfUpdateStatusMessage;
@@ -42,13 +46,34 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final closeToTray = prefs.getBool(AppConstants.prefCloseToTrayKey) ?? true;
     final baseDir = await OsPaths.getAppBaseDirectory();
     final defaultAppsDir = await OsPaths.getDefaultAppsInstallDirectory();
+    final toolsDir = await OsPaths.getToolsDirectory();
+    final hpatchzStatus = await ComponentManager.instance.getComponentStatus();
 
-    setState(() {
-      _catalogUrlController.text = url;
-      _customInstallPathController.text = customPath.isNotEmpty ? customPath : defaultAppsDir.path;
-      _closeToTray = closeToTray;
-      _baseDir = baseDir.path;
-    });
+    if (mounted) {
+      setState(() {
+        _catalogUrlController.text = url;
+        _customInstallPathController.text = customPath.isNotEmpty ? customPath : defaultAppsDir.path;
+        _closeToTray = closeToTray;
+        _baseDir = baseDir.path;
+        _toolsDir = toolsDir.path;
+        _hpatchzStatus = hpatchzStatus;
+      });
+    }
+  }
+
+  Future<void> _verifyOrDownloadComponents() async {
+    setState(() => _isVerifyingComponents = true);
+    await ComponentManager.instance.downloadAndInstallHpatchz();
+    final newStatus = await ComponentManager.instance.getComponentStatus();
+    if (mounted) {
+      setState(() {
+        _isVerifyingComponents = false;
+        _hpatchzStatus = newStatus;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Componentes verificados: $newStatus')),
+      );
+    }
   }
 
   Future<void> _saveCatalogUrl() async {
@@ -343,6 +368,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       style: const TextStyle(color: AppColors.success, fontSize: 13),
                     ),
                   ],
+                  const SizedBox(height: 12),
+                  HakkinButton(
+                    text: _isVerifyingComponents
+                        ? 'Verificando componentes...'
+                        : 'Verificar / Descargar Motor de Parches (hpatchz)',
+                    isLoading: _isVerifyingComponents,
+                    icon: Icons.build_circle_outlined,
+                    variant: HakkinButtonVariant.secondary,
+                    onPressed: _isVerifyingComponents ? null : _verifyOrDownloadComponents,
+                  ),
                 ],
               ),
             ),
@@ -382,6 +417,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildPathRow('Directorio Base:', _baseDir),
+                        if (_toolsDir.isNotEmpty)
+                          _buildPathRow('Herramientas:', _toolsDir),
+                        if (_hpatchzStatus.isNotEmpty)
+                          _buildPathRow('Motor hpatchz:', _hpatchzStatus),
                         _buildPathRow('Plataforma:', OsPaths.getCurrentPlatformKey()),
                         _buildPathRow('Versión de Lanzador:', AppConstants.appVersion),
                       ],

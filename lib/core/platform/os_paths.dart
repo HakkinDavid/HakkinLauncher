@@ -46,6 +46,23 @@ class OsPaths {
     return logsDir;
   }
 
+  /// Carpeta donde se almacenan y ejecutan binarios y herramientas auxiliares (ej. hpatchz).
+  static Future<Directory> getToolsDirectory() async {
+    final base = await getAppBaseDirectory();
+    final toolsDir = Directory(p.join(base.path, 'Tools'));
+    if (!await toolsDir.exists()) {
+      await toolsDir.create(recursive: true);
+    }
+    return toolsDir;
+  }
+
+  /// Retorna la referencia al archivo de una herramienta según el sistema operativo.
+  static Future<File> getToolFile(String toolName) async {
+    final toolsDir = await getToolsDirectory();
+    final ext = Platform.isWindows ? '.exe' : '';
+    return File(p.join(toolsDir.path, '$toolName$ext'));
+  }
+
   /// Identificador de la plataforma actual compatible con el esquema de plataformas del catálogo.
   static String getCurrentPlatformKey() {
     if (Platform.isWindows) {

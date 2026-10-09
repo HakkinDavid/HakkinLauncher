@@ -22,4 +22,9 @@ class AppConstants {
 
   static const String appIconPath = 'assets/hakkinlauncher.png';
   static const String appIconIcoPath = 'assets/hakkinlauncher.ico';
+
+  // Componentes externos autogestionados (HDiffPatch / hpatchz)
+  static const String defaultHpatchzVersion = 'v5.1.3';
+  static const String hpatchzDownloadBaseUrl =
+      'https://github.com/sisong/HDiffPatch/releases/download/$defaultHpatchzVersion';
 }

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import '../../../../core/crypto/hash_validator.dart';
 import '../../../../core/housekeeping/cleaner_service.dart';
+import '../../../../core/platform/component_manager.dart';
 import '../../../../core/platform/notification_service.dart';
 import '../../../../core/platform/os_paths.dart';
 import '../../../../core/platform/process_launcher.dart';
@@ -498,7 +499,7 @@ class PatchEngine {
     }
   }
 
-  /// Aplica el parche binario hpatchz si está disponible en el entorno o en bundle.
+  /// Aplica el parche binario hpatchz adaptándose a rutas locales, de bundle o descargadas bajo demanda.
   Future<bool> _applyHDiffPatch({
     required File patchFile,
     required Directory targetDirectory,
@@ -508,12 +509,20 @@ class PatchEngine {
       final exeFile = File(p.join(targetDirectory.path, executableRelativePath));
       if (!await exeFile.exists()) return false;
 
+      // Obtener la ruta resuelta o descargar hpatchz si no está presente
+      final hpatchzCmd = await ComponentManager.instance.getHpatchzPath();
+      if (hpatchzCmd == null) {
+        debugPrint('Aviso: hpatchz no está disponible ni se pudo descargar automáticamente.');
+        return false;
+      }
+
       final result = await Process.run(
-        'hpatchz',
+        hpatchzCmd,
         [exeFile.path, patchFile.path, exeFile.path],
       );
       return result.exitCode == 0;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Error ejecutando hpatchz: $e');
       return false;
     }
   }
