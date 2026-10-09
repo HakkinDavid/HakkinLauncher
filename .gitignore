@@ -26,3 +26,8 @@ doc/api/
 .flutter-plugins
 .flutter-plugins-dependencies
 /.idea
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class

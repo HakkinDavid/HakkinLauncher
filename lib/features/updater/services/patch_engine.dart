@@ -500,6 +500,7 @@ class PatchEngine {
   }
 
   /// Aplica el parche binario hpatchz adaptándose a rutas locales, de bundle o descargadas bajo demanda.
+  /// Soporta tanto parches a nivel de directorio (juegos y bundles de assets) como parches de binario único.
   Future<bool> _applyHDiffPatch({
     required File patchFile,
     required Directory targetDirectory,
@@ -516,9 +517,26 @@ class PatchEngine {
         return false;
       }
 
+      // Si el directorio de instalación contiene subdirectorios o múltiples archivos,
+      // intentamos primero parchear a nivel de directorio con sobreescritura atómica (-f).
+      final entities = targetDirectory.listSync();
+      final isDirectoryBundle = entities.length > 1 || entities.any((e) => e is Directory);
+
+      if (isDirectoryBundle) {
+        final dirResult = await Process.run(
+          hpatchzCmd,
+          ['-f', targetDirectory.path, patchFile.path, targetDirectory.path],
+        );
+        if (dirResult.exitCode == 0) {
+          return true;
+        }
+        debugPrint('Aviso: parche a nivel de directorio retornó ${dirResult.exitCode}, reintentando sobre ejecutable...');
+      }
+
+      // Fallback o modo binario único: parche directo sobre el ejecutable
       final result = await Process.run(
         hpatchzCmd,
-        [exeFile.path, patchFile.path, exeFile.path],
+        ['-f', exeFile.path, patchFile.path, exeFile.path],
       );
       return result.exitCode == 0;
     } catch (e) {

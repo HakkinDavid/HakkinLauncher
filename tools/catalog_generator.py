@@ -14,6 +14,15 @@ import re
 import sys
 import urllib.request
 
+try:
+    from tools.delta_generator import DeltaGenerator, DEFAULT_DELTAS_REPO
+except ImportError:
+    try:
+        from delta_generator import DeltaGenerator, DEFAULT_DELTAS_REPO
+    except ImportError:
+        DeltaGenerator = None
+        DEFAULT_DELTAS_REPO = "HakkinDavid/hakkin-launcher-deltas"
+
 # Pre-resolved checksums and byte sizes cache for known release assets
 KNOWN_ASSET_CACHE = {
     "https://github.com/Bonsanbec/tecate-simulator/releases/download/26.10.08-13/tecate-windows.zip": {
@@ -239,7 +248,13 @@ def fetch_remote_manifest(repo, tag="latest"):
             continue
     return None
 
-def generate_catalog(overrides_path, existing_catalog_path=None):
+def generate_catalog(
+    overrides_path,
+    existing_catalog_path=None,
+    generate_deltas=False,
+    deltas_repo=DEFAULT_DELTAS_REPO,
+    dry_run_deltas=False
+):
     with open(overrides_path, 'r', encoding='utf-8') as f:
         overrides = json.load(f)
 
@@ -384,6 +399,34 @@ def generate_catalog(overrides_path, existing_catalog_path=None):
             versions_list.sort(key=lambda x: parse_version_tuple(x["version"]), reverse=True)
             plat_latest_version = versions_list[0]["version"]
 
+            # Preservar delta_patches existentes en el catálogo previo si no están poblados
+            if existing_app and "platforms" in existing_app and plat_key in existing_app["platforms"]:
+                existing_ver_map = {
+                    v["version"]: v for v in existing_app["platforms"][plat_key].get("versions", [])
+                }
+                for v in versions_list:
+                    if not v.get("delta_patches") and v["version"] in existing_ver_map:
+                        v["delta_patches"] = existing_ver_map[v["version"]].get("delta_patches", [])
+
+            # Si se solicita generar deltas para el salto inmediato V_{N-1} -> V_N
+            if generate_deltas and DeltaGenerator and len(versions_list) >= 2:
+                target_ver = versions_list[0]
+                source_ver = versions_list[1]
+                has_delta = any(d.get("from_version") == source_ver["version"] for d in target_ver.get("delta_patches", []))
+                if not has_delta:
+                    print(f"  [Delta Worker] Generando diferencial para {meta['slug']} ({plat_key}): v{source_ver['version']} -> v{target_ver['version']}...")
+                    d_gen = DeltaGenerator(deltas_repo=deltas_repo, dry_run=dry_run_deltas)
+                    patch_entry = d_gen.generate_delta_patch(
+                        app_slug=meta["slug"],
+                        platform_key=plat_key,
+                        from_release=source_ver,
+                        to_release=target_ver
+                    )
+                    if patch_entry:
+                        if "delta_patches" not in target_ver:
+                            target_ver["delta_patches"] = []
+                        target_ver["delta_patches"].append(patch_entry)
+
             platforms_dict[plat_key] = {
                 "latest_version": plat_latest_version,
                 "protected_user_paths": plat_info.get("protected_user_paths", []),
@@ -493,10 +536,19 @@ def main():
     parser.add_argument("--schema", default="docs/CATALOG_SCHEMA.json", help="Path to CATALOG_SCHEMA.json")
     parser.add_argument("--output", default="docs/catalog.json", help="Output path for catalog.json")
     parser.add_argument("--update-example", action="store_true", help="Sync docs/catalog_example.json")
+    parser.add_argument("--generate-deltas", action="store_true", help="Generar parches diferenciales para saltos de versión")
+    parser.add_argument("--deltas-repo", default=DEFAULT_DELTAS_REPO, help="Repositorio satélite de deltas (default: HakkinDavid/hakkin-launcher-deltas)")
+    parser.add_argument("--dry-run-deltas", action="store_true", help="Simular generación de deltas sin publicar en GitHub")
 
     args = parser.parse_args()
 
-    manifest = generate_catalog(args.overrides, existing_catalog_path=args.output)
+    manifest = generate_catalog(
+        args.overrides,
+        existing_catalog_path=args.output,
+        generate_deltas=args.generate_deltas,
+        deltas_repo=args.deltas_repo,
+        dry_run_deltas=args.dry_run_deltas
+    )
     validate_manifest(manifest, args.schema)
 
     output_dir = os.path.dirname(args.output)
