@@ -1,0 +1,257 @@
+name: Multi-Platform Cloud Build & Release
+
+on:
+  push:
+    branches:
+      - stable
+  workflow_dispatch:
+    inputs:
+      version_tag:
+        description: 'Tag de versión manual (ej. 26.10.08-21). Vacío = auto YY.MM.DD-HH'
+        required: false
+        default: ''
+      force:
+        description: 'Forzar regeneración de release'
+        type: boolean
+        default: false
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  # ============================================================================
+  # 1. Compilación Nativa Windows (Paralelo)
+  # ============================================================================
+  build-windows:
+    name: Build Windows x64
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+          cache-key-secret: ${{ runner.os }}-flutter
+
+      - name: Enable Windows Desktop
+        run: flutter config --enable-windows-desktop
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Build Windows Release
+        run: flutter build windows --release
+
+      - name: Package Windows Binary
+        shell: pwsh
+        run: |
+          $releaseDir = "build\windows\x64\runner\Release"
+          7z a -tzip HakkinLauncher-windows-x64.zip ".\$releaseDir\*" -mx=5
+
+      - name: Upload Windows Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-artifact
+          path: HakkinLauncher-windows-x64.zip
+          retention-days: 1
+          compression-level: 0
+
+  # ============================================================================
+  # 2. Compilación Nativa Linux (Paralelo)
+  # ============================================================================
+  build-linux:
+    name: Build Linux x64
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Install Linux Build Dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends \
+            clang cmake ninja-build pkg-config \
+            libgtk-3-dev liblzma-dev libstdc++-12-dev
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+          cache-key-secret: ${{ runner.os }}-flutter
+
+      - name: Enable Linux Desktop
+        run: flutter config --enable-linux-desktop
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Build Linux Release
+        run: flutter build linux --release
+
+      - name: Package Linux Binary
+        run: |
+          cd build/linux/x64/release/bundle
+          zip -r -q -5 ../../../../../HakkinLauncher-linux-x64.zip .
+
+      - name: Upload Linux Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-artifact
+          path: HakkinLauncher-linux-x64.zip
+          retention-days: 1
+          compression-level: 0
+
+  # ============================================================================
+  # 3. Compilación Nativa macOS (Paralelo)
+  # ============================================================================
+  build-macos:
+    name: Build macOS
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+          cache-key-secret: ${{ runner.os }}-flutter
+
+      - name: Enable macOS Desktop
+        run: flutter config --enable-macos-desktop
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Build macOS Release
+        run: flutter build macos --release
+
+      - name: Package macOS Binaries
+        run: |
+          APP_PATH=$(find build/macos/Build/Products/Release -name "*.app" -maxdepth 1 | head -n 1)
+          ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" HakkinLauncher-macos-arm64.zip
+          ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" HakkinLauncher-macos-x64.zip
+
+      - name: Upload macOS Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-artifacts
+          path: |
+            HakkinLauncher-macos-arm64.zip
+            HakkinLauncher-macos-x64.zip
+          retention-days: 1
+          compression-level: 0
+
+  # ============================================================================
+  # 4. Publicación Unificada y Sincronización SSOT
+  # ============================================================================
+  release:
+    name: Publish Release & Sync SSOT
+    needs: [build-windows, build-linux, build-macos]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository (Full History)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: downloaded-artifacts
+
+      - name: Prepare Release Directory & Collect Binaries
+        run: |
+          mkdir -p build/release
+          find downloaded-artifacts -type f -name "*.zip" -exec mv {} build/release/ \;
+          echo "📦 Binarios recibidos de los jobs paralelos:"
+          ls -lh build/release/
+
+      - name: Evaluate Release and Publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Determinar Tag
+          if [ -n "${{ github.event.inputs.version_tag }}" ]; then
+            TAG="${{ github.event.inputs.version_tag }}"
+          else
+            TAG="$(date +"%y.%m.%d-%H")"
+          fi
+          echo "Release Tag: $TAG"
+
+          # Descargar manifest previo si existe
+          REMOTE_MANIFEST=""
+          LATEST_TAG="$(gh release view --json tagName -q .tagName 2>/dev/null || true)"
+          if [ -n "$LATEST_TAG" ]; then
+            REMOTE_MANIFEST="$(gh release download "$LATEST_TAG" -p "version_manifest.json" -O - 2>/dev/null || true)"
+          fi
+
+          EVAL_ARGS=("--new-tag" "$TAG")
+          if [ -n "$REMOTE_MANIFEST" ]; then
+            EVAL_ARGS+=("--remote-manifest" "$REMOTE_MANIFEST")
+          fi
+          if [ "${{ github.event.inputs.force }}" = "true" ]; then
+            EVAL_ARGS+=("--force")
+          fi
+
+          # Evaluar con gestor criptográfico
+          FILES=(build/release/*.zip)
+          EVAL_JSON="$(python3 scripts/release_hash_manager.py eval-release "${EVAL_ARGS[@]}" "${FILES[@]}")"
+          echo "Evaluación SSOT:"
+          echo "$EVAL_JSON"
+
+          ACTION="$(echo "$EVAL_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin).get('action', ''))")"
+          NOTES_FILE="$(echo "$EVAL_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin).get('notes_path', ''))")"
+          FILES_TO_UPLOAD=($(echo "$EVAL_JSON" | python3 -c "import sys, json; print(' '.join(json.load(sys.stdin).get('files_to_upload', [])))"))
+
+          if [ "$ACTION" = "CREATE_RELEASE" ] || [ "${{ github.event.inputs.force }}" = "true" ]; then
+            if gh release view "$TAG" >/dev/null 2>&1; then
+              echo "Actualizando release existente $TAG..."
+              gh release upload "$TAG" "${FILES_TO_UPLOAD[@]}" --clobber
+              gh release edit "$TAG" --notes-file "$NOTES_FILE" --latest --title "HakkinLauncher v$TAG"
+            else
+              echo "Creando nuevo release $TAG..."
+              gh release create "$TAG" "${FILES_TO_UPLOAD[@]}" \
+                --title "HakkinLauncher v$TAG" \
+                --notes-file "$NOTES_FILE" \
+                --latest
+            fi
+            echo "✅ Release $TAG publicado con éxito."
+          else
+            echo "🟢 Todos los binarios están al día. Omitiendo duplicación de release."
+          fi
+
+          # Sincronizar catálogo
+          python3 scripts/release_hash_manager.py sync-catalog
+
+      - name: Commit Updated Catalog & Metadata back to repository
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add tools/launcher_meta.json docs/catalog.json docs/catalog_example.json
+          if ! git diff --staged --quiet; then
+            git commit -m "chore(release): sincronizar catálogo y launcher_meta [skip ci]"
+            git push origin HEAD:${{ github.ref_name }}
+          else
+            echo "No hay cambios en el catálogo para commitear."
+          fi

@@ -34,6 +34,8 @@ LOCAL_MANIFEST_PATH = os.path.join(BUILD_DIR, ".export_manifest.json")
 VERSION_MANIFEST_FILE = os.path.join(BUILD_DIR, "version_manifest.json")
 RELEASE_NOTES_FILE = os.path.join(BUILD_DIR, "release_notes.md")
 LAUNCHER_META_FILE = os.path.join(WORKSPACE_ROOT, "tools", "launcher_meta.json")
+MIN_VALID_SIZE = 1_000_000  # 1 MB mínimo para binarios empaquetados válidos
+
 
 TARGET_CONFIG = {
     "macos-arm64": {
@@ -158,6 +160,9 @@ def is_target_cached(target):
         if not os.path.isfile(target_file):
             return False, f"El archivo {os.path.basename(target_file)} no existe en build/release/."
 
+        if os.path.getsize(target_file) < MIN_VALID_SIZE:
+            return False, f"El archivo {os.path.basename(target_file)} es inválido o dummy (< 1MB)."
+
         manifest = load_local_manifest()
         cached_source_hash = manifest.get("source_hashes", {}).get(sub)
         current_source_hash = compute_source_hash(sub)
@@ -195,6 +200,10 @@ def update_target_cache(target):
             continue
         target_file = cfg["path"]
         if not os.path.isfile(target_file):
+            all_ok = False
+            continue
+
+        if os.path.getsize(target_file) < MIN_VALID_SIZE:
             all_ok = False
             continue
 
@@ -268,6 +277,11 @@ def evaluate_release(local_files, remote_manifest_text, new_tag, force=False):
     # Evaluar cada binario local proporcionado
     for fpath in local_files:
         if not os.path.isfile(fpath):
+            continue
+
+        size_bytes = os.path.getsize(fpath)
+        if size_bytes < MIN_VALID_SIZE:
+            print(f"⚠️ Aviso: Omitiendo {os.path.basename(fpath)} ({size_bytes} bytes < 1MB, posible dummy o corrupto).", file=sys.stderr)
             continue
 
         fname = os.path.basename(fpath)
@@ -348,10 +362,18 @@ def evaluate_release(local_files, remote_manifest_text, new_tag, force=False):
     clean_version_tag = re.sub(r'^v+', '', new_tag)
     display_tag = f"v{clean_version_tag}"
 
+    existing_meta = {}
+    if os.path.isfile(LAUNCHER_META_FILE):
+        try:
+            with open(LAUNCHER_META_FILE, "r", encoding="utf-8") as f:
+                existing_meta = json.load(f)
+        except Exception:
+            pass
+
     launcher_meta_data = {
         "latest_version": clean_version_tag,
-        "min_required_launcher_version": "1.0.0",
-        "releases": {}
+        "min_required_launcher_version": existing_meta.get("min_required_launcher_version", "1.0.0"),
+        "releases": existing_meta.get("releases", {})
     }
     for pid, b in new_binaries.items():
         launcher_meta_data["releases"][pid] = {

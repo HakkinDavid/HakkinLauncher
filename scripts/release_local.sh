@@ -147,6 +147,7 @@ for t in "${TARGETS_TO_PROCESS[@]}"; do
             fi
             python3 "$HASH_MGR" update-local-cache --target "macos-${arch}"
           done
+          echo "[$t] Empaquetado completado y registrado en caché local."
         else
           echo "[macos] La compilación nativa de macOS requiere un host macOS."
         fi
@@ -160,31 +161,41 @@ for t in "${TARGETS_TO_PROCESS[@]}"; do
           WIN_RELEASE_DIR="build/windows/x64/runner/Release"
           rm -f "$ZIP_DEST"
           (cd "$WIN_RELEASE_DIR" && zip -r -q "$WORKSPACE_ROOT/$ZIP_DEST" .)
+          python3 "$HASH_MGR" update-local-cache --target "windows-x64"
+          echo "[$t] Empaquetado completado y registrado en caché local."
         else
-          # Host no Windows: si el zip no existe localmente, intentar preservar del último release remoto
-          if [[ ! -f "$ZIP_DEST" ]] && command -v gh >/dev/null 2>&1; then
-            echo "   Descargando HakkinLauncher-windows-x64.zip del release previo para preservar..."
+          # Host no Windows
+          if [[ "$TARGET" != "all" ]]; then
+            echo "❌ Error: La compilación de Windows requiere un host Windows o GitHub Actions CI."
+            echo "   💡 Para compilar en la nube automáticamente, haz push a la rama 'stable'."
+            exit 1
+          fi
+
+          PRESERVED=false
+          if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
             LATEST_REMOTE_TAG="$(gh release view --json tagName -q .tagName 2>/dev/null || true)"
             if [[ -n "$LATEST_REMOTE_TAG" ]]; then
-              gh release download "$LATEST_REMOTE_TAG" -p "HakkinLauncher-windows-x64.zip" -D "build/release/" 2>/dev/null || true
+              TMP_DL="$(mktemp -d)"
+              if gh release download "$LATEST_REMOTE_TAG" -p "HakkinLauncher-windows-x64.zip" -D "$TMP_DL" 2>/dev/null; then
+                DL_SIZE=$(stat -f%z "$TMP_DL/HakkinLauncher-windows-x64.zip" 2>/dev/null || stat -c%s "$TMP_DL/HakkinLauncher-windows-x64.zip" 2>/dev/null || echo 0)
+                if [[ "$DL_SIZE" -gt 1000000 ]]; then
+                  echo "   Preservando binario legítimo previo de Windows (${DL_SIZE} bytes)..."
+                  mv "$TMP_DL/HakkinLauncher-windows-x64.zip" "$ZIP_DEST"
+                  python3 "$HASH_MGR" update-local-cache --target "windows-x64"
+                  PRESERVED=true
+                fi
+              fi
+              rm -rf "$TMP_DL"
             fi
           fi
 
-          # Si aún no existe, generar paquete base de distribución para Windows
-          if [[ ! -f "$ZIP_DEST" ]]; then
-            echo "   Generando estructura de paquete para Windows x64..."
-            TMP_WIN="$(mktemp -d)"
-            mkdir -p "$TMP_WIN/data"
-            echo "HakkinLauncher Windows x64 v$TAG" > "$TMP_WIN/README.txt"
-            # Copiar assets compilados si existen
-            if [[ -d "build/flutter_assets" ]]; then
-              cp -R "build/flutter_assets" "$TMP_WIN/data/"
-            fi
-            (cd "$TMP_WIN" && zip -r -q "$WORKSPACE_ROOT/$ZIP_DEST" .)
-            rm -rf "$TMP_WIN"
+          if [[ "$PRESERVED" == true ]]; then
+            echo "[$t] Binario legítimo previo preservado y registrado en caché local."
+          else
+            echo "ℹ️ [$t] Host macOS ($HOST_OS) detectado. Flutter no soporta compilar Windows en Mac."
+            echo "   💡 No se creará ningún archivo dummy. Los binarios de Windows se compilarán en GitHub Actions al hacer push a 'stable'."
           fi
         fi
-        python3 "$HASH_MGR" update-local-cache --target "windows-x64"
         ;;
 
       linux)
@@ -195,34 +206,43 @@ for t in "${TARGETS_TO_PROCESS[@]}"; do
           LINUX_RELEASE_DIR="build/linux/x64/release/bundle"
           rm -f "$ZIP_DEST"
           (cd "$LINUX_RELEASE_DIR" && zip -r -q "$WORKSPACE_ROOT/$ZIP_DEST" .)
+          python3 "$HASH_MGR" update-local-cache --target "linux-x64"
+          echo "[$t] Empaquetado completado y registrado en caché local."
         else
-          # Host no Linux: si el zip no existe localmente, intentar preservar del último release remoto
-          if [[ ! -f "$ZIP_DEST" ]] && command -v gh >/dev/null 2>&1; then
-            echo "   Descargando HakkinLauncher-linux-x64.zip del release previo para preservar..."
+          # Host no Linux
+          if [[ "$TARGET" != "all" ]]; then
+            echo "❌ Error: La compilación de Linux requiere un host Linux o GitHub Actions CI."
+            echo "   💡 Para compilar en la nube automáticamente, haz push a la rama 'stable'."
+            exit 1
+          fi
+
+          PRESERVED=false
+          if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
             LATEST_REMOTE_TAG="$(gh release view --json tagName -q .tagName 2>/dev/null || true)"
             if [[ -n "$LATEST_REMOTE_TAG" ]]; then
-              gh release download "$LATEST_REMOTE_TAG" -p "HakkinLauncher-linux-x64.zip" -D "build/release/" 2>/dev/null || true
+              TMP_DL="$(mktemp -d)"
+              if gh release download "$LATEST_REMOTE_TAG" -p "HakkinLauncher-linux-x64.zip" -D "$TMP_DL" 2>/dev/null; then
+                DL_SIZE=$(stat -f%z "$TMP_DL/HakkinLauncher-linux-x64.zip" 2>/dev/null || stat -c%s "$TMP_DL/HakkinLauncher-linux-x64.zip" 2>/dev/null || echo 0)
+                if [[ "$DL_SIZE" -gt 1000000 ]]; then
+                  echo "   Preservando binario legítimo previo de Linux (${DL_SIZE} bytes)..."
+                  mv "$TMP_DL/HakkinLauncher-linux-x64.zip" "$ZIP_DEST"
+                  python3 "$HASH_MGR" update-local-cache --target "linux-x64"
+                  PRESERVED=true
+                fi
+              fi
+              rm -rf "$TMP_DL"
             fi
           fi
 
-          # Si aún no existe, generar paquete base de distribución para Linux
-          if [[ ! -f "$ZIP_DEST" ]]; then
-            echo "   Generando estructura de paquete para Linux x64..."
-            TMP_LNX="$(mktemp -d)"
-            mkdir -p "$TMP_LNX/data"
-            echo "HakkinLauncher Linux x64 v$TAG" > "$TMP_LNX/README.txt"
-            if [[ -d "build/flutter_assets" ]]; then
-              cp -R "build/flutter_assets" "$TMP_LNX/data/"
-            fi
-            (cd "$TMP_LNX" && zip -r -q "$WORKSPACE_ROOT/$ZIP_DEST" .)
-            rm -rf "$TMP_LNX"
+          if [[ "$PRESERVED" == true ]]; then
+            echo "[$t] Binario legítimo previo preservado y registrado en caché local."
+          else
+            echo "ℹ️ [$t] Host macOS ($HOST_OS) detectado. Flutter no soporta compilar Linux en Mac."
+            echo "   💡 No se creará ningún archivo dummy. Los binarios de Linux se compilarán en GitHub Actions al hacer push a 'stable'."
           fi
         fi
-        python3 "$HASH_MGR" update-local-cache --target "linux-x64"
         ;;
     esac
-
-    echo "[$t] Empaquetado completado y registrado en caché local."
   fi
 done
 
@@ -262,7 +282,7 @@ done
 # ------------------------------------------------------------------------------
 # 3. Evaluación contra version_manifest.json del último release
 # ------------------------------------------------------------------------------
-if command -v gh >/dev/null 2>&1; then
+if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
   echo "[GitHub] Consultando el último release para evaluar version_manifest.json..."
 
   LATEST_TAG="$(gh release view --json tagName -q .tagName 2>/dev/null || true)"
