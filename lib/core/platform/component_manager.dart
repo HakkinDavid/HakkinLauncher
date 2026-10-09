@@ -114,6 +114,15 @@ class ComponentManager {
       if (inPath != null) {
         return inPath;
       }
+
+      // 4. Directorio de desarrollo / repo local si aplica
+      final devToolFile = File(p.join(Directory.current.path, 'tools', 'bin', Platform.isWindows ? 'hpatchz.exe' : 'hpatchz'));
+      if (await devToolFile.exists() && await devToolFile.length() > 0) {
+        if (!Platform.isWindows) {
+          await _ensureExecutablePermissions(devToolFile.path);
+        }
+        return devToolFile.path;
+      }
     } catch (e) {
       debugPrint('Aviso buscando hpatchz existente: $e');
     }
@@ -139,11 +148,15 @@ class ComponentManager {
   /// Asigna permisos de ejecución en sistemas Unix y elimina cuarentena de Gatekeeper en macOS.
   Future<void> _ensureExecutablePermissions(String filePath) async {
     try {
-      await Process.run('chmod', ['+x', filePath]);
-      if (Platform.isMacOS) {
-        await Process.run('xattr', ['-d', 'com.apple.quarantine', filePath]);
+      if (Platform.isMacOS || Platform.isLinux) {
+        await Process.run('chmod', ['+x', filePath]);
       }
-    } catch (_) {}
+      if (Platform.isMacOS) {
+        await Process.run('xattr', ['-cr', filePath]);
+      }
+    } catch (e) {
+      debugPrint('Aviso asignando permisos a $filePath: $e');
+    }
   }
 
   /// Asegura que todos los componentes requeridos estén descargados y listos.

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 import '../constants/app_constants.dart';
 
@@ -14,10 +15,19 @@ class WindowService with WindowListener {
     _closeToTray = value;
   }
 
+  bool get closeToTray => _closeToTray;
+
   /// Inicializa la ventana de escritorio.
   static Future<void> initialize() async {
     if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
       await windowManager.ensureInitialized();
+
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        instance._closeToTray = prefs.getBool(AppConstants.prefCloseToTrayKey) ?? true;
+      } catch (e) {
+        debugPrint('Aviso al cargar preferencia closeToTray: $e');
+      }
 
       const windowOptions = WindowOptions(
         size: Size(1280, 800),
@@ -41,6 +51,8 @@ class WindowService with WindowListener {
         await windowManager.focus();
       });
 
+      // Interceptar evento de cierre para permitir minimizar a la bandeja
+      await windowManager.setPreventClose(true);
       windowManager.addListener(instance);
     }
   }

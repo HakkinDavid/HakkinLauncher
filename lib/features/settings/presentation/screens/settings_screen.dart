@@ -20,7 +20,6 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  final _catalogUrlController = TextEditingController();
   final _customInstallPathController = TextEditingController();
   bool _closeToTray = true;
   String _baseDir = '';
@@ -38,10 +37,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     _loadSettings();
   }
 
+  @override
+  void dispose() {
+    _customInstallPathController.dispose();
+    super.dispose();
+  }
+
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
-    final url = prefs.getString(AppConstants.prefCatalogUrlKey) ??
-        AppConstants.defaultCatalogUrl;
     final customPath = prefs.getString(AppConstants.prefCustomInstallPathKey) ?? '';
     final closeToTray = prefs.getBool(AppConstants.prefCloseToTrayKey) ?? true;
     final baseDir = await OsPaths.getAppBaseDirectory();
@@ -51,7 +54,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
     if (mounted) {
       setState(() {
-        _catalogUrlController.text = url;
         _customInstallPathController.text = customPath.isNotEmpty ? customPath : defaultAppsDir.path;
         _closeToTray = closeToTray;
         _baseDir = baseDir.path;
@@ -63,27 +65,31 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   Future<void> _verifyOrDownloadComponents() async {
     setState(() => _isVerifyingComponents = true);
-    await ComponentManager.instance.downloadAndInstallHpatchz();
-    final newStatus = await ComponentManager.instance.getComponentStatus();
-    if (mounted) {
-      setState(() {
-        _isVerifyingComponents = false;
-        _hpatchzStatus = newStatus;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Componentes verificados: $newStatus')),
-      );
-    }
-  }
-
-  Future<void> _saveCatalogUrl() async {
-    final repo = ref.read(catalogRepositoryProvider);
-    await repo.setCatalogUrl(_catalogUrlController.text.trim());
-    ref.invalidate(catalogManifestProvider);
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('URL del catálogo actualizada y recargada')),
-      );
+    try {
+      final success = await ComponentManager.instance.downloadAndInstallHpatchz();
+      final newStatus = await ComponentManager.instance.getComponentStatus();
+      if (mounted) {
+        setState(() {
+          _isVerifyingComponents = false;
+          _hpatchzStatus = newStatus;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              success
+                  ? 'Componentes verificados exitosamente: $newStatus'
+                  : 'Aviso: No se pudo verificar o descargar el motor de parches.',
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isVerifyingComponents = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al verificar componentes: $e')),
+        );
+      }
     }
   }
 
@@ -225,44 +231,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               const SizedBox(height: 24),
             ],
 
-            _buildSection(
-              title: 'Catálogo y Diccionario Remoto',
-              description:
-                  'URL pública de consulta desde donde se descargan las definiciones de aplicaciones y versiones.',
-              child: Column(
-                children: [
-                  TextField(
-                    controller: _catalogUrlController,
-                    decoration: const InputDecoration(
-                      labelText: 'URL del Manifiesto JSON',
-                      prefixIcon: Icon(Icons.link),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      HakkinButton(
-                        text: 'Guardar y Recargar',
-                        icon: Icons.refresh,
-                        variant: HakkinButtonVariant.primaryPlatinum,
-                        onPressed: _saveCatalogUrl,
-                      ),
-                      const SizedBox(width: 12),
-                      HakkinButton(
-                        text: 'Restablecer por Defecto',
-                        variant: HakkinButtonVariant.secondary,
-                        onPressed: () {
-                          _catalogUrlController.text = AppConstants.defaultCatalogUrl;
-                          _saveCatalogUrl();
-                        },
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 24),
 
             _buildSection(
               title: 'Ruta de Instalación de Juegos y Software',
