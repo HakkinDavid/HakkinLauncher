@@ -155,7 +155,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.system_update_alt, color: AppColors.celestialBlue, size: 36),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.asset(
+                        AppConstants.appIconPath,
+                        width: 44,
+                        height: 44,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: Column(
@@ -349,12 +357,41 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             _buildSection(
               title: 'Información del Sistema',
               description: 'Rutas locales utilizadas por HakkinLauncher.',
-              child: Column(
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildPathRow('Directorio Base:', _baseDir),
-                  _buildPathRow('Plataforma:', OsPaths.getCurrentPlatformKey()),
-                  _buildPathRow('Versión de Lanzador:', AppConstants.appVersion),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.3),
+                          blurRadius: 10,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.asset(
+                        AppConstants.appIconPath,
+                        width: 54,
+                        height: 54,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 20),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildPathRow('Directorio Base:', _baseDir),
+                        _buildPathRow('Plataforma:', OsPaths.getCurrentPlatformKey()),
+                        _buildPathRow('Versión de Lanzador:', AppConstants.appVersion),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),

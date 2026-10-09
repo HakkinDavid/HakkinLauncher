@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_colors.dart';
 import '../../features/catalog/data/models/app_entry.dart';
 import 'status_badge.dart';
@@ -185,6 +186,9 @@ class _AppCardState extends State<AppCard> {
   }
 
   Widget _buildPlaceholder() {
+    if (widget.app.id == 'com.hakkin.launcher' || widget.app.id == 'hakkin_launcher') {
+      return Image.asset(AppConstants.appIconPath, fit: BoxFit.cover);
+    }
     return Container(
       color: AppColors.surfaceElevated,
       child: Center(

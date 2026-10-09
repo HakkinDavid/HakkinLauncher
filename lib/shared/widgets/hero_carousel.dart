@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_colors.dart';
 import '../../features/catalog/data/models/app_entry.dart';
 import 'hakkin_button.dart';
@@ -129,6 +130,9 @@ class HeroCarousel extends StatelessWidget {
   }
 
   Widget _buildPlaceholder() {
+    if (widget.featuredApp.id == 'com.hakkin.launcher' || widget.featuredApp.id == 'hakkin_launcher') {
+      return Image.asset(AppConstants.appIconPath, fit: BoxFit.cover);
+    }
     return Container(
       color: AppColors.surfaceElevated,
       child: const Center(

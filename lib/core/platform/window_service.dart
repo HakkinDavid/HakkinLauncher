@@ -30,6 +30,13 @@ class WindowService with WindowListener {
       );
 
       await windowManager.waitUntilReadyToShow(windowOptions, () async {
+        if (Platform.isWindows) {
+          try {
+            await windowManager.setIcon(AppConstants.appIconIcoPath);
+          } catch (e) {
+            debugPrint('Aviso: No se pudo establecer icono de ventana: $e');
+          }
+        }
         await windowManager.show();
         await windowManager.focus();
       });

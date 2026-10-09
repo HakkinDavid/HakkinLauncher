@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/platform/shortcut_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/widgets/hakkin_button.dart';
 import '../../../../shared/widgets/status_badge.dart';
+import '../../../catalog/data/models/app_entry.dart';
 import '../../../catalog/presentation/controllers/catalog_controller.dart';
 import '../../data/models/installed_app.dart';
 import '../controllers/library_controller.dart';
@@ -124,14 +126,9 @@ class LibraryScreen extends ConsumerWidget {
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(color: AppColors.surfaceBorder),
                               ),
-                              child: Center(
-                                child: Icon(
-                                  catalogApp?.category == 'game'
-                                      ? Icons.sports_esports
-                                      : Icons.apps,
-                                  color: AppColors.celestialBlue,
-                                  size: 28,
-                                ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(9),
+                                child: _buildAppTileIcon(installedApp, catalogApp),
                               ),
                             ),
                             const SizedBox(width: 16),
@@ -447,5 +444,34 @@ class LibraryScreen extends ConsumerWidget {
     if (confirm == true) {
       await ref.read(installedAppsProvider.notifier).uninstallApp(app.id);
     }
+  }
+
+  Widget _buildAppTileIcon(InstalledApp installedApp, AppEntry? catalogApp) {
+    if (installedApp.id == 'com.hakkin.launcher' || installedApp.id == 'hakkin_launcher') {
+      return Image.asset(AppConstants.appIconPath, fit: BoxFit.cover);
+    }
+    if (catalogApp?.assets.icon != null && catalogApp!.assets.icon!.isNotEmpty) {
+      final iconUrl = catalogApp.assets.icon!;
+      if (iconUrl.startsWith('http')) {
+        return Image.network(
+          iconUrl,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => _buildDefaultCategoryIcon(catalogApp),
+        );
+      } else if (iconUrl.startsWith('assets/')) {
+        return Image.asset(iconUrl, fit: BoxFit.cover);
+      }
+    }
+    return _buildDefaultCategoryIcon(catalogApp);
+  }
+
+  Widget _buildDefaultCategoryIcon(AppEntry? catalogApp) {
+    return Center(
+      child: Icon(
+        catalogApp?.category == 'game' ? Icons.sports_esports : Icons.apps,
+        color: AppColors.celestialBlue,
+        size: 28,
+      ),
+    );
   }
 }
