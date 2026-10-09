@@ -51,9 +51,9 @@
           "assets": {
             "type": "object",
             "properties": {
-              "icon": { "type": "string" },
-              "poster": { "type": "string" },
-              "banner": { "type": "string" },
+              "icon": { "type": ["string", "null"] },
+              "poster": { "type": ["string", "null"] },
+              "banner": { "type": ["string", "null"] },
               "screenshots": {
                 "type": "array",
                 "items": { "type": "string" }
