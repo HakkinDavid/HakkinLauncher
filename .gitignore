@@ -31,3 +31,6 @@ doc/api/
 __pycache__/
 *.py[cod]
 *$py.class
+
+# Local tool binaries
+tools/bin/

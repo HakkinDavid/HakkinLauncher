@@ -23,14 +23,14 @@ class TestDeltaGenerator(unittest.TestCase):
 
     def test_format_delta_tag_standard(self):
         tag = format_delta_tag("tecate-simulator", "0.0.1", "26.10.08-13")
-        self.assertEqual(tag, "tecate-simulator.0.0.1...26.10.08-13")
+        self.assertEqual(tag, "tecate-simulator.0.0.1-to-26.10.08-13")
 
     def test_format_delta_tag_strips_v_prefix(self):
         tag = format_delta_tag("fractochales", "v1.60", "v1.64")
-        self.assertEqual(tag, "fractochales.1.60...1.64")
+        self.assertEqual(tag, "fractochales.1.60-to-1.64")
 
         tag2 = format_delta_tag("firefighter-form", "V26.08.01", "v26.08.04")
-        self.assertEqual(tag2, "firefighter-form.26.08.01...26.08.04")
+        self.assertEqual(tag2, "firefighter-form.26.08.01-to-26.08.04")
 
     def test_format_delta_asset_name(self):
         self.assertEqual(
@@ -62,7 +62,7 @@ class TestDeltaGenerator(unittest.TestCase):
         expected_url = f"https://github.com/{DEFAULT_DELTAS_REPO}/releases/download/{tag}/{asset}"
         self.assertEqual(
             expected_url,
-            "https://github.com/HakkinDavid/hakkin-launcher-deltas/releases/download/tecate-simulator.0.0.1...26.10.08-13/tecate-simulator_windows-x64.hdiff"
+            "https://github.com/HakkinDavid/hakkin-launcher-deltas/releases/download/tecate-simulator.0.0.1-to-26.10.08-13/tecate-simulator_windows-x64.hdiff"
         )
 
     def test_generator_initialization(self):

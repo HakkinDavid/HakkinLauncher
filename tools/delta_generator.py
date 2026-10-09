@@ -41,27 +41,57 @@ def compute_sha256(filepath):
     return h.hexdigest()
 
 
-def download_file(url, dest_path):
-    """Descarga un archivo con User-Agent estándar y timeout."""
+PACKAGE_CACHE_DIR = os.path.join(tempfile.gettempdir(), "hakkin_pkg_cache")
+os.makedirs(PACKAGE_CACHE_DIR, exist_ok=True)
+
+
+def download_file_with_cache(url, expected_sha=None):
+    """Descarga un archivo con caché persistente y reporte de progreso."""
+    if expected_sha and len(expected_sha) == 64:
+        cache_file = os.path.join(PACKAGE_CACHE_DIR, f"{expected_sha}.pkg")
+        if os.path.isfile(cache_file) and os.path.getsize(cache_file) > 0:
+            if compute_sha256(cache_file) == expected_sha:
+                print(f"    [Caché Local] Usando paquete en caché: {os.path.basename(cache_file)} ({os.path.getsize(cache_file):,} bytes)")
+                return cache_file
+
+    url_hash = hashlib.sha256(url.encode()).hexdigest()[:16]
+    temp_target = os.path.join(PACKAGE_CACHE_DIR, f"dl_{url_hash}.part")
+    final_target = os.path.join(PACKAGE_CACHE_DIR, f"{expected_sha or url_hash}.pkg")
+
     req = urllib.request.Request(
         url,
         headers={"User-Agent": "HakkinLauncher-DeltaGenerator/2.0 (Python urllib)"}
     )
-    with urllib.request.urlopen(req, timeout=120) as resp, open(dest_path, "wb") as out:
-        while chunk := resp.read(65536):
+    with urllib.request.urlopen(req, timeout=300) as resp, open(temp_target, "wb") as out:
+        total_size = int(resp.headers.get("content-length", 0))
+        downloaded = 0
+        last_logged_mb = 0
+        while chunk := resp.read(1048576):
             out.write(chunk)
-    return dest_path
+            downloaded += len(chunk)
+            curr_mb = downloaded // (1024 * 1024)
+            if curr_mb - last_logged_mb >= 50 or downloaded == total_size:
+                last_logged_mb = curr_mb
+                total_mb_str = f" / {total_size // (1024 * 1024)} MB" if total_size > 0 else ""
+                print(f"    [Descarga] {curr_mb} MB{total_mb_str}...", end="\r", flush=True)
+        print()
+
+    if os.path.exists(temp_target):
+        shutil.move(temp_target, final_target)
+    return final_target
 
 
 def format_delta_tag(slug, from_version, to_version):
     """
     Genera el tag del release del repositorio satélite según la especificación:
-    {nombre_del_repositorio}.{versión_origen}...{versión_destino}
+    {nombre_del_repositorio}.{versión_origen}-to-{versión_destino}
+    Nota: Git prohíbe secuencias de puntos consecutivos '..' o '...' en tags
+    (git-check-ref-format regla 3). Se utiliza '-to-' para representar el rango origen...destino.
     """
     clean_from = re.sub(r'^[vV]+', '', str(from_version).strip())
     clean_to = re.sub(r'^[vV]+', '', str(to_version).strip())
     clean_slug = str(slug).strip()
-    return f"{clean_slug}.{clean_from}...{clean_to}"
+    return f"{clean_slug}.{clean_from}-to-{clean_to}"
 
 
 def format_delta_asset_name(slug, platform_key):
@@ -72,6 +102,10 @@ def format_delta_asset_name(slug, platform_key):
 class DeltaGenerator:
     def __init__(self, deltas_repo=DEFAULT_DELTAS_REPO, hdiffz_cmd="hdiffz", dry_run=False):
         self.deltas_repo = deltas_repo
+        if hdiffz_cmd == "hdiffz":
+            local_bin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "bin", "hdiffz")
+            if os.path.isfile(local_bin) and os.access(local_bin, os.X_OK):
+                hdiffz_cmd = local_bin
         self.hdiffz_cmd = hdiffz_cmd
         self.dry_run = dry_run
         self._hdiffz_available = None
@@ -128,7 +162,10 @@ class DeltaGenerator:
             for asset in remote_release.get("assets", []):
                 if asset.get("name") == asset_name:
                     print(f"  [Satellite Cache] Asset {asset_name} ya existe en release {tag}.")
-                    # Si no tenemos target_sha256 del binario, lo calculamos si es posible
+                    patch_sha = ""
+                    digest = asset.get("digest", "")
+                    if digest and digest.startswith("sha256:"):
+                        patch_sha = digest[7:]
                     target_sha = to_release.get("executable_sha256", "")
                     if not target_sha:
                         target_sha = to_release.get("package", {}).get("sha256", "")
@@ -138,7 +175,7 @@ class DeltaGenerator:
                         "patch_format": "hdiff",
                         "url": asset.get("browser_download_url", expected_url),
                         "size_bytes": asset.get("size", 0),
-                        "patch_sha256": "",  # Se mantendrá el existente o se validará al volar
+                        "patch_sha256": patch_sha,
                         "target_sha256": target_sha
                     }
 
@@ -155,15 +192,13 @@ class DeltaGenerator:
             from_pkg = from_release["package"]
             to_pkg = to_release["package"]
 
-            from_file = os.path.join(work_dir, f"from_{from_release['version']}.pkg")
-            to_file = os.path.join(work_dir, f"to_{to_release['version']}.pkg")
+            print(f"  [Delta] Obteniendo paquete origen v{from_release['version']} ({from_pkg['url']})...")
+            from_file = download_file_with_cache(from_pkg["url"], from_pkg.get("sha256"))
+
+            print(f"  [Delta] Obteniendo paquete destino v{to_release['version']} ({to_pkg['url']})...")
+            to_file = download_file_with_cache(to_pkg["url"], to_pkg.get("sha256"))
+
             patch_file = os.path.join(work_dir, asset_name)
-
-            print(f"  [Delta] Descargando v{from_release['version']} ({from_pkg['url']})...")
-            download_file(from_pkg["url"], from_file)
-
-            print(f"  [Delta] Descargando v{to_release['version']} ({to_pkg['url']})...")
-            download_file(to_pkg["url"], to_file)
 
             is_from_zip = zipfile.is_zipfile(from_file)
             is_to_zip = zipfile.is_zipfile(to_file)

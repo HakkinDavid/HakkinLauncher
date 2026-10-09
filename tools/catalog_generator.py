@@ -412,9 +412,12 @@ def generate_catalog(
             if generate_deltas and DeltaGenerator and len(versions_list) >= 2:
                 target_ver = versions_list[0]
                 source_ver = versions_list[1]
-                has_delta = any(d.get("from_version") == source_ver["version"] for d in target_ver.get("delta_patches", []))
+                has_delta = any(
+                    d.get("from_version") == source_ver["version"] and d.get("patch_sha256")
+                    for d in target_ver.get("delta_patches", [])
+                )
                 if not has_delta:
-                    print(f"  [Delta Worker] Generando diferencial para {meta['slug']} ({plat_key}): v{source_ver['version']} -> v{target_ver['version']}...")
+                    print(f"  [Delta Worker] Generando o sincronizando diferencial para {meta['slug']} ({plat_key}): v{source_ver['version']} -> v{target_ver['version']}...")
                     d_gen = DeltaGenerator(deltas_repo=deltas_repo, dry_run=dry_run_deltas)
                     patch_entry = d_gen.generate_delta_patch(
                         app_slug=meta["slug"],
@@ -425,6 +428,9 @@ def generate_catalog(
                     if patch_entry:
                         if "delta_patches" not in target_ver:
                             target_ver["delta_patches"] = []
+                        target_ver["delta_patches"] = [
+                            d for d in target_ver["delta_patches"] if d.get("from_version") != source_ver["version"]
+                        ]
                         target_ver["delta_patches"].append(patch_entry)
 
             platforms_dict[plat_key] = {

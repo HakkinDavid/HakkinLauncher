@@ -1,6 +1,6 @@
 {
   "version": "2.0.0",
-  "catalog_timestamp": "2026-10-09T08:52:16.625617+00:00",
+  "catalog_timestamp": "2026-10-09T09:22:24.120051+00:00",
   "launcher_meta": {
     "latest_version": "26.10.08-23",
     "min_required_launcher_version": "1.0.0",
@@ -61,7 +61,7 @@
           "versions": [
             {
               "version": "26.10.08-13",
-              "release_date": "2026-10-08T00:00:00Z",
+              "release_date": "2026-10-08T20:22:34.508643+00:00",
               "changelog": "Lanzamiento de Tecate Simulator v26.10.08-13.",
               "executable_relative_path": "tecate.exe",
               "package": {
@@ -69,7 +69,17 @@
                 "size_bytes": 1084841300,
                 "sha256": "b38a07970facf3ef41569bac85aef707254c80e4251a0c401c6c207cfa671f29"
               },
-              "delta_patches": [],
+              "delta_patches": [
+                {
+                  "from_version": "0.0.1",
+                  "to_version": "26.10.08-13",
+                  "patch_format": "hdiff",
+                  "url": "https://github.com/HakkinDavid/hakkin-launcher-deltas/releases/download/tecate-simulator.0.0.1-to-26.10.08-13/tecate-simulator_windows-x64.hdiff",
+                  "size_bytes": 498024262,
+                  "patch_sha256": "3974f014242be3947c1276fccc2d801de65daa551654480854ea2392bc513659",
+                  "target_sha256": "b38a07970facf3ef41569bac85aef707254c80e4251a0c401c6c207cfa671f29"
+                }
+              ],
               "scripts": {
                 "pre_install": null,
                 "post_install": null
@@ -99,7 +109,7 @@
           "versions": [
             {
               "version": "26.10.08-13",
-              "release_date": "2026-10-08T00:00:00Z",
+              "release_date": "2026-10-08T20:22:34.508643+00:00",
               "changelog": "Lanzamiento de Tecate Simulator v26.10.08-13.",
               "executable_relative_path": "tecate.app/Contents/MacOS/tecate",
               "package": {
@@ -107,7 +117,17 @@
                 "size_bytes": 1111734578,
                 "sha256": "a5ff201a1cfc14bce9fe53bfb1f1e02acb349deaef0ae3a34392fa2a34faa98d"
               },
-              "delta_patches": [],
+              "delta_patches": [
+                {
+                  "from_version": "0.0.1",
+                  "to_version": "26.10.08-13",
+                  "patch_format": "hdiff",
+                  "url": "https://github.com/HakkinDavid/hakkin-launcher-deltas/releases/download/tecate-simulator.0.0.1-to-26.10.08-13/tecate-simulator_macos-arm64.hdiff",
+                  "size_bytes": 498279879,
+                  "patch_sha256": "dd058798f30d4c8594e1ad78ecdeabe30c1829e4c9cec3c09ff05846c8066462",
+                  "target_sha256": "a5ff201a1cfc14bce9fe53bfb1f1e02acb349deaef0ae3a34392fa2a34faa98d"
+                }
+              ],
               "scripts": {
                 "pre_install": null,
                 "post_install": null
@@ -274,7 +294,17 @@
                 "size_bytes": 17286178,
                 "sha256": "6f0d0d522187f3588442b560679dde2409a630b6afa86a07e1919ce016051c44"
               },
-              "delta_patches": [],
+              "delta_patches": [
+                {
+                  "from_version": "1.0.0",
+                  "to_version": "26.08.04",
+                  "patch_format": "hdiff",
+                  "url": "https://github.com/HakkinDavid/hakkin-launcher-deltas/releases/download/firefighter-form.1.0.0-to-26.08.04/firefighter-form_windows-x64.hdiff",
+                  "size_bytes": 1861,
+                  "patch_sha256": "59a0e69ea7692a65cb72f107ee67a9043de3f1d36e4c7a132a7bba007fc0866a",
+                  "target_sha256": "2e8ead9b21b87e1792f11f51f2a9993ec6aceae81684b6cb95f7bdd36a106783"
+                }
+              ],
               "scripts": {
                 "pre_install": null,
                 "post_install": null
@@ -312,7 +342,17 @@
                 "size_bytes": 65859605,
                 "sha256": "45c81794d8779d4bb52068523cadce07b7663795006a127039b8460da7c677fa"
               },
-              "delta_patches": [],
+              "delta_patches": [
+                {
+                  "from_version": "1.0.0",
+                  "to_version": "26.08.04",
+                  "patch_format": "hdiff",
+                  "url": "https://github.com/HakkinDavid/hakkin-launcher-deltas/releases/download/firefighter-form.1.0.0-to-26.08.04/firefighter-form_android.hdiff",
+                  "size_bytes": 27371,
+                  "patch_sha256": "82f0ea6a90e0f46892f4574f80c4a3d159491cee81d77f7065c6b1238e888361",
+                  "target_sha256": "45c81794d8779d4bb52068523cadce07b7663795006a127039b8460da7c677fa"
+                }
+              ],
               "scripts": {
                 "pre_install": null,
                 "post_install": null
@@ -378,7 +418,17 @@
                 "size_bytes": 90255671,
                 "sha256": "77b915fbf6fa4ad40a361432bb7b8d5eeffd3fe5ea50949350be83a26e14cd4b"
               },
-              "delta_patches": [],
+              "delta_patches": [
+                {
+                  "from_version": "1.0.0",
+                  "to_version": "26.09.11",
+                  "patch_format": "hdiff",
+                  "url": "https://github.com/HakkinDavid/hakkin-launcher-deltas/releases/download/platinum-world-management.1.0.0-to-26.09.11/platinum-world-management_android.hdiff",
+                  "size_bytes": 30725,
+                  "patch_sha256": "30afe0d199d8c88e18eec1ec89cb396013f1ae0d139c0b4d30ae6b70fec01366",
+                  "target_sha256": "77b915fbf6fa4ad40a361432bb7b8d5eeffd3fe5ea50949350be83a26e14cd4b"
+                }
+              ],
               "scripts": {
                 "pre_install": null,
                 "post_install": null
@@ -518,7 +568,17 @@
                 "size_bytes": 51776,
                 "sha256": "89f7cda9c01e6e25cee1ae61106a8ecb01a17a59f8357787fe1c957a2a8a9f73"
               },
-              "delta_patches": [],
+              "delta_patches": [
+                {
+                  "from_version": "1.0",
+                  "to_version": "64.0.0",
+                  "patch_format": "hdiff",
+                  "url": "https://github.com/HakkinDavid/hakkin-launcher-deltas/releases/download/wiimote-userland-driver.1.0-to-64.0.0/wiimote-userland-driver_macos-arm64.hdiff",
+                  "size_bytes": 32,
+                  "patch_sha256": "4368464160edd0994d442ccd1bc5e94e32d60d774274b1fa2de8526e6616b034",
+                  "target_sha256": "89f7cda9c01e6e25cee1ae61106a8ecb01a17a59f8357787fe1c957a2a8a9f73"
+                }
+              ],
               "scripts": {
                 "pre_install": null,
                 "post_install": null
@@ -584,7 +644,17 @@
                 "size_bytes": 1262592,
                 "sha256": "c2d1d9003dc3f9f877854910ad6648f5e400dca561225961aa6734686770b165"
               },
-              "delta_patches": [],
+              "delta_patches": [
+                {
+                  "from_version": "1.0.0",
+                  "to_version": "1.1.0",
+                  "patch_format": "hdiff",
+                  "url": "https://github.com/HakkinDavid/hakkin-launcher-deltas/releases/download/languages-autohotkey.1.0.0-to-1.1.0/languages-autohotkey_windows-x64.hdiff",
+                  "size_bytes": 1190891,
+                  "patch_sha256": "70f5f01cf5868ad5e042df43c4b761dd564676fae3d61557a571f10e0bce3832",
+                  "target_sha256": "c2d1d9003dc3f9f877854910ad6648f5e400dca561225961aa6734686770b165"
+                }
+              ],
               "scripts": {
                 "pre_install": null,
                 "post_install": null
@@ -700,7 +770,17 @@
                 "size_bytes": 149086,
                 "sha256": "738faa1f834128baffce566a6f33070c697e250dde5392699cfbcaefbaab90ca"
               },
-              "delta_patches": [],
+              "delta_patches": [
+                {
+                  "from_version": "1.1.1",
+                  "to_version": "26.1",
+                  "patch_format": "hdiff",
+                  "url": "https://github.com/HakkinDavid/hakkin-launcher-deltas/releases/download/catify-mod.1.1.1-to-26.1/catify-mod_windows-x64.hdiff",
+                  "size_bytes": 9280,
+                  "patch_sha256": "4db4bfee8d8d7afa1ce7efe821212299ddcd2dac2eb7fd9e83a27df9cede9c71",
+                  "target_sha256": "738faa1f834128baffce566a6f33070c697e250dde5392699cfbcaefbaab90ca"
+                }
+              ],
               "scripts": {
                 "pre_install": null,
                 "post_install": null
