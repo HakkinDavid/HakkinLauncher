@@ -1,6 +1,6 @@
 {
   "version": "2.0.0",
-  "catalog_timestamp": "2026-10-09T09:22:24.120051+00:00",
+  "catalog_timestamp": "2026-10-09T09:43:51.459317+00:00",
   "launcher_meta": {
     "latest_version": "26.10.08-23",
     "min_required_launcher_version": "1.0.0",
@@ -61,7 +61,7 @@
           "versions": [
             {
               "version": "26.10.08-13",
-              "release_date": "2026-10-08T20:22:34.508643+00:00",
+              "release_date": "2026-10-08T00:00:00Z",
               "changelog": "Lanzamiento de Tecate Simulator v26.10.08-13.",
               "executable_relative_path": "tecate.exe",
               "package": {
@@ -109,7 +109,7 @@
           "versions": [
             {
               "version": "26.10.08-13",
-              "release_date": "2026-10-08T20:22:34.508643+00:00",
+              "release_date": "2026-10-08T00:00:00Z",
               "changelog": "Lanzamiento de Tecate Simulator v26.10.08-13.",
               "executable_relative_path": "tecate.app/Contents/MacOS/tecate",
               "package": {
@@ -228,21 +228,37 @@
           "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1280&q=80"
         ]
       },
-      "latest_version": "1.0.0",
+      "latest_version": "3.0",
       "platforms": {
         "android": {
-          "latest_version": "1.0.0",
+          "latest_version": "3.0",
           "protected_user_paths": [],
           "versions": [
             {
-              "version": "1.0.0",
+              "version": "3.0",
               "release_date": "2026-10-08T00:00:00Z",
-              "changelog": "Lanzamiento de Sistema de Apoyo Migrante v1.0.0.",
+              "changelog": "Lanzamiento de Sistema de Apoyo Migrante v3.0.",
               "executable_relative_path": "migrant-aid-map-android.apk",
               "package": {
                 "url": "https://github.com/Bonsanbec/migrant-aid-map/releases/download/latest/migrant-aid-map-android.apk",
                 "size_bytes": 54644848,
                 "sha256": "6127a04ccb69209720508e69be9355e37a1af4db5d1b2fea67c19ed9d5caa8b0"
+              },
+              "delta_patches": [],
+              "scripts": {
+                "pre_install": null,
+                "post_install": null
+              }
+            },
+            {
+              "version": "2.2",
+              "release_date": "2026-10-08T00:00:00Z",
+              "changelog": "Lanzamiento de Sistema de Apoyo Migrante v2.2.",
+              "executable_relative_path": "migrant-aid-map-android.apk",
+              "package": {
+                "url": "https://github.com/Bonsanbec/migrant-aid-map/releases/download/2.2/migrant-aid-map-android.apk",
+                "size_bytes": 54639495,
+                "sha256": "79c8a2bdb35666a34be7c2603df9ef8a9c37ff27aae7ee3ce0b8fe435297103d"
               },
               "delta_patches": [],
               "scripts": {
@@ -294,31 +310,101 @@
                 "size_bytes": 17286178,
                 "sha256": "6f0d0d522187f3588442b560679dde2409a630b6afa86a07e1919ce016051c44"
               },
-              "delta_patches": [
-                {
-                  "from_version": "1.0.0",
-                  "to_version": "26.08.04",
-                  "patch_format": "hdiff",
-                  "url": "https://github.com/HakkinDavid/hakkin-launcher-deltas/releases/download/firefighter-form.1.0.0-to-26.08.04/firefighter-form_windows-x64.hdiff",
-                  "size_bytes": 1861,
-                  "patch_sha256": "59a0e69ea7692a65cb72f107ee67a9043de3f1d36e4c7a132a7bba007fc0866a",
-                  "target_sha256": "2e8ead9b21b87e1792f11f51f2a9993ec6aceae81684b6cb95f7bdd36a106783"
-                }
-              ],
+              "delta_patches": [],
               "scripts": {
                 "pre_install": null,
                 "post_install": null
               }
             },
             {
-              "version": "1.0.0",
+              "version": "26.06.02",
               "release_date": "2026-10-08T00:00:00Z",
-              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v1.0.0.",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v26.06.02.",
               "executable_relative_path": "bomberos.exe",
               "package": {
-                "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.08.04/bomberos-windows-release.zip",
-                "size_bytes": 17286178,
-                "sha256": "6f0d0d522187f3588442b560679dde2409a630b6afa86a07e1919ce016051c44"
+                "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.06.02/bomberos-windows-release.zip",
+                "size_bytes": 16025163,
+                "sha256": "f9289b8b5138617ca430848cf67f451b1bc8c04bd7d6dc5f6ebd2f7c05f0d0b9"
+              },
+              "delta_patches": [],
+              "scripts": {
+                "pre_install": null,
+                "post_install": null
+              }
+            },
+            {
+              "version": "26.05.21",
+              "release_date": "2026-10-08T00:00:00Z",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v26.05.21.",
+              "executable_relative_path": "bomberos.exe",
+              "package": {
+                "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.05.21/bomberos-windows-release.zip",
+                "size_bytes": 15966209,
+                "sha256": "6cb8165f9ebfc1aaaeab3114f5ec34741b291fdc49c657d38b64723b3dd66f09"
+              },
+              "delta_patches": [],
+              "scripts": {
+                "pre_install": null,
+                "post_install": null
+              }
+            },
+            {
+              "version": "26.04.02",
+              "release_date": "2026-10-08T00:00:00Z",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v26.04.02.",
+              "executable_relative_path": "bomberos.exe",
+              "package": {
+                "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.04.02/bomberos-windows-release.zip",
+                "size_bytes": 15862010,
+                "sha256": "9ce13af44c6e1079dde00842d1d9879e36d92b569dab143cd95f581e4348d3da"
+              },
+              "delta_patches": [],
+              "scripts": {
+                "pre_install": null,
+                "post_install": null
+              }
+            },
+            {
+              "version": "26.03.17",
+              "release_date": "2026-10-08T00:00:00Z",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v26.03.17.",
+              "executable_relative_path": "bomberos.exe",
+              "package": {
+                "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.03.17/bomberos-windows-release.zip",
+                "size_bytes": 15861517,
+                "sha256": "e06d12944100b81ff71c00392d8a4c0c375db46ac6ad17d3276e920b7b95da36"
+              },
+              "delta_patches": [],
+              "scripts": {
+                "pre_install": null,
+                "post_install": null
+              }
+            },
+            {
+              "version": "26.03.11",
+              "release_date": "2026-10-08T00:00:00Z",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v26.03.11.",
+              "executable_relative_path": "bomberos.exe",
+              "package": {
+                "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.03.11/bomberos-windows-release.zip",
+                "size_bytes": 15861469,
+                "sha256": "a1a37187e238d9ec58bad698322b13fc5961f90d4f69928d7f9d5d70927a48da"
+              },
+              "delta_patches": [],
+              "scripts": {
+                "pre_install": null,
+                "post_install": null
+              }
+            },
+            {
+              "version": "26.02.27",
+              "release_date": "2026-10-08T00:00:00Z",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v26.02.27.",
+              "executable_relative_path": "bomberos.exe",
+              "package": {
+                "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.02.27/bomberos-windows-release.zip",
+                "size_bytes": 15848916,
+                "sha256": "a7b50f789eb27bb20ee6596f83c12aeb8b7dae38e4173b41f20723c9691f1851"
               },
               "delta_patches": [],
               "scripts": {
@@ -342,31 +428,213 @@
                 "size_bytes": 65859605,
                 "sha256": "45c81794d8779d4bb52068523cadce07b7663795006a127039b8460da7c677fa"
               },
-              "delta_patches": [
-                {
-                  "from_version": "1.0.0",
-                  "to_version": "26.08.04",
-                  "patch_format": "hdiff",
-                  "url": "https://github.com/HakkinDavid/hakkin-launcher-deltas/releases/download/firefighter-form.1.0.0-to-26.08.04/firefighter-form_android.hdiff",
-                  "size_bytes": 27371,
-                  "patch_sha256": "82f0ea6a90e0f46892f4574f80c4a3d159491cee81d77f7065c6b1238e888361",
-                  "target_sha256": "45c81794d8779d4bb52068523cadce07b7663795006a127039b8460da7c677fa"
-                }
-              ],
+              "delta_patches": [],
               "scripts": {
                 "pre_install": null,
                 "post_install": null
               }
             },
             {
-              "version": "1.0.0",
+              "version": "26.06.02",
               "release_date": "2026-10-08T00:00:00Z",
-              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v1.0.0.",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v26.06.02.",
               "executable_relative_path": "bomberos-android-release.apk",
               "package": {
-                "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.08.04/bomberos-android-release.apk",
-                "size_bytes": 65859605,
-                "sha256": "45c81794d8779d4bb52068523cadce07b7663795006a127039b8460da7c677fa"
+                "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.06.02/bomberos-android-release.apk",
+                "size_bytes": 60871555,
+                "sha256": "75d8efec0e0b6fc91e65c632dd796aa435511bd0ef4747f385990db2202cdacc"
+              },
+              "delta_patches": [],
+              "scripts": {
+                "pre_install": null,
+                "post_install": null
+              }
+            },
+            {
+              "version": "26.05.21",
+              "release_date": "2026-10-08T00:00:00Z",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v26.05.21.",
+              "executable_relative_path": "bomberos-android-release.apk",
+              "package": {
+                "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.05.21/bomberos-android-release.apk",
+                "size_bytes": 60871559,
+                "sha256": "2bc504b3b1ced96f33406f19f089579d0d987656b56e5771de4c96c5e60364a7"
+              },
+              "delta_patches": [],
+              "scripts": {
+                "pre_install": null,
+                "post_install": null
+              }
+            },
+            {
+              "version": "26.04.02",
+              "release_date": "2026-10-08T00:00:00Z",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v26.04.02.",
+              "executable_relative_path": "bomberos-android-release.apk",
+              "package": {
+                "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.04.02/bomberos-android-release.apk",
+                "size_bytes": 60017095,
+                "sha256": "aa178f0d034d7fc0bf2270fe4c7ad4eadc274c68278e8f58c2684f36d55dad05"
+              },
+              "delta_patches": [],
+              "scripts": {
+                "pre_install": null,
+                "post_install": null
+              }
+            },
+            {
+              "version": "26.03.17",
+              "release_date": "2026-10-08T00:00:00Z",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v26.03.17.",
+              "executable_relative_path": "bomberos-android-release.apk",
+              "package": {
+                "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.03.17/bomberos-android-release.apk",
+                "size_bytes": 60016843,
+                "sha256": "1656ba343cea7f69be162b5dd2f44b12b889d14538ca57fed8e48936c208ed48"
+              },
+              "delta_patches": [],
+              "scripts": {
+                "pre_install": null,
+                "post_install": null
+              }
+            },
+            {
+              "version": "26.03.11",
+              "release_date": "2026-10-08T00:00:00Z",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v26.03.11.",
+              "executable_relative_path": "bomberos-android-release.apk",
+              "package": {
+                "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.03.11/bomberos-android-release.apk",
+                "size_bytes": 60016843,
+                "sha256": "5d04314a2915bb2f950c81f4aecfa67c0a026b9c670f42348a66f6ec267a50f9"
+              },
+              "delta_patches": [],
+              "scripts": {
+                "pre_install": null,
+                "post_install": null
+              }
+            },
+            {
+              "version": "26.02.27",
+              "release_date": "2026-10-08T00:00:00Z",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v26.02.27.",
+              "executable_relative_path": "bomberos-android-release.apk",
+              "package": {
+                "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.02.27/bomberos-android-release.apk",
+                "size_bytes": 59918307,
+                "sha256": "5cdd5f6696823447faade0294ca3f453120fcebd5fb1ab4afb929739c86bcb1f"
+              },
+              "delta_patches": [],
+              "scripts": {
+                "pre_install": null,
+                "post_install": null
+              }
+            },
+            {
+              "version": "26.01.28",
+              "release_date": "2026-10-08T00:00:00Z",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v26.01.28.",
+              "executable_relative_path": "bomberos-android-release.apk",
+              "package": {
+                "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.01.28/bomberos-android-release.apk",
+                "size_bytes": 59179483,
+                "sha256": "76a9f2f79461c51ec02fd5275851ec3e69466ca0add8319f25ec2cb4e8508292"
+              },
+              "delta_patches": [],
+              "scripts": {
+                "pre_install": null,
+                "post_install": null
+              }
+            },
+            {
+              "version": "25.11.12",
+              "release_date": "2026-10-08T00:00:00Z",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v25.11.12.",
+              "executable_relative_path": "bomberos-android-release.apk",
+              "package": {
+                "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v25.11.12/bomberos-android-release.apk",
+                "size_bytes": 59176700,
+                "sha256": "20ac98aa060673b67ba0e7fea28c0410c4250c3402e6fc64a370439784a1ed18"
+              },
+              "delta_patches": [],
+              "scripts": {
+                "pre_install": null,
+                "post_install": null
+              }
+            },
+            {
+              "version": "25.11.11",
+              "release_date": "2026-10-08T00:00:00Z",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v25.11.11.",
+              "executable_relative_path": "bomberos-android-release.apk",
+              "package": {
+                "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v25.11.11/bomberos-android-release.apk",
+                "size_bytes": 59094780,
+                "sha256": "3ce92214b9974dd72e15f2ecd9e79f894fad86ae957bef1aedc4aec59172ae78"
+              },
+              "delta_patches": [],
+              "scripts": {
+                "pre_install": null,
+                "post_install": null
+              }
+            },
+            {
+              "version": "25.11.07",
+              "release_date": "2026-10-08T00:00:00Z",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v25.11.07.",
+              "executable_relative_path": "bomberos-android-release.apk",
+              "package": {
+                "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v25.11.07/bomberos-android-release.apk",
+                "size_bytes": 59094784,
+                "sha256": "7919a14c4118582047a5dbbe54e83c229292452cb8f2ab77aa7fa7c51d8b5c70"
+              },
+              "delta_patches": [],
+              "scripts": {
+                "pre_install": null,
+                "post_install": null
+              }
+            },
+            {
+              "version": "25.11.06",
+              "release_date": "2026-10-08T00:00:00Z",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v25.11.06.",
+              "executable_relative_path": "bomberos-android-release.apk",
+              "package": {
+                "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v25.11.06/bomberos-android-release.apk",
+                "size_bytes": 58244837,
+                "sha256": "b9a111fe18280a624cf8b6e29cd1c338afbe099890b043c3d6a5b5779f10c3d3"
+              },
+              "delta_patches": [],
+              "scripts": {
+                "pre_install": null,
+                "post_install": null
+              }
+            },
+            {
+              "version": "25.11.05",
+              "release_date": "2026-10-08T00:00:00Z",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v25.11.05.",
+              "executable_relative_path": "bomberos-android-release.apk",
+              "package": {
+                "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v25.11.05/bomberos-android-release.apk",
+                "size_bytes": 58244821,
+                "sha256": "4ad1bd709f69e825ad49538450bc466461317b7dd2930cd8a0d2e76271f2135b"
+              },
+              "delta_patches": [],
+              "scripts": {
+                "pre_install": null,
+                "post_install": null
+              }
+            },
+            {
+              "version": "25.11.02",
+              "release_date": "2026-10-08T00:00:00Z",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v25.11.02.",
+              "executable_relative_path": "bomberos-android-release.apk",
+              "package": {
+                "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v25.11.02/bomberos-android-release.apk",
+                "size_bytes": 58260277,
+                "sha256": "11809e25db8a7b1143d8822d39ba1b95cbbe6a57dad72bf355c4f988f3a9b8f3"
               },
               "delta_patches": [],
               "scripts": {
@@ -418,31 +686,85 @@
                 "size_bytes": 90255671,
                 "sha256": "77b915fbf6fa4ad40a361432bb7b8d5eeffd3fe5ea50949350be83a26e14cd4b"
               },
-              "delta_patches": [
-                {
-                  "from_version": "1.0.0",
-                  "to_version": "26.09.11",
-                  "patch_format": "hdiff",
-                  "url": "https://github.com/HakkinDavid/hakkin-launcher-deltas/releases/download/platinum-world-management.1.0.0-to-26.09.11/platinum-world-management_android.hdiff",
-                  "size_bytes": 30725,
-                  "patch_sha256": "30afe0d199d8c88e18eec1ec89cb396013f1ae0d139c0b4d30ae6b70fec01366",
-                  "target_sha256": "77b915fbf6fa4ad40a361432bb7b8d5eeffd3fe5ea50949350be83a26e14cd4b"
-                }
-              ],
+              "delta_patches": [],
               "scripts": {
                 "pre_install": null,
                 "post_install": null
               }
             },
             {
-              "version": "1.0.0",
+              "version": "26.09.08",
               "release_date": "2026-10-08T00:00:00Z",
-              "changelog": "Lanzamiento de Platinum World Management System (PWMS) v1.0.0.",
+              "changelog": "Lanzamiento de Platinum World Management System v26.09.08.",
               "executable_relative_path": "pwms-android-release.apk",
               "package": {
-                "url": "https://github.com/HakkinDavid/PWMS/releases/download/v26.09.11/pwms-android-release.apk",
-                "size_bytes": 90255671,
-                "sha256": "77b915fbf6fa4ad40a361432bb7b8d5eeffd3fe5ea50949350be83a26e14cd4b"
+                "url": "https://github.com/HakkinDavid/PWMS/releases/download/v26.09.08/pwms-android-release.apk",
+                "size_bytes": 90288515,
+                "sha256": "1a435149339c78ad966c079ab98e19ec9ba2306586df64645418ee5e3a2008e9"
+              },
+              "delta_patches": [],
+              "scripts": {
+                "pre_install": null,
+                "post_install": null
+              }
+            },
+            {
+              "version": "26.09.01",
+              "release_date": "2026-10-08T00:00:00Z",
+              "changelog": "Lanzamiento de Platinum World Management System v26.09.01.",
+              "executable_relative_path": "pwms-android-release.apk",
+              "package": {
+                "url": "https://github.com/HakkinDavid/PWMS/releases/download/v26.09.01/pwms-android-release.apk",
+                "size_bytes": 89059111,
+                "sha256": "3373b06d995dd9248b0ab117c4a18e58503667750a5509e40c22922d8e0f294c"
+              },
+              "delta_patches": [],
+              "scripts": {
+                "pre_install": null,
+                "post_install": null
+              }
+            },
+            {
+              "version": "26.08.31",
+              "release_date": "2026-10-08T00:00:00Z",
+              "changelog": "Lanzamiento de Platinum World Management System v26.08.31.",
+              "executable_relative_path": "pwms-android-release.apk",
+              "package": {
+                "url": "https://github.com/HakkinDavid/PWMS/releases/download/v26.08.31/pwms-android-release.apk",
+                "size_bytes": 89124687,
+                "sha256": "29697e7e326b1ae969da373ef4abc89599273fd34770df371b37d777d2d750ae"
+              },
+              "delta_patches": [],
+              "scripts": {
+                "pre_install": null,
+                "post_install": null
+              }
+            },
+            {
+              "version": "26.08.28",
+              "release_date": "2026-10-08T00:00:00Z",
+              "changelog": "Lanzamiento de Platinum World Management System v26.08.28.",
+              "executable_relative_path": "pwms-android-release.apk",
+              "package": {
+                "url": "https://github.com/HakkinDavid/PWMS/releases/download/v26.08.28/pwms-android-release.apk",
+                "size_bytes": 88534355,
+                "sha256": "c50b50b7527e2905032d07814af2f17df8ba1b9384844f59a1c210ba5c8f8c67"
+              },
+              "delta_patches": [],
+              "scripts": {
+                "pre_install": null,
+                "post_install": null
+              }
+            },
+            {
+              "version": "26.08.16",
+              "release_date": "2026-10-08T00:00:00Z",
+              "changelog": "Lanzamiento de Platinum World Management System v26.08.16.",
+              "executable_relative_path": "pwms-android-release.apk",
+              "package": {
+                "url": "https://github.com/HakkinDavid/PWMS/releases/download/v26.08.16/pwms-android-release.apk",
+                "size_bytes": 86466275,
+                "sha256": "5b501044ea8826609b98af0a6a0d9336808c3af5e238d66c9ea3d2da8418cc00"
               },
               "delta_patches": [],
               "scripts": {
@@ -552,38 +874,12 @@
           "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1280&q=80"
         ]
       },
-      "latest_version": "64.0.0",
+      "latest_version": "1.0",
       "platforms": {
         "macos-arm64": {
-          "latest_version": "64.0.0",
+          "latest_version": "1.0",
           "protected_user_paths": [],
           "versions": [
-            {
-              "version": "64.0.0",
-              "release_date": "2026-10-08T00:00:00Z",
-              "changelog": "Lanzamiento de Wiimote Userland Driver v64.0.0.",
-              "executable_relative_path": "WiimoteUserlandDriver-mac-arm64",
-              "package": {
-                "url": "https://github.com/HakkinDavid/WiimoteUserlandDriver/releases/download/v1.0/WiimoteUserlandDriver-mac-arm64",
-                "size_bytes": 51776,
-                "sha256": "89f7cda9c01e6e25cee1ae61106a8ecb01a17a59f8357787fe1c957a2a8a9f73"
-              },
-              "delta_patches": [
-                {
-                  "from_version": "1.0",
-                  "to_version": "64.0.0",
-                  "patch_format": "hdiff",
-                  "url": "https://github.com/HakkinDavid/hakkin-launcher-deltas/releases/download/wiimote-userland-driver.1.0-to-64.0.0/wiimote-userland-driver_macos-arm64.hdiff",
-                  "size_bytes": 32,
-                  "patch_sha256": "4368464160edd0994d442ccd1bc5e94e32d60d774274b1fa2de8526e6616b034",
-                  "target_sha256": "89f7cda9c01e6e25cee1ae61106a8ecb01a17a59f8357787fe1c957a2a8a9f73"
-                }
-              ],
-              "scripts": {
-                "pre_install": null,
-                "post_install": null
-              }
-            },
             {
               "version": "1.0",
               "release_date": "2026-10-08T00:00:00Z",
@@ -704,21 +1000,53 @@
           "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1280&q=80"
         ]
       },
-      "latest_version": "1.0.0",
+      "latest_version": "1.2",
       "platforms": {
         "android": {
-          "latest_version": "1.0.0",
+          "latest_version": "1.2",
           "protected_user_paths": [],
           "versions": [
             {
-              "version": "1.0.0",
+              "version": "1.2",
               "release_date": "2026-10-08T00:00:00Z",
-              "changelog": "Lanzamiento de CAT Helper v1.0.0.",
+              "changelog": "Lanzamiento de CAT Helper v1.2.",
               "executable_relative_path": "CATHelper.apk",
               "package": {
                 "url": "https://github.com/HakkinDavid/cathelper/releases/download/latest/CATHelper.apk",
                 "size_bytes": 6176525,
                 "sha256": "f902bed32da91038f6d2dd4f3ad56f468f823c320fc4cd8f7a7de724583012c4"
+              },
+              "delta_patches": [],
+              "scripts": {
+                "pre_install": null,
+                "post_install": null
+              }
+            },
+            {
+              "version": "1.1",
+              "release_date": "2026-10-08T00:00:00Z",
+              "changelog": "Lanzamiento de CAT Helper v1.1.",
+              "executable_relative_path": "CATHelper.apk",
+              "package": {
+                "url": "https://github.com/HakkinDavid/cathelper/releases/download/1.1/CATHelper.apk",
+                "size_bytes": 6228749,
+                "sha256": "cd1a3a376ca602f4d56ea5837b91ceb80f526b7fabcd40be757ba843c083159e"
+              },
+              "delta_patches": [],
+              "scripts": {
+                "pre_install": null,
+                "post_install": null
+              }
+            },
+            {
+              "version": "1.0",
+              "release_date": "2026-10-08T00:00:00Z",
+              "changelog": "Lanzamiento de CAT Helper v1.0.",
+              "executable_relative_path": "CATHelper.apk",
+              "package": {
+                "url": "https://github.com/HakkinDavid/cathelper/releases/download/1.0/CATHelper.apk",
+                "size_bytes": 6126949,
+                "sha256": "ac1e5ca0127953053c3e4faecb8ea3e4a662dd71fe5691d6e286bc208fd0fe63"
               },
               "delta_patches": [],
               "scripts": {
@@ -754,47 +1082,37 @@
           "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?w=1280&q=80"
         ]
       },
-      "latest_version": "26.1",
+      "latest_version": "1.1.1",
       "platforms": {
         "windows-x64": {
-          "latest_version": "26.1",
+          "latest_version": "1.1.1",
           "protected_user_paths": [],
           "versions": [
             {
-              "version": "26.1",
+              "version": "1.1.1",
               "release_date": "2026-10-08T00:00:00Z",
-              "changelog": "Lanzamiento de CatifyMod Forge v26.1.",
+              "changelog": "Lanzamiento de CatifyMod Forge v1.1.1.",
               "executable_relative_path": "catify-1.1.1.jar",
               "package": {
                 "url": "https://github.com/HakkinDavid/CatifyMod-Forge/releases/download/26.1/catify-1.1.1.jar",
                 "size_bytes": 149086,
                 "sha256": "738faa1f834128baffce566a6f33070c697e250dde5392699cfbcaefbaab90ca"
               },
-              "delta_patches": [
-                {
-                  "from_version": "1.1.1",
-                  "to_version": "26.1",
-                  "patch_format": "hdiff",
-                  "url": "https://github.com/HakkinDavid/hakkin-launcher-deltas/releases/download/catify-mod.1.1.1-to-26.1/catify-mod_windows-x64.hdiff",
-                  "size_bytes": 9280,
-                  "patch_sha256": "4db4bfee8d8d7afa1ce7efe821212299ddcd2dac2eb7fd9e83a27df9cede9c71",
-                  "target_sha256": "738faa1f834128baffce566a6f33070c697e250dde5392699cfbcaefbaab90ca"
-                }
-              ],
+              "delta_patches": [],
               "scripts": {
                 "pre_install": null,
                 "post_install": null
               }
             },
             {
-              "version": "1.1.1",
+              "version": "1.0.2",
               "release_date": "2026-10-08T00:00:00Z",
-              "changelog": "Lanzamiento de CatifyMod (Forge) v1.1.1.",
-              "executable_relative_path": "catify-1.1.1.jar",
+              "changelog": "Lanzamiento de CatifyMod Forge v1.0.2.",
+              "executable_relative_path": "catify-1.0.2.jar",
               "package": {
-                "url": "https://github.com/HakkinDavid/CatifyMod-Forge/releases/download/26.1/catify-1.1.1.jar",
-                "size_bytes": 149086,
-                "sha256": "738faa1f834128baffce566a6f33070c697e250dde5392699cfbcaefbaab90ca"
+                "url": "https://github.com/HakkinDavid/CatifyMod-Forge/releases/download/latest/catify-1.0.2.jar",
+                "size_bytes": 150902,
+                "sha256": "659f1b92563736dcf62cdeb60e216da74d12dc754dc7757220e7dee2a5450fe6"
               },
               "delta_patches": [],
               "scripts": {

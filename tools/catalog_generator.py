@@ -49,17 +49,9 @@ KNOWN_ASSET_CACHE = {
         "size_bytes": 54644848,
         "sha256": "6127a04ccb69209720508e69be9355e37a1af4db5d1b2fea67c19ed9d5caa8b0"
     },
-    "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.08.04/bomberos-windows-release.zip": {
-        "size_bytes": 17286178,
-        "sha256": "6f0d0d522187f3588442b560679dde2409a630b6afa86a07e1919ce016051c44"
-    },
-    "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.08.04/bomberos-android-release.apk": {
-        "size_bytes": 65859605,
-        "sha256": "45c81794d8779d4bb52068523cadce07b7663795006a127039b8460da7c677fa"
-    },
-    "https://github.com/HakkinDavid/PWMS/releases/download/v26.09.11/pwms-android-release.apk": {
-        "size_bytes": 90255671,
-        "sha256": "77b915fbf6fa4ad40a361432bb7b8d5eeffd3fe5ea50949350be83a26e14cd4b"
+    "https://github.com/Bonsanbec/migrant-aid-map/releases/download/2.2/migrant-aid-map-android.apk": {
+        "size_bytes": 54639495,
+        "sha256": "79c8a2bdb35666a34be7c2603df9ef8a9c37ff27aae7ee3ce0b8fe435297103d"
     },
     "https://github.com/HakkinDavid/smart-scheduler/releases/download/v2.5/smart-scheduler-macos-arm64.zip": {
         "size_bytes": 32060507,
@@ -68,6 +60,10 @@ KNOWN_ASSET_CACHE = {
     "https://github.com/HakkinDavid/smart-scheduler/releases/download/v2.0/smart-scheduler-macos-v2.0.zip": {
         "size_bytes": 31540120,
         "sha256": "77e384bf8e999c011e0bc598e29bc11394a10ffc8821950ad0281b289cf291ae"
+    },
+    "https://github.com/HakkinDavid/smart-scheduler/releases/download/v2.0/smart-scheduler-macos-arm64.zip": {
+        "size_bytes": 32063818,
+        "sha256": "66d9600fa979f9cd95de695869c7c76fc4835a25de6d60137c2b049bb84b410b"
     },
     "https://github.com/HakkinDavid/WiimoteUserlandDriver/releases/download/v1.0/WiimoteUserlandDriver-mac-arm64": {
         "size_bytes": 51776,
@@ -85,37 +81,195 @@ KNOWN_ASSET_CACHE = {
         "size_bytes": 6176525,
         "sha256": "f902bed32da91038f6d2dd4f3ad56f468f823c320fc4cd8f7a7de724583012c4"
     },
+    "https://github.com/HakkinDavid/cathelper/releases/download/1.1/CATHelper.apk": {
+        "size_bytes": 6228749,
+        "sha256": "cd1a3a376ca602f4d56ea5837b91ceb80f526b7fabcd40be757ba843c083159e"
+    },
+    "https://github.com/HakkinDavid/cathelper/releases/download/1.0/CATHelper.apk": {
+        "size_bytes": 6126949,
+        "sha256": "ac1e5ca0127953053c3e4faecb8ea3e4a662dd71fe5691d6e286bc208fd0fe63"
+    },
     "https://github.com/HakkinDavid/CatifyMod-Forge/releases/download/26.1/catify-1.1.1.jar": {
         "size_bytes": 149086,
         "sha256": "738faa1f834128baffce566a6f33070c697e250dde5392699cfbcaefbaab90ca"
+    },
+    "https://github.com/HakkinDavid/CatifyMod-Forge/releases/download/latest/catify-1.0.2.jar": {
+        "size_bytes": 150902,
+        "sha256": "659f1b92563736dcf62cdeb60e216da74d12dc754dc7757220e7dee2a5450fe6"
+    },
+    "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.08.04/bomberos-windows-release.zip": {
+        "size_bytes": 17286178,
+        "sha256": "6f0d0d522187f3588442b560679dde2409a630b6afa86a07e1919ce016051c44"
+    },
+    "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.06.02/bomberos-windows-release.zip": {
+        "size_bytes": 16025163,
+        "sha256": "f9289b8b5138617ca430848cf67f451b1bc8c04bd7d6dc5f6ebd2f7c05f0d0b9"
+    },
+    "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.05.21/bomberos-windows-release.zip": {
+        "size_bytes": 15966209,
+        "sha256": "6cb8165f9ebfc1aaaeab3114f5ec34741b291fdc49c657d38b64723b3dd66f09"
+    },
+    "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.04.02/bomberos-windows-release.zip": {
+        "size_bytes": 15862010,
+        "sha256": "9ce13af44c6e1079dde00842d1d9879e36d92b569dab143cd95f581e4348d3da"
+    },
+    "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.03.17/bomberos-windows-release.zip": {
+        "size_bytes": 15861517,
+        "sha256": "e06d12944100b81ff71c00392d8a4c0c375db46ac6ad17d3276e920b7b95da36"
+    },
+    "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.03.11/bomberos-windows-release.zip": {
+        "size_bytes": 15861469,
+        "sha256": "a1a37187e238d9ec58bad698322b13fc5961f90d4f69928d7f9d5d70927a48da"
+    },
+    "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.02.27/bomberos-windows-release.zip": {
+        "size_bytes": 15848916,
+        "sha256": "a7b50f789eb27bb20ee6596f83c12aeb8b7dae38e4173b41f20723c9691f1851"
+    },
+    "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.08.04/bomberos-android-release.apk": {
+        "size_bytes": 65859605,
+        "sha256": "45c81794d8779d4bb52068523cadce07b7663795006a127039b8460da7c677fa"
+    },
+    "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.06.02/bomberos-android-release.apk": {
+        "size_bytes": 60871555,
+        "sha256": "75d8efec0e0b6fc91e65c632dd796aa435511bd0ef4747f385990db2202cdacc"
+    },
+    "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.05.21/bomberos-android-release.apk": {
+        "size_bytes": 60871559,
+        "sha256": "2bc504b3b1ced96f33406f19f089579d0d987656b56e5771de4c96c5e60364a7"
+    },
+    "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.04.02/bomberos-android-release.apk": {
+        "size_bytes": 60017095,
+        "sha256": "aa178f0d034d7fc0bf2270fe4c7ad4eadc274c68278e8f58c2684f36d55dad05"
+    },
+    "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.03.17/bomberos-android-release.apk": {
+        "size_bytes": 60016843,
+        "sha256": "1656ba343cea7f69be162b5dd2f44b12b889d14538ca57fed8e48936c208ed48"
+    },
+    "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.03.11/bomberos-android-release.apk": {
+        "size_bytes": 60016843,
+        "sha256": "5d04314a2915bb2f950c81f4aecfa67c0a026b9c670f42348a66f6ec267a50f9"
+    },
+    "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.02.27/bomberos-android-release.apk": {
+        "size_bytes": 59918307,
+        "sha256": "5cdd5f6696823447faade0294ca3f453120fcebd5fb1ab4afb929739c86bcb1f"
+    },
+    "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.01.28/bomberos-android-release.apk": {
+        "size_bytes": 59179483,
+        "sha256": "76a9f2f79461c51ec02fd5275851ec3e69466ca0add8319f25ec2cb4e8508292"
+    },
+    "https://github.com/HakkinDavid/firefighter-form/releases/download/v25.11.12/bomberos-android-release.apk": {
+        "size_bytes": 59176700,
+        "sha256": "20ac98aa060673b67ba0e7fea28c0410c4250c3402e6fc64a370439784a1ed18"
+    },
+    "https://github.com/HakkinDavid/firefighter-form/releases/download/v25.11.11/bomberos-android-release.apk": {
+        "size_bytes": 59094780,
+        "sha256": "3ce92214b9974dd72e15f2ecd9e79f894fad86ae957bef1aedc4aec59172ae78"
+    },
+    "https://github.com/HakkinDavid/firefighter-form/releases/download/v25.11.07/bomberos-android-release.apk": {
+        "size_bytes": 59094784,
+        "sha256": "7919a14c4118582047a5dbbe54e83c229292452cb8f2ab77aa7fa7c51d8b5c70"
+    },
+    "https://github.com/HakkinDavid/firefighter-form/releases/download/v25.11.06/bomberos-android-release.apk": {
+        "size_bytes": 58244837,
+        "sha256": "b9a111fe18280a624cf8b6e29cd1c338afbe099890b043c3d6a5b5779f10c3d3"
+    },
+    "https://github.com/HakkinDavid/firefighter-form/releases/download/v25.11.05/bomberos-android-release.apk": {
+        "size_bytes": 58244821,
+        "sha256": "4ad1bd709f69e825ad49538450bc466461317b7dd2930cd8a0d2e76271f2135b"
+    },
+    "https://github.com/HakkinDavid/firefighter-form/releases/download/v25.11.02/bomberos-android-release.apk": {
+        "size_bytes": 58260277,
+        "sha256": "11809e25db8a7b1143d8822d39ba1b95cbbe6a57dad72bf355c4f988f3a9b8f3"
+    },
+    "https://github.com/HakkinDavid/PWMS/releases/download/v26.09.11/pwms-android-release.apk": {
+        "size_bytes": 90255671,
+        "sha256": "77b915fbf6fa4ad40a361432bb7b8d5eeffd3fe5ea50949350be83a26e14cd4b"
+    },
+    "https://github.com/HakkinDavid/PWMS/releases/download/v26.09.08/pwms-android-release.apk": {
+        "size_bytes": 90288515,
+        "sha256": "1a435149339c78ad966c079ab98e19ec9ba2306586df64645418ee5e3a2008e9"
+    },
+    "https://github.com/HakkinDavid/PWMS/releases/download/v26.09.01/pwms-android-release.apk": {
+        "size_bytes": 89059111,
+        "sha256": "3373b06d995dd9248b0ab117c4a18e58503667750a5509e40c22922d8e0f294c"
+    },
+    "https://github.com/HakkinDavid/PWMS/releases/download/v26.08.31/pwms-android-release.apk": {
+        "size_bytes": 89124687,
+        "sha256": "29697e7e326b1ae969da373ef4abc89599273fd34770df371b37d777d2d750ae"
+    },
+    "https://github.com/HakkinDavid/PWMS/releases/download/v26.08.28/pwms-android-release.apk": {
+        "size_bytes": 88534355,
+        "sha256": "c50b50b7527e2905032d07814af2f17df8ba1b9384844f59a1c210ba5c8f8c67"
+    },
+    "https://github.com/HakkinDavid/PWMS/releases/download/v26.08.16/pwms-android-release.apk": {
+        "size_bytes": 86466275,
+        "sha256": "5b501044ea8826609b98af0a6a0d9336808c3af5e238d66c9ea3d2da8418cc00"
     }
 }
 
-def clean_version(tag_or_filename, url=None):
-    """Normalize versions like 'v1.64-prod-2D' -> '1.64', 'v26.08.04' -> '26.08.04', '26.10.08-13' -> '26.10.08-13'"""
-    if url:
-        match_url = re.search(r'/releases/download/([^/]+)/', url)
-        if match_url:
-            tag = match_url.group(1)
-            if tag != "latest":
-                m_ts = re.search(r'v?(\d+(?:\.\d+)+-\d+)', tag)
-                if m_ts:
-                    return m_ts.group(1)
-                m = re.search(r'v?(\d+(\.\d+)*)', tag)
-                if m:
-                    res = m.group(1)
-                    return res if '.' in res else f"{res}.0.0"
+# Explicit canonical version mappings for assets when tag is 'latest' or filename lacks version
+URL_VERSION_HINTS = {
+    "https://github.com/Bonsanbec/tecate-simulator/releases/download/latest/tecate-windows-v0.0.1-release.zip": "0.0.1",
+    "https://github.com/Bonsanbec/tecate-simulator/releases/download/latest/tecate-macos-v0.0.1-release.zip": "0.0.1",
+    "https://github.com/Bonsanbec/migrant-aid-map/releases/download/latest/migrant-aid-map-android.apk": "3.0",
+    "https://github.com/HakkinDavid/cathelper/releases/download/latest/CATHelper.apk": "1.2",
+    "https://github.com/HakkinDavid/CatifyMod-Forge/releases/download/latest/catify-1.0.2.jar": "1.0.2",
+    "https://github.com/HakkinDavid/CatifyMod-Forge/releases/download/26.1/catify-1.1.1.jar": "1.1.1",
+    "https://github.com/HakkinDavid/languages-autohotkey/releases/download/latest/spanish-v1.0.exe": "1.1.0",
+    "https://github.com/HakkinDavid/languages-autohotkey/releases/download/latest/pinyin-v1.0.exe": "1.0.0",
+}
 
-    cleaned = re.sub(r'(arm64|x86_64|x64|win32|win64)', '', tag_or_filename, flags=re.IGNORECASE)
-    m_ts = re.search(r'v?(\d+(?:\.\d+)+-\d+)', cleaned)
-    if m_ts:
-        return m_ts.group(1)
-    match = re.search(r'v?(\d+(\.\d+)+)', cleaned)
-    if match:
-        return match.group(1)
-    match_single = re.search(r'v(\d+)', cleaned)
-    if match_single:
-        return f"{match_single.group(1)}.0.0"
+def clean_version(tag="", release_name="", filename="", url=""):
+    """
+    Robust version normalizer that avoids architecture tokens (arm64, x64, etc.)
+    and accurately resolves versions even when GitHub API is throttled or offline.
+    """
+    if url and url in URL_VERSION_HINTS:
+        return URL_VERSION_HINTS[url]
+
+    # 1. Mod JARs with explicit embedded version
+    if filename and re.search(r'catify-(\d+(\.\d+)+)\.jar', filename):
+        return re.search(r'catify-(\d+(\.\d+)+)\.jar', filename).group(1)
+
+    # 2. Extract tag from URL if not given or if 'latest'
+    if (not tag or tag.lower() == "latest") and url:
+        m_tag = re.search(r'/releases/download/([^/]+)/', url)
+        if m_tag and m_tag.group(1).lower() != "latest":
+            tag = m_tag.group(1)
+
+    # 3. Tag analysis (when not 'latest')
+    if tag and tag.lower() != "latest":
+        cleaned_tag = re.sub(r'(arm64|x86_64|x64|win32|win64)', '', tag, flags=re.I)
+        m_ts = re.search(r'v?(\d+(?:\.\d+)+-\d+)', cleaned_tag)
+        if m_ts:
+            return m_ts.group(1)
+        m = re.search(r'v?(\d+(\.\d+)+)', cleaned_tag)
+        if m:
+            return m.group(1)
+        m_single = re.search(r'^v?(\d+)$', cleaned_tag)
+        if m_single:
+            return f"{m_single.group(1)}.0.0"
+
+    # 4. Release Title / Name
+    if release_name:
+        cleaned_name = re.sub(r'(arm64|x86_64|x64|win32|win64)', '', release_name, flags=re.I)
+        m_name = re.search(r'(?:^|[\s_vV])(\d+\.\d+(?:\.\d+)?(?:-\d+)?)', cleaned_name)
+        if m_name and "minecraft" not in cleaned_name.lower():
+            return m_name.group(1).lstrip("vV")
+
+    # 5. Filename analysis
+    if filename:
+        cleaned_fn = re.sub(r'(arm64|x86_64|x64|win32|win64)', '', filename, flags=re.I)
+        m_fn = re.search(r'(?:^|[_\-\.vV])(\d+\.\d+(?:\.\d+)?(?:-\d+)?)', cleaned_fn)
+        if m_fn:
+            return m_fn.group(1).lstrip("vV_.-")
+
+    # 6. Fallback on release_name even if Minecraft was present
+    if release_name:
+        m = re.search(r'v?(\d+(\.\d+)+)', release_name)
+        if m:
+            return m.group(1)
+
     return "1.0.0"
 
 def parse_version_tuple(v):
@@ -123,20 +277,24 @@ def parse_version_tuple(v):
     parts = re.findall(r'\d+', str(v))
     return tuple(int(p) for p in parts) if parts else (0,)
 
-def resolve_asset_metadata(url, direct_sha=None):
+def resolve_asset_metadata(url, direct_sha=None, direct_size=0):
     """Resolve exact byte size and sha256 using cache or network."""
     if url in KNOWN_ASSET_CACHE:
-        return KNOWN_ASSET_CACHE[url]["size_bytes"], KNOWN_ASSET_CACHE[url]["sha256"]
+        cached = KNOWN_ASSET_CACHE[url]
+        return cached["size_bytes"], cached["sha256"]
     
+    if direct_sha and len(direct_sha) == 64 and direct_size > 0:
+        return direct_size, direct_sha
+
     sha = direct_sha
-    size = 0
+    size = direct_size
     try:
         req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req) as resp:
+        with urllib.request.urlopen(req, timeout=15) as resp:
             cl = resp.headers.get('Content-Length')
             if cl:
                 size = int(cl)
-            if not sha:
+            if not sha or len(sha) != 64:
                 h = hashlib.sha256()
                 while True:
                     chunk = resp.read(65536)
@@ -166,11 +324,6 @@ class ManifestAdapter:
 
     @staticmethod
     def adapt(manifest_data, app_meta):
-        """
-        Adapts a validated version_manifest dict into a dict of:
-        { platform_key: VersionEntry }
-        Returns {} if invalid or incompatible.
-        """
         if not isinstance(manifest_data, dict):
             return {}
 
@@ -224,9 +377,7 @@ class ManifestAdapter:
 
 def fetch_remote_manifest(repo, tag="latest"):
     """
-    Convention over Configuration:
     Fetches version_manifest.json from GitHub Releases without requiring any project-specific flags.
-    Falls back gracefully (returns None) on 404, rate limit, network failure, or malformed JSON.
     """
     urls_to_try = [
         f"https://github.com/{repo}/releases/download/{tag}/version_manifest.json",
@@ -248,6 +399,28 @@ def fetch_remote_manifest(repo, tag="latest"):
             continue
     return None
 
+def fetch_github_releases(repo, token=None):
+    """
+    Dynamic Discovery: Fetches public releases for a repository via GitHub API.
+    Handles pagination and authentication gracefully, falling back to empty list on error.
+    """
+    token = token or os.environ.get("GITHUB_TOKEN")
+    headers = {"User-Agent": "HakkinLauncher-CatalogGenerator/2.0"}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    
+    url = f"https://api.github.com/repos/{repo}/releases?per_page=100"
+    try:
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req, timeout=8) as resp:
+            if resp.status == 200:
+                data = json.loads(resp.read().decode("utf-8"))
+                if isinstance(data, list):
+                    return data
+    except Exception as e:
+        print(f"Notice: Could not fetch releases from GitHub API for {repo}: {e}", file=sys.stderr)
+    return []
+
 def generate_catalog(
     overrides_path,
     existing_catalog_path=None,
@@ -258,7 +431,7 @@ def generate_catalog(
     with open(overrides_path, 'r', encoding='utf-8') as f:
         overrides = json.load(f)
 
-    # Load existing catalog if available to merge historical versions
+    # Load existing catalog if available to merge historical versions and delta patches
     existing_apps_map = {}
     if existing_catalog_path and os.path.exists(existing_catalog_path):
         try:
@@ -278,9 +451,7 @@ def generate_catalog(
 
         existing_app = existing_apps_map.get(app_id)
 
-        # -----------------------------------------------------------------
-        # Level 1 Strategy: Remote Manifest
-        # -----------------------------------------------------------------
+        # Level 1 Strategy: Remote Manifest (e.g. version_manifest.json)
         remote_manifest_versions = {}
         remote_manifest = fetch_remote_manifest(repo)
         if remote_manifest:
@@ -288,18 +459,23 @@ def generate_catalog(
             if remote_manifest_versions:
                 print(f"  [L1] Auto-discovered version_manifest.json (v{remote_manifest.get('release_version')}) for {repo}")
 
-        # Look up platform rules
+        # Dynamic Discovery: GitHub API Releases
+        remote_releases = fetch_github_releases(repo)
+
+        # Process each configured platform
         for plat_key, plat_info in meta.get("platforms", {}).items():
             versions_list = []
             seen_versions = set()
+            seen_urls = set()
 
             # L1 Ingestion: Was this platform resolved via remote manifest?
             if plat_key in remote_manifest_versions:
                 v_entry = remote_manifest_versions[plat_key]
                 versions_list.append(v_entry)
                 seen_versions.add(v_entry["version"])
+                seen_urls.add(v_entry["package"]["url"])
 
-            # 1. If explicit versions are defined in overrides
+            # Strategy 1: Explicit versions defined in overrides
             if "versions" in plat_info and isinstance(plat_info["versions"], list):
                 for v_def in plat_info["versions"]:
                     v_str = v_def.get("version", "1.0.0")
@@ -307,7 +483,6 @@ def generate_catalog(
                         continue
                     pkg = v_def.get("package")
                     if not pkg:
-                        # Find from pattern or cache
                         pattern = v_def.get("asset_pattern", ".*")
                         matched_asset = None
                         for cached_url, cached_info in KNOWN_ASSET_CACHE.items():
@@ -340,57 +515,112 @@ def generate_catalog(
                     }
                     versions_list.append(v_entry)
                     seen_versions.add(v_str)
+                    seen_urls.add(pkg["url"])
 
-            # 2. Level 2 & 3: Match assets from cache or pattern
+            # Strategy 2: Dynamic Multi-Release Discovery from GitHub Releases & Pre-resolved Cache
             else:
                 pattern = plat_info.get("asset_pattern", ".*")
-                cached_matches = []
+
+                # Ingest releases discovered via GitHub API
+                if remote_releases:
+                    for r in remote_releases:
+                        if r.get("draft", False):
+                            continue
+                        tag = r.get("tag_name", "")
+                        r_name = r.get("name", "")
+                        pub_date = r.get("published_at", "2026-10-08T00:00:00Z")
+                        body = (r.get("body") or "").strip()
+
+                        for asset in r.get("assets", []):
+                            fn = asset.get("name", "")
+                            if re.search(pattern, fn):
+                                url = asset.get("browser_download_url", "")
+                                if url in seen_urls:
+                                    continue
+                                v_str = clean_version(tag=tag, release_name=r_name, filename=fn, url=url)
+                                if v_str in seen_versions:
+                                    continue
+
+                                # Resolve exact size and sha256 digest
+                                size = asset.get("size", 0)
+                                digest = asset.get("digest")
+                                sha256 = ""
+                                if digest and digest.startswith("sha256:"):
+                                    sha256 = digest[7:]
+                                elif url in KNOWN_ASSET_CACHE:
+                                    sha256 = KNOWN_ASSET_CACHE[url]["sha256"]
+                                    if size <= 0:
+                                        size = KNOWN_ASSET_CACHE[url]["size_bytes"]
+                                else:
+                                    size, sha256 = resolve_asset_metadata(url, direct_sha=None, direct_size=size)
+
+                                exe_rel = fn if fn.endswith(".jar") else plat_info.get("executable_relative_path", fn)
+                                changelog = body if body else f"Lanzamiento de {meta['title']} v{v_str}."
+
+                                v_entry = {
+                                    "version": v_str,
+                                    "release_date": pub_date,
+                                    "changelog": changelog,
+                                    "executable_relative_path": exe_rel,
+                                    "package": {
+                                        "url": url,
+                                        "size_bytes": size,
+                                        "sha256": sha256
+                                    },
+                                    "delta_patches": [],
+                                    "scripts": {"pre_install": None, "post_install": None}
+                                }
+                                versions_list.append(v_entry)
+                                seen_versions.add(v_str)
+                                seen_urls.add(url)
+
+                # Fallback to KNOWN_ASSET_CACHE (for offline builds or un-indexed assets)
                 for cached_url, cached_info in KNOWN_ASSET_CACHE.items():
                     if f"github.com/{repo}/releases/download/" in cached_url:
-                        filename = cached_url.split('/')[-1]
-                        if re.search(pattern, filename):
-                            cached_matches.append({
-                                "url": cached_url,
-                                "filename": filename,
-                                "size_bytes": cached_info["size_bytes"],
-                                "sha256": cached_info["sha256"]
-                            })
+                        fn = cached_url.split('/')[-1]
+                        if re.search(pattern, fn):
+                            if cached_url in seen_urls:
+                                continue
+                            v_str = clean_version(filename=fn, url=cached_url)
+                            if v_str in seen_versions:
+                                continue
 
-                for matched_asset in cached_matches:
-                    version_str = clean_version(matched_asset["filename"], matched_asset["url"])
-                    if version_str == "1.0.0" and "latest_version" in meta:
-                        version_str = meta["latest_version"]
-
-                    if version_str not in seen_versions:
-                        v_entry = {
-                            "version": version_str,
-                            "release_date": "2026-10-08T00:00:00Z",
-                            "changelog": f"Lanzamiento de {meta['title']} v{version_str}.",
-                            "executable_relative_path": plat_info.get("executable_relative_path", matched_asset["filename"]),
-                            "package": {
-                                "url": matched_asset["url"],
-                                "size_bytes": matched_asset["size_bytes"],
-                                "sha256": matched_asset["sha256"]
-                            },
-                            "delta_patches": [],
-                            "scripts": {
-                                "pre_install": None,
-                                "post_install": None
+                            exe_rel = fn if fn.endswith(".jar") else plat_info.get("executable_relative_path", fn)
+                            v_entry = {
+                                "version": v_str,
+                                "release_date": "2026-10-08T00:00:00Z",
+                                "changelog": f"Lanzamiento de {meta['title']} v{v_str}.",
+                                "executable_relative_path": exe_rel,
+                                "package": {
+                                    "url": cached_url,
+                                    "size_bytes": cached_info["size_bytes"],
+                                    "sha256": cached_info["sha256"]
+                                },
+                                "delta_patches": [],
+                                "scripts": {"pre_install": None, "post_install": None}
                             }
-                        }
-                        versions_list.append(v_entry)
-                        seen_versions.add(version_str)
+                            versions_list.append(v_entry)
+                            seen_versions.add(v_str)
+                            seen_urls.add(cached_url)
 
                 if not versions_list and plat_key not in remote_manifest_versions:
                     print(f"  Warning: no asset found for {plat_key} matching {pattern}", file=sys.stderr)
 
-            # 3. Level 4: Merge previously recorded versions for this platform if any
+            # Strategy 3: Merge previously recorded versions for this platform (filtering corrupted ghosts)
             if existing_app and "platforms" in existing_app and plat_key in existing_app["platforms"]:
                 existing_plat = existing_app["platforms"][plat_key]
                 for old_v in existing_plat.get("versions", []):
-                    if old_v.get("version") and old_v["version"] not in seen_versions:
+                    old_ver = old_v.get("version")
+                    old_url = old_v.get("package", {}).get("url", "")
+                    # Filter out ghost 64.0.0 and duplicate 1.0.0 pointing to 26.xx packages
+                    if old_ver == "64.0.0":
+                        continue
+                    if old_ver == "1.0.0" and any(x in old_url for x in ["26.", "v26."]):
+                        continue
+                    if old_ver and old_ver not in seen_versions and old_url not in seen_urls:
                         versions_list.append(old_v)
-                        seen_versions.add(old_v["version"])
+                        seen_versions.add(old_ver)
+                        seen_urls.add(old_url)
 
             if not versions_list:
                 continue
@@ -399,39 +629,46 @@ def generate_catalog(
             versions_list.sort(key=lambda x: parse_version_tuple(x["version"]), reverse=True)
             plat_latest_version = versions_list[0]["version"]
 
-            # Preservar delta_patches existentes en el catálogo previo si no están poblados
+            # Preserve and sanitize existing delta_patches
+            valid_versions = {v["version"] for v in versions_list}
             if existing_app and "platforms" in existing_app and plat_key in existing_app["platforms"]:
                 existing_ver_map = {
                     v["version"]: v for v in existing_app["platforms"][plat_key].get("versions", [])
                 }
                 for v in versions_list:
                     if not v.get("delta_patches") and v["version"] in existing_ver_map:
-                        v["delta_patches"] = existing_ver_map[v["version"]].get("delta_patches", [])
+                        raw_patches = existing_ver_map[v["version"]].get("delta_patches", [])
+                        valid_patches = [
+                            p for p in raw_patches
+                            if p.get("from_version") in valid_versions and p.get("from_version") != v["version"]
+                        ]
+                        v["delta_patches"] = valid_patches
 
-            # Si se solicita generar deltas para el salto inmediato V_{N-1} -> V_N
+            # Generate differential deltas for immediate predecessor V_{N-1} -> V_N
             if generate_deltas and DeltaGenerator and len(versions_list) >= 2:
                 target_ver = versions_list[0]
                 source_ver = versions_list[1]
-                has_delta = any(
-                    d.get("from_version") == source_ver["version"] and d.get("patch_sha256")
-                    for d in target_ver.get("delta_patches", [])
-                )
-                if not has_delta:
-                    print(f"  [Delta Worker] Generando o sincronizando diferencial para {meta['slug']} ({plat_key}): v{source_ver['version']} -> v{target_ver['version']}...")
-                    d_gen = DeltaGenerator(deltas_repo=deltas_repo, dry_run=dry_run_deltas)
-                    patch_entry = d_gen.generate_delta_patch(
-                        app_slug=meta["slug"],
-                        platform_key=plat_key,
-                        from_release=source_ver,
-                        to_release=target_ver
+                if target_ver["package"]["url"] != source_ver["package"]["url"] and target_ver["version"] != source_ver["version"]:
+                    has_delta = any(
+                        d.get("from_version") == source_ver["version"] and d.get("patch_sha256")
+                        for d in target_ver.get("delta_patches", [])
                     )
-                    if patch_entry:
-                        if "delta_patches" not in target_ver:
-                            target_ver["delta_patches"] = []
-                        target_ver["delta_patches"] = [
-                            d for d in target_ver["delta_patches"] if d.get("from_version") != source_ver["version"]
-                        ]
-                        target_ver["delta_patches"].append(patch_entry)
+                    if not has_delta:
+                        print(f"  [Delta Worker] Generando diferencial para {meta['slug']} ({plat_key}): v{source_ver['version']} -> v{target_ver['version']}...")
+                        d_gen = DeltaGenerator(deltas_repo=deltas_repo, dry_run=dry_run_deltas)
+                        patch_entry = d_gen.generate_delta_patch(
+                            app_slug=meta["slug"],
+                            platform_key=plat_key,
+                            from_release=source_ver,
+                            to_release=target_ver
+                        )
+                        if patch_entry:
+                            if "delta_patches" not in target_ver:
+                                target_ver["delta_patches"] = []
+                            target_ver["delta_patches"] = [
+                                d for d in target_ver["delta_patches"] if d.get("from_version") != source_ver["version"]
+                            ]
+                            target_ver["delta_patches"].append(patch_entry)
 
             platforms_dict[plat_key] = {
                 "latest_version": plat_latest_version,

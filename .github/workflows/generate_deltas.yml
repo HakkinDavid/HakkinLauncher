@@ -49,9 +49,10 @@ jobs:
           echo "✅ HDiffPatch instalado correctamente:"
           tools/bin/hdiffz -v
 
-      - name: Run Unit Tests for Delta Generator
+      - name: Run Unit Tests for Delta and Catalog Generators
         run: |
           python3 tools/test_delta_generator.py
+          python3 tools/test_catalog_generator.py
 
       - name: Generate Deltas & Synchronize Catalog
         env:
