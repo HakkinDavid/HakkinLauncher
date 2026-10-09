@@ -129,22 +129,29 @@ class PatchEngine {
       final pkg = targetRelease.package;
       yield UpdateStatus(
         stage: UpdateStage.downloading,
-        message: 'Descargando paquete limpio de v$targetVersionStr (${(pkg.sizeBytes / 1048576).toStringAsFixed(1)} MB)...',
-        progress: 0.25,
+        message: 'Iniciando descarga de v$targetVersionStr (${(pkg.sizeBytes / 1048576).toStringAsFixed(1)} MB)...',
+        progress: 0.05,
       );
 
       final cleanZipPath = p.join(downloadsDir.path, '${app.slug}_v${targetVersionStr}_clean.zip');
       try {
-        await _downloader.downloadFile(
+        await for (final dl in _downloader.downloadFileStream(
           url: pkg.url,
           destinationPath: cleanZipPath,
-          onProgress: (p) {},
-        );
+        )) {
+          final mappedProgress = 0.05 + (dl.progress * 0.65);
+          final speedStr = dl.speedFormatted.isNotEmpty ? ' • ${dl.speedFormatted}' : '';
+          yield UpdateStatus(
+            stage: UpdateStage.downloading,
+            message: 'Descargando v$targetVersionStr: ${dl.statusText}$speedStr',
+            progress: mappedProgress,
+          );
+        }
 
         yield const UpdateStatus(
           stage: UpdateStage.verifyingChecksum,
           message: 'Verificando integridad criptográfica del paquete...',
-          progress: 0.55,
+          progress: 0.72,
         );
 
         final zipFile = File(cleanZipPath);
@@ -164,7 +171,7 @@ class PatchEngine {
         yield const UpdateStatus(
           stage: UpdateStage.extractingFullPackage,
           message: 'Limpiando directorio y extrayendo paquete...',
-          progress: 0.7,
+          progress: 0.80,
         );
 
         if (await targetInstallDir.exists()) {
@@ -174,7 +181,11 @@ class PatchEngine {
         }
         await targetInstallDir.create(recursive: true);
 
-        await _extractZip(zipFile, targetInstallDir);
+        await _extractOrInstallPackage(
+          zipFile,
+          targetInstallDir,
+          targetRelease.executableRelativePath,
+        );
 
         // Restaurar datos de usuario protegidos
         if (userBackups.isNotEmpty) {
@@ -241,24 +252,31 @@ class PatchEngine {
     if (shouldAttemptDelta && matchedDelta != null) {
       yield UpdateStatus(
         stage: UpdateStage.downloading,
-        message: 'Descargando parche de actualización (${(matchedDelta.sizeBytes / 1048576).toStringAsFixed(1)} MB)...',
-        progress: 0.1,
+        message: 'Iniciando descarga de parche diferencial (${(matchedDelta.sizeBytes / 1048576).toStringAsFixed(1)} MB)...',
+        progress: 0.05,
       );
 
       final patchFilePath = p.join(downloadsDir.path, '${app.slug}_update.hdiff');
       bool deltaSuccess = false;
 
       try {
-        await _downloader.downloadFile(
+        await for (final dl in _downloader.downloadFileStream(
           url: matchedDelta.url,
           destinationPath: patchFilePath,
-          onProgress: (p) {},
-        );
+        )) {
+          final mappedProgress = 0.05 + (dl.progress * 0.45);
+          final speedStr = dl.speedFormatted.isNotEmpty ? ' • ${dl.speedFormatted}' : '';
+          yield UpdateStatus(
+            stage: UpdateStage.downloading,
+            message: 'Descargando parche: ${dl.statusText}$speedStr',
+            progress: mappedProgress,
+          );
+        }
 
         yield const UpdateStatus(
           stage: UpdateStage.verifyingChecksum,
           message: 'Verificando firma de seguridad del parche...',
-          progress: 0.4,
+          progress: 0.55,
         );
 
         final patchFile = File(patchFilePath);
@@ -270,7 +288,7 @@ class PatchEngine {
             yield const UpdateStatus(
               stage: UpdateStage.runningPreScripts,
               message: 'Ejecutando script previo a la actualización...',
-              progress: 0.5,
+              progress: 0.65,
             );
             final preScriptPath = p.join(targetInstallDir.path, targetRelease.scripts.preInstall);
             await ProcessLauncher.runScript(
@@ -282,7 +300,7 @@ class PatchEngine {
           yield const UpdateStatus(
             stage: UpdateStage.applyingDelta,
             message: 'Aplicando parche diferencial...',
-            progress: 0.6,
+            progress: 0.75,
           );
 
           deltaSuccess = await _applyHDiffPatch(
@@ -342,23 +360,30 @@ class PatchEngine {
     final pkg = targetRelease.package;
     yield UpdateStatus(
       stage: UpdateStage.downloading,
-      message: 'Descargando paquete completo v$targetVersionStr (${(pkg.sizeBytes / 1048576).toStringAsFixed(1)} MB)...',
-      progress: 0.2,
+      message: 'Iniciando descarga de v$targetVersionStr (${(pkg.sizeBytes / 1048576).toStringAsFixed(1)} MB)...',
+      progress: 0.05,
     );
 
     final fullPackageZipPath = p.join(downloadsDir.path, '${app.slug}_v${targetVersionStr}_full.zip');
 
     try {
-      await _downloader.downloadFile(
+      await for (final dl in _downloader.downloadFileStream(
         url: pkg.url,
         destinationPath: fullPackageZipPath,
-        onProgress: (p) {},
-      );
+      )) {
+        final mappedProgress = 0.05 + (dl.progress * 0.65);
+        final speedStr = dl.speedFormatted.isNotEmpty ? ' • ${dl.speedFormatted}' : '';
+        yield UpdateStatus(
+          stage: UpdateStage.downloading,
+          message: 'Descargando v$targetVersionStr: ${dl.statusText}$speedStr',
+          progress: mappedProgress,
+        );
+      }
 
       yield const UpdateStatus(
         stage: UpdateStage.verifyingChecksum,
         message: 'Verificando integridad criptográfica del paquete...',
-        progress: 0.5,
+        progress: 0.72,
       );
 
       final zipFile = File(fullPackageZipPath);
@@ -380,7 +405,7 @@ class PatchEngine {
         yield const UpdateStatus(
           stage: UpdateStage.preservingUserData,
           message: 'Protegiendo partidas y configuraciones de usuario...',
-          progress: 0.65,
+          progress: 0.75,
         );
 
         for (final userRelPath in platformRelease.protectedUserPaths) {
@@ -396,7 +421,7 @@ class PatchEngine {
         yield const UpdateStatus(
           stage: UpdateStage.runningPreScripts,
           message: 'Ejecutando script pre-instalación...',
-          progress: 0.7,
+          progress: 0.78,
         );
         final preScriptPath = p.join(targetInstallDir.path, targetRelease.scripts.preInstall);
         await ProcessLauncher.runScript(
@@ -408,14 +433,18 @@ class PatchEngine {
       yield const UpdateStatus(
         stage: UpdateStage.extractingFullPackage,
         message: 'Extrayendo archivos de la aplicación...',
-        progress: 0.75,
+        progress: 0.82,
       );
 
       if (!await targetInstallDir.exists()) {
         await targetInstallDir.create(recursive: true);
       }
 
-      await _extractZip(zipFile, targetInstallDir);
+      await _extractOrInstallPackage(
+        zipFile,
+        targetInstallDir,
+        targetRelease.executableRelativePath,
+      );
 
       if (userBackups.isNotEmpty) {
         for (final entry in userBackups.entries) {
@@ -489,21 +518,38 @@ class PatchEngine {
     }
   }
 
-  /// Extrae un archivo ZIP en el directorio destino de forma asíncrona.
-  Future<void> _extractZip(File zipFile, Directory targetDirectory) async {
-    final bytes = await zipFile.readAsBytes();
-    final archive = ZipDecoder().decodeBytes(bytes);
+  /// Extrae un archivo ZIP o instala un archivo/binario directamente si no es un archivo ZIP.
+  Future<void> _extractOrInstallPackage(
+    File downloadedFile,
+    Directory targetDirectory,
+    String executableRelativePath,
+  ) async {
+    final bytes = await downloadedFile.readAsBytes();
+    final isZip = bytes.length >= 4 &&
+        bytes[0] == 0x50 &&
+        bytes[1] == 0x4B &&
+        bytes[2] == 0x03 &&
+        bytes[3] == 0x04;
 
-    for (final file in archive) {
-      final filename = file.name;
-      final outPath = p.join(targetDirectory.path, filename);
-      if (file.isFile) {
-        final outFile = File(outPath);
-        await outFile.parent.create(recursive: true);
-        await outFile.writeAsBytes(file.content as List<int>);
-      } else {
-        await Directory(outPath).create(recursive: true);
+    if (isZip) {
+      final archive = ZipDecoder().decodeBytes(bytes);
+      for (final file in archive) {
+        final filename = file.name;
+        final outPath = p.join(targetDirectory.path, filename);
+        if (file.isFile) {
+          final outFile = File(outPath);
+          await outFile.parent.create(recursive: true);
+          await outFile.writeAsBytes(file.content as List<int>);
+        } else {
+          await Directory(outPath).create(recursive: true);
+        }
       }
+    } else {
+      // Si el paquete descargado es directamente un binario o ejecutable independiente
+      final destPath = p.join(targetDirectory.path, executableRelativePath);
+      final destFile = File(destPath);
+      await destFile.parent.create(recursive: true);
+      await downloadedFile.copy(destFile.path);
     }
   }
 

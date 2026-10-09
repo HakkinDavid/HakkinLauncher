@@ -107,7 +107,14 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
                     children: [
                       IconButton(
                         icon: const Icon(Icons.arrow_back, color: AppColors.platinum),
-                        onPressed: () => context.pop(),
+                        tooltip: 'Volver',
+                        onPressed: () {
+                          if (context.canPop()) {
+                            context.pop();
+                          } else {
+                            context.go('/');
+                          }
+                        },
                       ),
                       const SizedBox(width: 8),
                       Text(
@@ -248,6 +255,7 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
                                   isInstalled: isInstalled,
                                   isRunning: isRunning,
                                   isUpdating: isUpdating,
+                                  updateStatus: updateStatus,
                                   installedApp: installedApp,
                                   platformRelease: platformRelease,
                                 ),
@@ -279,14 +287,18 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                updateStatus.message,
-                                style: const TextStyle(
-                                  color: AppColors.platinum,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
+                              Expanded(
+                                child: Text(
+                                  updateStatus.message,
+                                  style: const TextStyle(
+                                    color: AppColors.platinum,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
+                              const SizedBox(width: 12),
                               Text(
                                 '${(updateStatus.progress * 100).toStringAsFixed(0)}%',
                                 style: const TextStyle(
@@ -299,11 +311,77 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
                           ),
                           const SizedBox(height: 10),
                           LinearProgressIndicator(
-                            value: updateStatus.progress,
+                            value: updateStatus.progress.clamp(0.0, 1.0),
                             backgroundColor: AppColors.surfaceElevated,
                             valueColor: const AlwaysStoppedAnimation<Color>(
                               AppColors.celestialBlue,
                             ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+              // Aviso en caso de fallo en la descarga o instalación
+              if (updateStatus != null && updateStatus.stage == UpdateStage.failed)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.redAccent.withValues(alpha: 0.7)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.error_outline, color: Colors.redAccent, size: 28),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Error en la descarga o instalación',
+                                  style: TextStyle(
+                                    color: AppColors.platinum,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  updateStatus.message,
+                                  style: const TextStyle(
+                                    color: AppColors.platinumMuted,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          HakkinButton(
+                            text: 'Reintentar',
+                            icon: Icons.refresh,
+                            variant: HakkinButtonVariant.secondary,
+                            onPressed: () {
+                              ref.read(updateProgressProvider.notifier).clearStatus(app.id);
+                              ref.read(updateProgressProvider.notifier).startInstallOrUpdate(
+                                    app,
+                                    targetVersion: selectedVersionStr,
+                                  );
+                            },
+                          ),
+                          const SizedBox(width: 8),
+                          IconButton(
+                            icon: const Icon(Icons.close, color: AppColors.platinumMuted, size: 20),
+                            tooltip: 'Cerrar aviso',
+                            onPressed: () {
+                              ref.read(updateProgressProvider.notifier).clearStatus(app.id);
+                            },
                           ),
                         ],
                       ),
@@ -526,6 +604,7 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
     required bool isInstalled,
     required bool isRunning,
     required bool isUpdating,
+    required UpdateStatus? updateStatus,
     required InstalledApp? installedApp,
     required PlatformRelease? platformRelease,
   }) {
@@ -538,8 +617,11 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
     }
 
     if (isUpdating) {
-      return const HakkinButton(
-        text: 'Instalando...',
+      final pct = updateStatus != null
+          ? ' ${(updateStatus.progress * 100).clamp(0, 100).toStringAsFixed(0)}%'
+          : '';
+      return HakkinButton(
+        text: 'Instalando...$pct',
         isLoading: true,
         variant: HakkinButtonVariant.primaryPlatinum,
         onPressed: null,

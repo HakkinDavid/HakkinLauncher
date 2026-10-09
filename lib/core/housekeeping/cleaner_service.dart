@@ -11,17 +11,14 @@ class CleanerService {
     try {
       final downloadsDir = await OsPaths.getDownloadsDirectory();
       if (await downloadsDir.exists()) {
-        final entities = downloadsDir.listSync();
+        final entities = downloadsDir.listSync(recursive: false);
         for (final entity in entities) {
           if (entity is File) {
-            final name = entity.path.toLowerCase();
-            if (name.endsWith('.tmp') ||
-                name.endsWith('.zip') ||
-                name.endsWith('.hdiff') ||
-                name.endsWith('.patch')) {
-              await entity.delete();
-              deletedCount++;
-            }
+            await entity.delete();
+            deletedCount++;
+          } else if (entity is Directory) {
+            await entity.delete(recursive: true);
+            deletedCount++;
           }
         }
       }

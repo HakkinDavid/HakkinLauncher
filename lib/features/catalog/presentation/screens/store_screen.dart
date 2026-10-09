@@ -86,7 +86,7 @@ class StoreScreen extends ConsumerWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
                     child: HeroCarousel(
                       featuredApp: featured,
-                      onDetailsPressed: () => context.go('/app/${featured.id}'),
+                      onDetailsPressed: () => context.push('/app/${featured.id}'),
                     ),
                   ),
                 ),
@@ -148,7 +148,7 @@ class StoreScreen extends ConsumerWidget {
                         isInstalled: isInstalled,
                         hasUpdate: hasUpdate,
                         isRunning: isRunning,
-                        onTap: () => context.go('/app/${app.id}'),
+                        onTap: () => context.push('/app/${app.id}'),
                       );
                     },
                     childCount: filteredApps.length,

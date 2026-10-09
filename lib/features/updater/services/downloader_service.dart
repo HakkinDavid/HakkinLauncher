@@ -31,17 +31,24 @@ class DownloadProgress {
 class DownloaderService {
   final Dio _dio;
 
-  DownloaderService({Dio? dio}) : _dio = dio ?? Dio();
+  DownloaderService({Dio? dio})
+      : _dio = dio ??
+            Dio(
+              BaseOptions(
+                connectTimeout: const Duration(seconds: 15),
+                sendTimeout: const Duration(seconds: 15),
+                receiveTimeout: const Duration(seconds: 30),
+              ),
+            );
 
-  /// Descarga un archivo con soporte para reanudación automática si se interrumpe la conexión.
-  Future<File> downloadFile({
+  /// Transmite el progreso de la descarga en tiempo real como Stream.
+  Stream<DownloadProgress> downloadFileStream({
     required String url,
     required String destinationPath,
-    required void Function(DownloadProgress progress) onProgress,
     CancelToken? cancelToken,
     bool allowResume = true,
     int maxRetries = 3,
-  }) async {
+  }) async* {
     final destFile = File(destinationPath);
     if (!await destFile.parent.exists()) {
       await destFile.parent.create(recursive: true);
@@ -50,6 +57,7 @@ class DownloaderService {
     int attempt = 0;
     while (attempt < maxRetries) {
       attempt++;
+      IOSink? sink;
       try {
         int existingLength = 0;
         if (allowResume && await destFile.exists()) {
@@ -66,6 +74,9 @@ class DownloaderService {
           headers: (allowResume && existingLength > 0)
               ? {'Range': 'bytes=$existingLength-'}
               : null,
+          followRedirects: true,
+          validateStatus: (status) =>
+              status != null && status >= 200 && status < 400,
         );
 
         final response = await _dio.get<ResponseBody>(
@@ -74,15 +85,24 @@ class DownloaderService {
           cancelToken: cancelToken,
         );
 
+        final statusCode = response.statusCode ?? 200;
+        if (statusCode == 416) {
+          // Rango no satisfecho; reiniciar archivo limpio
+          if (await destFile.exists()) {
+            await destFile.delete();
+          }
+          existingLength = 0;
+          continue;
+        }
+
         final responseStream = response.data?.stream;
         if (responseStream == null) {
           throw const FileSystemException('Respuesta de descarga vacía');
         }
 
-        final statusCode = response.statusCode ?? 200;
         final isPartial = statusCode == 206;
 
-        // Si el servidor devolvió 200 normal en lugar de 206, significa que no soporta Range o reinició
+        // Si el servidor devolvió 200 normal en lugar de 206, reinicia desde cero
         final isAppending = isPartial && existingLength > 0;
         final fileMode = isAppending ? FileMode.append : FileMode.write;
 
@@ -98,28 +118,39 @@ class DownloaderService {
           totalLength = isAppending ? (existingLength + length) : length;
         }
 
-        final sink = destFile.openWrite(mode: fileMode);
+        sink = destFile.openWrite(mode: fileMode);
         int currentReceived = isAppending ? existingLength : 0;
+
+        // Emitir progreso inicial al comenzar
+        yield DownloadProgress(
+          receivedBytes: currentReceived,
+          totalBytes: totalLength,
+          progress: totalLength > 0
+              ? (currentReceived / totalLength).clamp(0.0, 1.0)
+              : 0.0,
+          speedBytesPerSec: 0.0,
+          statusText: totalLength > 0
+              ? '${(currentReceived / 1048576).toStringAsFixed(1)} MB de ${(totalLength / 1048576).toStringAsFixed(1)} MB'
+              : '${(currentReceived / 1048576).toStringAsFixed(1)} MB descargados',
+        );
 
         await for (final chunk in responseStream) {
           sink.add(chunk);
           currentReceived += chunk.length;
 
           final elapsedMs = stopwatch.elapsedMilliseconds;
-          if (elapsedMs - lastCheckTime > 500) {
+          if (elapsedMs - lastCheckTime >= 250) {
             final timeDiffSec = (elapsedMs - lastCheckTime) / 1000.0;
             final bytesDiff = currentReceived - lastReceived;
-            lastSpeed = bytesDiff / timeDiffSec;
+            lastSpeed = timeDiffSec > 0 ? (bytesDiff / timeDiffSec) : 0.0;
             lastReceived = currentReceived;
             lastCheckTime = elapsedMs;
-          }
 
-          final fraction = totalLength > 0
-              ? (currentReceived / totalLength).clamp(0.0, 1.0)
-              : 0.0;
+            final fraction = totalLength > 0
+                ? (currentReceived / totalLength).clamp(0.0, 1.0)
+                : 0.0;
 
-          onProgress(
-            DownloadProgress(
+            yield DownloadProgress(
               receivedBytes: currentReceived,
               totalBytes: totalLength,
               progress: fraction,
@@ -127,15 +158,34 @@ class DownloaderService {
               statusText: totalLength > 0
                   ? '${(currentReceived / 1048576).toStringAsFixed(1)} MB de ${(totalLength / 1048576).toStringAsFixed(1)} MB'
                   : '${(currentReceived / 1048576).toStringAsFixed(1)} MB descargados',
-            ),
-          );
+            );
+          }
         }
 
         await sink.flush();
         await sink.close();
+        sink = null;
 
-        return destFile;
+        // Emitir progreso final completo
+        yield DownloadProgress(
+          receivedBytes: currentReceived,
+          totalBytes: totalLength > 0 ? totalLength : currentReceived,
+          progress: 1.0,
+          speedBytesPerSec: lastSpeed,
+          statusText: totalLength > 0
+              ? '${(totalLength / 1048576).toStringAsFixed(1)} MB de ${(totalLength / 1048576).toStringAsFixed(1)} MB'
+              : '${(currentReceived / 1048576).toStringAsFixed(1)} MB completados',
+        );
+
+        return;
       } catch (e) {
+        if (sink != null) {
+          try {
+            await sink.close();
+          } catch (_) {}
+          sink = null;
+        }
+
         if (cancelToken?.isCancelled ?? false) {
           rethrow;
         }
@@ -146,7 +196,26 @@ class DownloaderService {
         await Future.delayed(Duration(seconds: attempt * 2));
       }
     }
+  }
 
-    return destFile;
+  /// Descarga un archivo con soporte para reanudación automática si se interrumpe la conexión.
+  Future<File> downloadFile({
+    required String url,
+    required String destinationPath,
+    required void Function(DownloadProgress progress) onProgress,
+    CancelToken? cancelToken,
+    bool allowResume = true,
+    int maxRetries = 3,
+  }) async {
+    await for (final progress in downloadFileStream(
+      url: url,
+      destinationPath: destinationPath,
+      cancelToken: cancelToken,
+      allowResume: allowResume,
+      maxRetries: maxRetries,
+    )) {
+      onProgress(progress);
+    }
+    return File(destinationPath);
   }
 }

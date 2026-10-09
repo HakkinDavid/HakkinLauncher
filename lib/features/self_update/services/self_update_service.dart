@@ -394,17 +394,25 @@ rm -f "\$0" 2>/dev/null || true
 
     yield SelfUpdateStatus(
       stage: SelfUpdateStage.downloading,
-      message: 'Descargando actualización v${launcherMeta.latestVersion}...',
-      progress: 0.2,
+      message: 'Iniciando descarga de actualización v${launcherMeta.latestVersion}...',
+      progress: 0.05,
       newVersion: launcherMeta.latestVersion,
     );
 
     try {
-      await _downloader.downloadFile(
+      await for (final dl in _downloader.downloadFileStream(
         url: downloadUrl,
         destinationPath: updateZipPath,
-        onProgress: (p) {},
-      );
+      )) {
+        final mappedProgress = 0.05 + (dl.progress * 0.65);
+        final speedStr = dl.speedFormatted.isNotEmpty ? ' • ${dl.speedFormatted}' : '';
+        yield SelfUpdateStatus(
+          stage: SelfUpdateStage.downloading,
+          message: 'Descargando actualización: ${dl.statusText}$speedStr',
+          progress: mappedProgress,
+          newVersion: launcherMeta.latestVersion,
+        );
+      }
 
       yield const SelfUpdateStatus(
         stage: SelfUpdateStage.verifyingChecksum,

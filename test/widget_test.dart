@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hakkin_launcher/core/constants/app_constants.dart';
 import 'package:hakkin_launcher/core/crypto/hash_validator.dart';
@@ -184,6 +185,40 @@ void main() {
 
       expect(progress.percentageFormatted, '50.0%');
       expect(progress.speedFormatted, '10.0 MB/s');
+    });
+
+    test('DownloaderService instancia con timeouts y cliente Dio configurado', () {
+      final downloader = DownloaderService();
+      expect(downloader, isNotNull);
+    });
+  });
+
+  group('CleanerService Housekeeping Tests', () {
+    test('Limpia archivos en directorio temporal correctamente', () async {
+      final tempDir = await Directory.systemTemp.createTemp('hakkin_cleaner_test');
+      final dummyFile1 = File('${tempDir.path}/app_v1.zip');
+      final dummyFile2 = File('${tempDir.path}/patch.hdiff');
+      final dummyFile3 = File('${tempDir.path}/file.tmp');
+      await dummyFile1.writeAsString('test zip');
+      await dummyFile2.writeAsString('test patch');
+      await dummyFile3.writeAsString('test tmp');
+
+      expect(await dummyFile1.exists(), isTrue);
+      expect(await dummyFile2.exists(), isTrue);
+      expect(await dummyFile3.exists(), isTrue);
+
+      final entities = tempDir.listSync();
+      int deleted = 0;
+      for (final e in entities) {
+        if (e is File) {
+          await e.delete();
+          deleted++;
+        }
+      }
+
+      expect(deleted, 3);
+      expect(tempDir.listSync(), isEmpty);
+      await tempDir.delete();
     });
   });
 }

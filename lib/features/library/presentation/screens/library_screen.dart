@@ -185,7 +185,7 @@ class LibraryScreen extends ConsumerWidget {
                                 variant: HakkinButtonVariant.primaryPlatinum,
                                 onPressed: isRunning
                                     ? null
-                                    : () => context.go('/app/${catalogApp.id}'),
+                                    : () => context.push('/app/${catalogApp.id}'),
                               ),
                               const SizedBox(width: 10),
                             ],
@@ -208,7 +208,7 @@ class LibraryScreen extends ConsumerWidget {
                               onSelected: (val) async {
                                 if (val == 'versions') {
                                   if (catalogApp != null) {
-                                    context.go('/app/${catalogApp.id}');
+                                    context.push('/app/${catalogApp.id}');
                                   }
                                 } else if (val == 'args') {
                                   _showArgumentsDialog(context, ref, installedApp);
