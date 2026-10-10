@@ -49,15 +49,32 @@ $outputMsi = "$OutputDir\HakkinLauncher-windows-x64.msi"
 # Normalizar directorio de origen sin barras finales
 $cleanSourceDir = $SourceDir.TrimEnd('\', '/')
 
-# 1. Cosechar directorio de release de Flutter usando heat.exe
-heat.exe dir "$cleanSourceDir" -cg AppFiles -dr INSTALLFOLDER -scom -sfrag -srd -var "var.SourceDir" -out "$harvestedWxs"
+# 1. Cosechar directorio de release de Flutter usando heat.exe (-gg genera GUIDs validos para los componentes)
+heat.exe dir "$cleanSourceDir" -cg AppFiles -dr INSTALLFOLDER -scom -sreg -sfrag -srd -gg -var "var.SourceDir" -out "$harvestedWxs"
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Fallo durante la ejecucion de heat.exe (codigo de salida $LASTEXITCODE)."
+    exit $LASTEXITCODE
+}
 
 # 2. Compilar objetos WiX usando candle.exe
 candle.exe "-dProductVersion=$msiVersion" "-dSourceDir=$cleanSourceDir" "-dIconPath=$IconPath" "$wxsFile" -out "$mainObj"
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Fallo durante la compilacion de HakkinLauncher.wxs con candle.exe (codigo de salida $LASTEXITCODE)."
+    exit $LASTEXITCODE
+}
+
 candle.exe "-dProductVersion=$msiVersion" "-dSourceDir=$cleanSourceDir" "$harvestedWxs" -out "$harvestedObj"
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Fallo durante la compilacion de AppFiles.wxs con candle.exe (codigo de salida $LASTEXITCODE)."
+    exit $LASTEXITCODE
+}
 
 # 3. Enlazar instalador MSI usando light.exe
 light.exe -ext WixUIExtension -sval "$mainObj" "$harvestedObj" -out "$outputMsi"
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Fallo durante el enlazado del instalador MSI con light.exe (codigo de salida $LASTEXITCODE)."
+    exit $LASTEXITCODE
+}
 
 if (Test-Path $outputMsi) {
     $size = (Get-Item $outputMsi).Length
