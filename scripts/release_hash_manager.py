@@ -96,21 +96,21 @@ TARGET_CONFIG = {
     "windows-msi": {
         "filename": "HakkinLauncher-windows-x64.msi",
         "path": os.path.join(BUILD_DIR, "HakkinLauncher-windows-x64.msi"),
-        "display_name": "Windows x64 (Instalador nativo .msi)",
+        "display_name": "Windows x64",
         "type": "installer",
         "platform_key": "windows-x64",
     },
     "macos-dmg": {
         "filename": "HakkinLauncher-macos.dmg",
         "path": os.path.join(BUILD_DIR, "HakkinLauncher-macos.dmg"),
-        "display_name": "macOS Universal (Imagen .dmg con /Applications)",
+        "display_name": "macOS Universal",
         "type": "installer",
         "platform_key": "macos",
     },
     "linux-deb": {
         "filename": "HakkinLauncher-linux-amd64.deb",
         "path": os.path.join(BUILD_DIR, "HakkinLauncher-linux-amd64.deb"),
-        "display_name": "Linux Ubuntu / Debian (Paquete nativo .deb)",
+        "display_name": "Linux",
         "type": "installer",
         "platform_key": "linux-x64",
     },
@@ -454,13 +454,13 @@ def evaluate_release(local_files, remote_manifest_text, new_tag, force=False):
 
     # Generar Release Notes en Markdown con secciones separadas para instaladores y autoactualización
     installer_lines = [
-        "### 🚀 Instaladores Nativos Recomendados (Nuevos Usuarios)",
+        "### Instalable",
         "",
         "| Plataforma | Formato | Archivo | Tamaño | SHA-256 | Descarga |",
         "| :--- | :--- | :--- | :--- | :--- | :--- |"
     ]
     package_lines = [
-        "### 📦 Paquetes Portables y Autoactualización en Segundo Plano",
+        "### Portable",
         "",
         "| Plataforma | Archivo | Tamaño | SHA-256 | Descarga |",
         "| :--- | :--- | :--- | :--- | :--- |"
