@@ -63,3 +63,15 @@ No incrustar viñetas, flechas, numerales ni caracteres decorativos (`+`, `-`, `
 Evitar paréntesis explicativos innecesarios y textos redundantes. Las cadenas deben ser directas y precisas.
 - Incorrecto: `'Limpiar archivos temporales (caché)'`
 - Correcto: `'Limpiar archivos temporales'`
+
+### 2.5 Extensión Normativa de Formato para el Catálogo (`catalog.json`)
+El catálogo es una fuente de datos dinámica externa; por tanto:
+- **No aplica la regla de *zero hardcoded strings* del código Dart**: Sus cadenas no se trasladan a `AppStrings`.
+- **Aplica estrictamente toda la normativa de formato**:
+  1. `title`: Title Case, **sin punto final**, sin emojis ni símbolos decorativos.
+  2. `summary`: Una o dos oraciones en español técnico con **punto final obligatorio (`.`)**, sin anglicismos.
+  3. `description_markdown`: Markdown semántico 100% en español (prohibido inglés residual). Encabezados sin punto final. Párrafos y viñetas (`- **Nombre**: Descripción.`) con **punto final obligatorio (`.`)**.
+  4. `changelog`: Resumen legible y formal en español con **punto final (`.`)**. Prohibidos volcados de Git (`Merge branch`, `Update release.yaml`), enlaces (`**Full Changelog**`), tablas Markdown con hashes truncados y notas informales (`meow`).
+  5. `tags`: Title Case, **sin punto final**, en español técnico o siglas universales (*3D*, *macOS*, etc.).
+  6. `developer`: Nombre institucional o de autor, **sin punto final**.
+

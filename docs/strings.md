@@ -156,6 +156,65 @@ Todas las cadenas de la aplicación deben ser concisas, precisas, elegantes y di
 
 ---
 
+### 2.6. Extensión Normativa de Formato para el Catálogo (`catalog.json`)
+
+#### 2.6.1. Ámbito de Aplicación: Formato vs. Cero Cadenas Literales (*Hardcoding*)
+El catálogo (`docs/catalog.json`) y sus manifiestos remotos constituyen fuentes de datos dinámicas externas consumidas por el cliente en tiempo de ejecución. Por su naturaleza desacoplada del código fuente del lanzador:
+- **No aplica la regla de *zero hardcoded strings* del código Dart**: Las cadenas textuales de los títulos, descripciones y notas de versión no se trasladan a constantes dentro de `lib/core/constants/app_strings.dart` (hacerlo acoplaría datos dinámicos como código estático compilado).
+- **Aplica estrictamente toda la normativa de formato y estilo**: Todas las cadenas legibles por el usuario dentro del catálogo (`title`, `summary`, `description_markdown`, `changelog`, `tags`, `developer`) deben cumplir rigurosamente las reglas de puntuación, capitalización, español profesional técnico, concisión y prohibición de símbolos visuales embebidos.
+
+#### 2.6.2. Reglas Específicas por Atributo del Catálogo
+
+1. **Título de la Aplicación o Juego (`title`)**:
+   - **Capitalización**: Mayúscula inicial o *Title Case*.
+   - **Puntuación**: **Nunca lleva punto final**.
+   - **Símbolos**: Prohibido el uso de emojis, numerales decorativos o símbolos (`#`, `+`, `•`, etc.).
+   - *Correcto*: `"Tecate Simulator"`, `"Platinum World Management System"`, `"CAT Helper"`
+   - *Incorrecto*: `"Tecate Simulator."`, `"Juego #1: Tecate"`
+
+2. **Resumen de Tarjeta (`summary`)**:
+   - **Estructura**: Una o dos oraciones completas, gramaticalmente depuradas y directas que definan el propósito primordial del software.
+   - **Puntuación**: Comienza obligatoriamente con mayúscula y **finaliza siempre con punto (`.`)**.
+   - **Español Técnico**: Sin anglicismos crudos ni términos no adaptados (*offline-first* $\rightarrow$ *con funcionamiento local prioritario*; *ranking* $\rightarrow$ *clasificación*; *mod* $\rightarrow$ *modificación*; *skins* $\rightarrow$ *aspectos personalizados*).
+   - *Correcto*: `"Simulación y renderizado 3D de rayos y arcos eléctricos siguiendo trayectorias de menor resistencia y autosimilitud fractal."`
+   - *Incorrecto*: `"Simulación 3D de rayos y arcos eléctricos"` *(sin punto final)*
+
+3. **Descripción Detallada en Markdown (`description_markdown`)**:
+   - **Estructura Semántica**: Estructura Markdown clara y profesional.
+   - **Encabezados (`#`, `##`, `###`)**: Mayúscula inicial y **estrictamente sin punto final**.
+   - **Párrafos de Prosa**: Oraciones completas que inician con mayúscula y **concluyen con punto final (`.`)**.
+   - **Listas de Características (`- **Nombre**: Descripción.` )**:
+     - Cada elemento de lista debe contar con un título destacado en negrita con mayúscula inicial y sin punto previo a los dos puntos (`- **Nombre de Característica**:`).
+     - La explicación posterior a los dos puntos debe comenzar con mayúscula y **finalizar obligatoriamente con punto (`.`)**.
+   - **Español Profesional Integral (Prohibición de Inglés Residual)**: Queda terminantemente prohibido incorporar párrafos, introducciones o fragmentos en inglés importados directamente desde repositorios externos. Todo texto descriptivo debe redactarse en español profesional.
+   - **Eliminación de Anglicismos Crudos**: Adaptar sistemáticamente términos del ecosistema de software (*lore* $\rightarrow$ *trasfondo histórico*; *bundle* $\rightarrow$ *paquete de aplicación*; *offline-ready* $\rightarrow$ *operación sin conexión*; *client-side* $\rightarrow$ *del lado del cliente*; *keycodes* $\rightarrow$ *códigos de tecla*).
+
+4. **Notas de la Versión (`changelog`)**:
+   - **Propósito**: Comunicar con dignidad técnica y claridad los cambios de cada entrega histórica para el usuario final.
+   - **Puntuación**: Toda nota o elemento descriptivo debe comenzar con mayúscula y **finalizar obligatoriamente con punto final (`.`)**.
+   - **Prohibición Absoluta de Residuos de Git o GitHub**:
+     - **Prohibido el volcado directo de mensajes de commits**: Cadenas crudas como `"- Merge branch 'master' into stable"`, `"- Update release.yaml"`, `"- versionado visible"` o historiales no curados de Git están prohibidos. Deben sintetizarse en notas descriptivas redactadas formalmente.
+     - **Prohibidos enlaces de comparación de Git**: Cadenas como `"**Full Changelog**: https://github.com/..."` deben reemplazarse por la síntesis en español de los cambios introducidos.
+     - **Prohibidas tablas Markdown crudas de GitHub Releases**: Tablas de descargas con códigos criptográficos SHA-256 truncados (`a5ff201a1cfc...`) o enlaces markdown dentro de la nota deben reemplazarse por una descripción textual limpia de la entrega (el lanzador ya expone descargas y sumas de verificación nativamente).
+     - **Prohibidas notas informales, bromas o cadenas vacías**: Textos como `"meow"`, `"meow 2"`, `"test"` o cadenas de depuración deben sustituirse por notas formales de entrega.
+   - *Correcto*: `"Lanzamiento de Tecate Simulator versión 26.10.08-13 con soporte optimizado para Windows y macOS."`
+   - *Correcto*: `"Lanzamiento inicial de Smart Scheduler versión 2.0.0 con interfaz visual y soporte de restricciones."`
+   - *Incorrecto*: `"**Full Changelog**: https://github.com/Bonsanbec/tecate-simulator/commits/latest"`
+   - *Incorrecto*: `"meow 3"`
+
+5. **Etiquetas Temáticas (`tags`)**:
+   - **Formato**: Cada etiqueta se redacta con mayúscula inicial (*Title Case*).
+   - **Puntuación**: **Nunca llevan punto final**.
+   - **Estandarización Lingüística**: Se redactan preferentemente en español técnico (*Simulación*, *Mundo abierto*, *Ciencia*, *Física*, *Educación*, *Herramienta*, *Juegos*, *Solidaridad*, *Emergencias*, *Atención médica*), salvo siglas o términos técnicos universales consolidados (*3D*, *Drift*, *SQLite*, *macOS*, *Android*, *Windows*, *AutoHotkey*, *HID*).
+   - *Correcto*: `["Simulación", "Física", "Electricidad", "Fractales", "Ciencia", "3D"]`
+   - *Incorrecto*: `["Simulation.", "3d", "game"]`
+
+6. **Desarrollador (`developer`)**:
+   - **Formato**: Nombre propio o institucional del autor u organización responsable.
+   - **Puntuación**: **Sin punto final**.
+
+---
+
 ## 3. Patrones de Implementación en Código Dart
 
 ### 3.1. Constantes Estáticas vs. Métodos Parametrizados

@@ -1,47 +1,67 @@
 {
   "version": "2.0.0",
-  "catalog_timestamp": "2026-10-10T07:40:31.619409+00:00",
+  "catalog_timestamp": "2026-10-10T10:06:35.305103+00:00",
   "launcher_meta": {
-    "latest_version": "26.10.10-00",
+    "latest_version": "26.10.10-01",
     "min_required_launcher_version": "1.0.0",
-    "releases": {
+    "installers": {
+      "windows-x64": {
+        "format": "msi",
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.10-01/HakkinLauncher-windows-x64.msi",
+        "sha256": "7562656bb5e22ee53be7d2e904570a087b1c0543fd13c17d8fb3216c2ede4676",
+        "size_bytes": 1050000
+      },
+      "macos": {
+        "format": "dmg",
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.10-01/HakkinLauncher-macos.dmg",
+        "sha256": "7562656bb5e22ee53be7d2e904570a087b1c0543fd13c17d8fb3216c2ede4676",
+        "size_bytes": 1050000
+      },
       "linux-x64": {
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.10-00/HakkinLauncher-linux-x64.zip",
-        "sha256": "193d5a574b800a5f57b10aa0c5c600e16697a3325b4413d754cf4c77d6cda1b7",
-        "size_bytes": 10882434
+        "format": "deb",
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.10-01/HakkinLauncher-linux-amd64.deb",
+        "sha256": "7562656bb5e22ee53be7d2e904570a087b1c0543fd13c17d8fb3216c2ede4676",
+        "size_bytes": 1050000
+      }
+    },
+    "releases": {
+      "windows-x64": {
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.10-01/HakkinLauncher-windows-x64.zip",
+        "sha256": "7562656bb5e22ee53be7d2e904570a087b1c0543fd13c17d8fb3216c2ede4676",
+        "size_bytes": 1050000
       },
       "macos-arm64": {
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.10-00/HakkinLauncher-macos-arm64.zip",
-        "sha256": "a1890a5cc5dbed0be339c3b7bb930f9130af879a41926188d694368dae4ee8d5",
-        "size_bytes": 11591420
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.10-01/HakkinLauncher-macos-arm64.zip",
+        "sha256": "7562656bb5e22ee53be7d2e904570a087b1c0543fd13c17d8fb3216c2ede4676",
+        "size_bytes": 1050000
       },
       "macos-x64": {
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.10-00/HakkinLauncher-macos-x64.zip",
-        "sha256": "35130e380614c1a2355daaae4bbb746862edc2a518618315ec87f514231bec84",
-        "size_bytes": 11591420
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.10-01/HakkinLauncher-macos-x64.zip",
+        "sha256": "7562656bb5e22ee53be7d2e904570a087b1c0543fd13c17d8fb3216c2ede4676",
+        "size_bytes": 1050000
       },
-      "windows-x64": {
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.10-00/HakkinLauncher-windows-x64.zip",
-        "sha256": "833960e99bcfa0c07db12bed456714c404489975c7c88818b679431ce8b00516",
-        "size_bytes": 12716045
+      "linux-x64": {
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.10-01/HakkinLauncher-linux-x64.zip",
+        "sha256": "7562656bb5e22ee53be7d2e904570a087b1c0543fd13c17d8fb3216c2ede4676",
+        "size_bytes": 1050000
       }
     }
   },
   "apps": [
     {
-      "id": "com.bonsanbec.tecate-simulator",
+      "id": "dev.bonsanbec.tecate",
       "slug": "tecate-simulator",
       "title": "Tecate Simulator",
       "category": "game",
       "developer": "Bonsanbec",
       "summary": "Videojuego social ambientado en una reconstrucción histórica 1:1 de Tecate de 2009. Minijuegos, vehículos, personajes, topografía, geografía y edificios fidedignos.",
-      "description_markdown": "# Tecate Simulator\n\nVideojuego social cuyo mapa y lore es una reconstrucción fidedigna histórica del Tecate, Baja California, de 2009.\n\n### Características:\n- **Reconstrucción 1:1**: Topografía, geografía y arquitectura fidedigna del municipio basada en fotogrametría y registros históricos.\n- **Mundo Social e Interactivo**: Minijuegos, vehículos conducibles, personajes y misiones de exploración urbana.\n- **Soporte Multiplataforma**: Compilaciones nativas optimizadas para Windows x64 y macOS Apple Silicon.",
+      "description_markdown": "# Tecate Simulator\n\nVideojuego social cuyo mapa y trasfondo histórico constituyen una reconstrucción fidedigna del Tecate, Baja California, de 2009.\n\n### Características:\n- **Reconstrucción 1:1**: Topografía, geografía y arquitectura fidedigna del municipio basada en fotogrametría y registros históricos.\n- **Mundo Social e Interactivo**: Minijuegos, vehículos conducibles, personajes y misiones de exploración urbana.\n- **Soporte Multiplataforma**: Compilaciones nativas optimizadas para Windows x64 y macOS Apple Silicon.",
       "tags": [
-        "Game",
+        "Juego",
         "Social",
-        "Simulation",
-        "Historical",
-        "Open World",
+        "Simulación",
+        "Histórico",
+        "Mundo abierto",
         "3D"
       ],
       "assets": {
@@ -61,7 +81,7 @@
             {
               "version": "26.10.08-13",
               "release_date": "2026-10-08T20:27:07Z",
-              "changelog": "| Plataforma | Archivo | Tamaño | SHA-256 | Descarga |\r\n| :--- | :--- | :--- | :--- | :--- |\r\n| **macOS (Apple Silicon & Intel Universal)** | `tecate-macos.zip` | 1060.2 MB | `a5ff201a1cfc...` | [Descargar (v26.10.08-13)](https://github.com/Bonsanbec/tecate-simulator/releases/download/26.10.08-13/tecate-macos.zip) |\r\n| **Windows (x86_64 Desktop)** | `tecate-windows.zip` | 1034.6 MB | `b38a07970fac...` | [Descargar (v26.10.08-13)](https://github.com/Bonsanbec/tecate-simulator/releases/download/26.10.08-13/tecate-windows.zip) |",
+              "changelog": "Lanzamiento de Tecate Simulator versión 26.10.08-13 con soporte optimizado para Windows y macOS.",
               "package": {
                 "url": "https://github.com/Bonsanbec/tecate-simulator/releases/download/26.10.08-13/tecate-windows.zip",
                 "size_bytes": 1084841300,
@@ -87,7 +107,7 @@
             {
               "version": "0.0.1",
               "release_date": "2026-09-28T06:01:26Z",
-              "changelog": "**Full Changelog**: https://github.com/Bonsanbec/tecate-simulator/commits/latest",
+              "changelog": "Lanzamiento inicial de Tecate Simulator versión 0.0.1.",
               "package": {
                 "url": "https://github.com/Bonsanbec/tecate-simulator/releases/download/latest/tecate-windows-v0.0.1-release.zip",
                 "size_bytes": 771167643,
@@ -109,7 +129,7 @@
             {
               "version": "26.10.08-13",
               "release_date": "2026-10-08T20:27:07Z",
-              "changelog": "| Plataforma | Archivo | Tamaño | SHA-256 | Descarga |\r\n| :--- | :--- | :--- | :--- | :--- |\r\n| **macOS (Apple Silicon & Intel Universal)** | `tecate-macos.zip` | 1060.2 MB | `a5ff201a1cfc...` | [Descargar (v26.10.08-13)](https://github.com/Bonsanbec/tecate-simulator/releases/download/26.10.08-13/tecate-macos.zip) |\r\n| **Windows (x86_64 Desktop)** | `tecate-windows.zip` | 1034.6 MB | `b38a07970fac...` | [Descargar (v26.10.08-13)](https://github.com/Bonsanbec/tecate-simulator/releases/download/26.10.08-13/tecate-windows.zip) |",
+              "changelog": "Lanzamiento de Tecate Simulator versión 26.10.08-13 con soporte optimizado para Windows y macOS.",
               "package": {
                 "url": "https://github.com/Bonsanbec/tecate-simulator/releases/download/26.10.08-13/tecate-macos.zip",
                 "size_bytes": 1111734578,
@@ -135,7 +155,7 @@
             {
               "version": "0.0.1",
               "release_date": "2026-09-28T06:01:26Z",
-              "changelog": "**Full Changelog**: https://github.com/Bonsanbec/tecate-simulator/commits/latest",
+              "changelog": "Lanzamiento inicial de Tecate Simulator versión 0.0.1.",
               "package": {
                 "url": "https://github.com/Bonsanbec/tecate-simulator/releases/download/latest/tecate-macos-v0.0.1-release.zip",
                 "size_bytes": 798030827,
@@ -153,19 +173,19 @@
       }
     },
     {
-      "id": "com.bonsanbec.fractochales",
+      "id": "dev.bonsanbec.fractochales",
       "slug": "fractochales",
       "title": "Fractochales",
       "category": "app",
       "developer": "Bonsanbec",
       "summary": "Simulación y renderizado 3D de rayos y arcos eléctricos siguiendo trayectorias de menor resistencia y autosimilitud fractal.",
-      "description_markdown": "# Fractochales\n\nProgram that simulates the behavior of electric bolts through various environments, focusing on their tendencies to follow the path of least resistance and appear self-similar.\n\n### Características:\n- **Física de Rayos**: Renderizado 3D dinámico que modela la propagación eléctrica y las estructuras fractales de descarga.\n- **Personalización y Gamificación**: Múltiples opciones de configuración de entorno, conductividad y modos lúdicos.\n- **Investigación Científica**: Útil para comprender la física de la electricidad y realizar experimentación sobre descargas atmosféricas.\n- Desarrollado en C++ con SFML y OpenAL.",
+      "description_markdown": "# Fractochales\n\nPrograma que simula el comportamiento de rayos y arcos eléctricos en diversos entornos, modelando su tendencia a seguir trayectorias de menor resistencia y presentar autosimilitud fractal.\n\n### Características:\n- **Física de Rayos**: Renderizado 3D dinámico que modela la propagación eléctrica y las estructuras fractales de descarga.\n- **Personalización y Gamificación**: Múltiples opciones de configuración de entorno, conductividad y modos lúdicos.\n- **Investigación Científica**: Útil para comprender la física de la electricidad y realizar experimentación sobre descargas atmosféricas.\n- **Desarrollo y Rendimiento**: Implementado en C++ con bibliotecas SFML y OpenAL.",
       "tags": [
-        "Simulation",
-        "Physics",
-        "Electricity",
-        "Fractals",
-        "Science",
+        "Simulación",
+        "Física",
+        "Electricidad",
+        "Fractales",
+        "Ciencia",
         "3D"
       ],
       "assets": {
@@ -188,7 +208,7 @@
             {
               "version": "3.27",
               "release_date": "2026-10-09T22:08:47Z",
-              "changelog": "**Full Changelog**: https://github.com/Bonsanbec/fractochales/compare/v1.64-prod-2D...v3.27",
+              "changelog": "Lanzamiento de Fractochales versión 3.27 con mejoras en el motor de renderizado fractal y optimizaciones de rendimiento.",
               "package": {
                 "url": "https://github.com/Bonsanbec/fractochales/releases/download/v3.27/fractochales-win-x86_64-v3.27.zip",
                 "size_bytes": 29001895,
@@ -214,7 +234,7 @@
             {
               "version": "1.64",
               "release_date": "2023-11-30T12:08:45Z",
-              "changelog": "Lanzamiento de Fractochales v1.64.",
+              "changelog": "Lanzamiento inicial de Fractochales versión 1.64 con renderizado bidimensional.",
               "package": {
                 "url": "https://github.com/Bonsanbec/fractochales/releases/download/v1.64-prod-2D/fractochales-win-x86_64-v1.64.zip",
                 "size_bytes": 23238440,
@@ -236,7 +256,7 @@
             {
               "version": "3.27",
               "release_date": "2026-10-09T22:08:47Z",
-              "changelog": "**Full Changelog**: https://github.com/Bonsanbec/fractochales/compare/v1.64-prod-2D...v3.27",
+              "changelog": "Lanzamiento de Fractochales versión 3.27 con paquete nativo para macOS Apple Silicon.",
               "package": {
                 "url": "https://github.com/Bonsanbec/fractochales/releases/download/v3.27/fractochales-mac-arm64-v3.27.app.zip",
                 "size_bytes": 29737927,
@@ -258,7 +278,7 @@
             {
               "version": "3.27",
               "release_date": "2026-10-09T22:08:47Z",
-              "changelog": "**Full Changelog**: https://github.com/Bonsanbec/fractochales/compare/v1.64-prod-2D...v3.27",
+              "changelog": "Lanzamiento de Fractochales versión 3.27 con soporte táctil y optimización móvil para Android.",
               "package": {
                 "url": "https://github.com/Bonsanbec/fractochales/releases/download/v3.27/fractochales-android-v3.27.apk",
                 "size_bytes": 29535928,
@@ -276,18 +296,18 @@
       }
     },
     {
-      "id": "com.bonsanbec.migrant-aid-map",
+      "id": "dev.bonsanbec.migrant-aid-map",
       "slug": "migrant-aid-map",
       "title": "Sistema de Apoyo Migrante",
       "category": "app",
       "developer": "Bonsanbec",
       "summary": "Herramienta comunitaria de apoyo y solidaridad digital nacida en Tijuana para conectar a personas migrantes con albergues, servicios y comedores.",
-      "description_markdown": "# Sistema de Apoyo Migrante\n\nEste proyecto nació al observar una necesidad urgente en las calles de Tijuana: personas migrantes buscando ayuda, orientación y un lugar seguro.\n\n### Propósito:\n- Conectar a personas en movilidad con esfuerzos colectivos de la comunidad, albergues, comedores y servicios médicos gratuitos según directorios de OIM y ACNUR.\n- Enfoque comunitario y solidario: hecho para acompañar, guiar y recordar que nadie camina solo.\n- Versión web y aplicación móvil Android offline-ready.",
+      "description_markdown": "# Sistema de Apoyo Migrante\n\nEste proyecto nació al observar una necesidad urgente en las calles de Tijuana: personas migrantes buscando ayuda, orientación y un lugar seguro.\n\n### Propósito:\n- **Conectividad Humanitaria**: Vinculación de personas en movilidad con albergues, comedores y servicios médicos gratuitos según directorios de OIM y ACNUR.\n- **Enfoque Solidario**: Diseñado para acompañar, orientar y brindar apoyo directo en comunidad.\n- **Disponibilidad Continua**: Plataforma accesible vía web y aplicación móvil para Android con operación garantizada sin conexión.",
       "tags": [
-        "Humanitarian",
-        "Community",
-        "Maps",
-        "Solidarity",
+        "Humanitario",
+        "Comunidad",
+        "Mapas",
+        "Solidaridad",
         "Tijuana",
         "Android"
       ],
@@ -309,7 +329,7 @@
             {
               "version": "3.0",
               "release_date": "2025-05-28T08:17:27Z",
-              "changelog": "Lanzamiento de Sistema de Apoyo Migrante v3.0.",
+              "changelog": "Lanzamiento de Sistema de Apoyo Migrante versión 3.0 con actualización de directorios y mapas interactivos.",
               "package": {
                 "url": "https://github.com/Bonsanbec/migrant-aid-map/releases/download/latest/migrant-aid-map-android.apk",
                 "size_bytes": 54644848,
@@ -335,7 +355,7 @@
             {
               "version": "2.2",
               "release_date": "2025-04-20T20:23:00Z",
-              "changelog": "**Full Changelog**: https://github.com/HakkinDavid/migrant-aid-map/commits/latest",
+              "changelog": "Lanzamiento de Sistema de Apoyo Migrante versión 2.2 con mejoras en la navegación y servicios comunitarios.",
               "package": {
                 "url": "https://github.com/Bonsanbec/migrant-aid-map/releases/download/2.2/migrant-aid-map-android.apk",
                 "size_bytes": 54639495,
@@ -353,20 +373,20 @@
       }
     },
     {
-      "id": "com.hakkin.firefighter-form",
+      "id": "dev.bonsanbec.firefighter-form",
       "slug": "firefighter-form",
       "title": "Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos",
       "category": "app",
       "developer": "HakkinDavid",
       "summary": "Sistema para digitalizar, optimizar y centralizar el registro y consulta de atenciones médicas e incidentes del cuerpo de bomberos de Tijuana.",
-      "description_markdown": "# Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos\n\nProyecto dirigido a digitalizar, optimizar y centralizar el registro, almacenamiento y consulta de información sobre incidentes y atenciones médicas realizadas por el cuerpo de bomberos de Tijuana.\n\n### Objetivos Principales:\n- **Validez Legal y Digitalización**: Formatos prehospitalarios estandarizados con folios únicos y firmas digitales.\n- **Offline-First**: Operación garantizada en zonas sin cobertura celular con sincronización automática posterior.\n- **Reportes y Estadísticas**: Generación y exportación de reportes PDF e interoperabilidad con sistemas institucionales.",
+      "description_markdown": "# Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos\n\nProyecto dirigido a digitalizar, optimizar y centralizar el registro, almacenamiento y consulta de información sobre incidentes y atenciones médicas realizadas por el cuerpo de bomberos de Tijuana.\n\n### Objetivos Principales:\n- **Validez Legal y Digitalización**: Formatos prehospitalarios estandarizados con folios únicos y firmas digitales.\n- **Operación sin Conexión**: Funcionamiento garantizado en zonas sin cobertura celular con sincronización automática posterior.\n- **Reportes y Estadísticas**: Generación y exportación de reportes PDF e interoperabilidad con sistemas institucionales.",
       "tags": [
-        "Emergency",
-        "Firefighters",
+        "Emergencias",
+        "Bomberos",
         "Tijuana",
-        "Medical",
-        "Productivity",
-        "Offline-First"
+        "Atención médica",
+        "Productividad",
+        "Sin conexión"
       ],
       "assets": {
         "icon": "https://raw.githubusercontent.com/HakkinDavid/firefighter-form/master/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_1024.png",
@@ -389,7 +409,7 @@
             {
               "version": "26.08.04",
               "release_date": "2026-08-04T22:04:20Z",
-              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v26.08.04.",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 26.08.04 con sincronización remota y optimización de formularios.",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.08.04/bomberos-windows-release.zip",
                 "size_bytes": 17286178,
@@ -415,7 +435,7 @@
             {
               "version": "26.06.02",
               "release_date": "2026-06-02T02:04:58Z",
-              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v26.06.02.",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 26.06.02 con validación digital de firmas.",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.06.02/bomberos-windows-release.zip",
                 "size_bytes": 16025163,
@@ -431,7 +451,7 @@
             {
               "version": "26.05.21",
               "release_date": "2026-05-21T10:28:31Z",
-              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v26.05.21.",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 26.05.21 con exportación a PDF.",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.05.21/bomberos-windows-release.zip",
                 "size_bytes": 15966209,
@@ -447,7 +467,7 @@
             {
               "version": "26.04.02",
               "release_date": "2026-04-02T22:15:03Z",
-              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v26.04.02.",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 26.04.02 con folios únicos de atención.",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.04.02/bomberos-windows-release.zip",
                 "size_bytes": 15862010,
@@ -463,7 +483,7 @@
             {
               "version": "26.03.17",
               "release_date": "2026-03-18T00:02:20Z",
-              "changelog": "**Full Changelog**: https://github.com/HakkinDavid/firefighter-form/compare/v26.03.11...v26.03.17",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 26.03.17 con correcciones en el registro de incidentes.",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.03.17/bomberos-windows-release.zip",
                 "size_bytes": 15861517,
@@ -479,7 +499,7 @@
             {
               "version": "26.03.11",
               "release_date": "2026-03-11T09:41:33Z",
-              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v26.03.11.",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 26.03.11 con soporte de incidentes vehiculares.",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.03.11/bomberos-windows-release.zip",
                 "size_bytes": 15861469,
@@ -495,7 +515,7 @@
             {
               "version": "26.02.27",
               "release_date": "2026-02-27T10:57:46Z",
-              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v26.02.27.",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 26.02.27 con registro prehospitalario base.",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.02.27/bomberos-windows-release.zip",
                 "size_bytes": 15848916,
@@ -517,7 +537,7 @@
             {
               "version": "26.08.04",
               "release_date": "2026-08-04T22:04:20Z",
-              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v26.08.04.",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 26.08.04 con sincronización remota y optimización de formularios.",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.08.04/bomberos-android-release.apk",
                 "size_bytes": 65859605,
@@ -543,7 +563,7 @@
             {
               "version": "26.06.02",
               "release_date": "2026-06-02T02:04:58Z",
-              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v26.06.02.",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 26.06.02 con validación digital de firmas.",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.06.02/bomberos-android-release.apk",
                 "size_bytes": 60871555,
@@ -559,7 +579,7 @@
             {
               "version": "26.05.21",
               "release_date": "2026-05-21T10:28:31Z",
-              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v26.05.21.",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 26.05.21 con exportación a PDF.",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.05.21/bomberos-android-release.apk",
                 "size_bytes": 60871559,
@@ -575,7 +595,7 @@
             {
               "version": "26.04.02",
               "release_date": "2026-04-02T22:15:03Z",
-              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v26.04.02.",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 26.04.02 con folios únicos de atención.",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.04.02/bomberos-android-release.apk",
                 "size_bytes": 60017095,
@@ -591,7 +611,7 @@
             {
               "version": "26.03.17",
               "release_date": "2026-03-18T00:02:20Z",
-              "changelog": "**Full Changelog**: https://github.com/HakkinDavid/firefighter-form/compare/v26.03.11...v26.03.17",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 26.03.17 con correcciones en el registro de incidentes.",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.03.17/bomberos-android-release.apk",
                 "size_bytes": 60016843,
@@ -607,7 +627,7 @@
             {
               "version": "26.03.11",
               "release_date": "2026-03-11T09:41:33Z",
-              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v26.03.11.",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 26.03.11 con soporte de incidentes vehiculares.",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.03.11/bomberos-android-release.apk",
                 "size_bytes": 60016843,
@@ -623,7 +643,7 @@
             {
               "version": "26.02.27",
               "release_date": "2026-02-27T10:57:46Z",
-              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos v26.02.27.",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 26.02.27 con registro prehospitalario base.",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.02.27/bomberos-android-release.apk",
                 "size_bytes": 59918307,
@@ -639,7 +659,7 @@
             {
               "version": "26.01.28",
               "release_date": "2026-01-28T00:58:14Z",
-              "changelog": "- Merge branch 'master' into stable\n- versionado visible",
+              "changelog": "Visualización del identificador de versión y mejoras de estabilidad general.",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.01.28/bomberos-android-release.apk",
                 "size_bytes": 59179483,
@@ -655,7 +675,7 @@
             {
               "version": "25.11.12",
               "release_date": "2025-11-12T04:21:37Z",
-              "changelog": "- Merge branch 'master' into stable\r\n- corregir error de desplegado condicional",
+              "changelog": "Corrección de errores en el despliegue condicional de formularios.",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v25.11.12/bomberos-android-release.apk",
                 "size_bytes": 59176700,
@@ -671,7 +691,7 @@
             {
               "version": "25.11.11",
               "release_date": "2025-11-11T02:34:27Z",
-              "changelog": "- Merge branch 'master' into stable\n- Utilizar controller correcto durante recuperación",
+              "changelog": "Corrección en el controlador durante la recuperación de datos médicos.",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v25.11.11/bomberos-android-release.apk",
                 "size_bytes": 59094780,
@@ -687,7 +707,7 @@
             {
               "version": "25.11.07",
               "release_date": "2025-11-07T12:51:29Z",
-              "changelog": "- Merge branch 'master' into stable\n- Update release.yaml\n- Merge branch 'master' into stable\n- Update release.yaml\n- mostrar todos los commits del día en versiones de release\n- Merge branch 'master' into stable\n- pretender actualizar en debug\n- mejor expresión de funciones y casos\n- atrapar errores\n- solicitar procesamiento inmediato de tarea\n- solicitar procesamiento inmediato de tarea\n- Merge branch 'master' into stable\n- solicitar secretos a github\n- debug\n- debug\n- corregir storeType\n- corregir storeType\n- Update release.yaml\n- Update release.yaml\n- Update release.yaml\n- Update release.yaml\n- Update release.yaml\n- Update release.yaml\n- validar keystore\n- validar keystore\n- Update release.yaml\n- Update release.yaml\n- Merge branch 'master' into stable\n- Update release.yaml\n- Merge branch 'master' of https://github.com/HakkinDavid/firefighter-form\n- Only update if update is new\n- Update release.yaml\n- Update release.yaml\n- intento de workflow app automático\n- intento de workflow app automático\n- más claridad\n- corregir actualización\n- esperar en la corrutina de actualización\n- cambiar nomenclatura\n- reportar versión a SRE\n- firmar con release\n- log availabilityMap\n- Merge branch 'master' of https://github.com/HakkinDavid/firefighter-form\n- Logs para tarea de actualización\n- Actualización solo para android\n- establecer versión automáticamente\n- Tarea rutinaria para actualizar aplicación\n- canal de actualización\n- arreglar tuplas\n- corregir canvas infinito",
+              "changelog": "Optimizaciones continuas en la rutina de actualización, validación de certificados y renderizado.",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v25.11.07/bomberos-android-release.apk",
                 "size_bytes": 59094784,
@@ -703,7 +723,7 @@
             {
               "version": "25.11.06",
               "release_date": "2025-11-07T00:43:05Z",
-              "changelog": "**Full Changelog**: https://github.com/HakkinDavid/firefighter-form/compare/v25.11.05...v25.11.06",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 25.11.06 con ajustes de rendimiento.",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v25.11.06/bomberos-android-release.apk",
                 "size_bytes": 58244837,
@@ -719,7 +739,7 @@
             {
               "version": "25.11.05",
               "release_date": "2025-11-05T11:34:20Z",
-              "changelog": "**Full Changelog**: https://github.com/HakkinDavid/firefighter-form/compare/v25.11.02...v25.11.05",
+              "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 25.11.05 con mejoras en la interfaz de captura.",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v25.11.05/bomberos-android-release.apk",
                 "size_bytes": 58244821,
@@ -735,7 +755,7 @@
             {
               "version": "25.11.02",
               "release_date": "2025-11-02T10:38:19Z",
-              "changelog": "**Full Changelog**: https://github.com/HakkinDavid/firefighter-form/compare/v25.11.01...v25.11.02",
+              "changelog": "Lanzamiento inicial de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 25.11.02.",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v25.11.02/bomberos-android-release.apk",
                 "size_bytes": 58260277,
@@ -753,19 +773,19 @@
       }
     },
     {
-      "id": "com.hakkin.pwms",
+      "id": "dev.bonsanbec.pwms",
       "slug": "platinum-world-management",
       "title": "Platinum World Management System",
       "category": "app",
       "developer": "HakkinDavid",
-      "summary": "Gemelo digital personal, offline-first y autocontenido con arquitectura 4NF y Drift para catalogar objetos físicos, seres vivos, herramientas y documentos con auditoría e inventario.",
-      "description_markdown": "# Platinum World Management System\n\nAplicación personal, offline-first y autocontenida desarrollada con Flutter, Riverpod, GoRouter y Drift sobre SQLite diseñada para actuar como el gemelo digital completo del mundo del usuario.\n\n### Visión y Filosofía:\n- **Normalización 4NF**: Unifica objetos físicos, herramientas, seres vivos, documentos, proyectos e infraestructura digital en un modelo relacional en Cuarta Forma Normal.\n- **Local-First Estricto**: SQLite local como única fuente de verdad, sin servidores externos obligatorios.\n- **Historial y Trazabilidad**: Todo cambio de ubicación o edición genera eventos automáticos de auditoría.",
+      "summary": "Gemelo digital personal, autocontenido y con funcionamiento local prioritario con arquitectura 4NF y Drift para catalogar objetos físicos, seres vivos, herramientas y documentos con auditoría e inventario.",
+      "description_markdown": "# Platinum World Management System\n\nAplicación personal, autocontenida y con operación local prioritaria desarrollada con Flutter, Riverpod, GoRouter y Drift sobre SQLite diseñada para actuar como el gemelo digital completo del mundo del usuario.\n\n### Visión y Filosofía:\n- **Normalización 4NF**: Unifica objetos físicos, herramientas, seres vivos, documentos, proyectos e infraestructura digital en un modelo relacional en Cuarta Forma Normal.\n- **Operación Local Exclusiva**: SQLite local como única fuente de verdad, sin servidores externos obligatorios.\n- **Historial y Trazabilidad**: Todo cambio de ubicación o edición genera eventos automáticos de auditoría.",
       "tags": [
-        "Digital Twin",
-        "Offline-First",
+        "Gemelo digital",
+        "Operación local",
         "Drift",
-        "Inventory",
-        "Auditing",
+        "Inventario",
+        "Auditoría",
         "4NF"
       ],
       "assets": {
@@ -786,7 +806,7 @@
             {
               "version": "26.09.11",
               "release_date": "2026-09-11T03:01:32Z",
-              "changelog": "Lanzamiento de Platinum World Management System v26.09.11.",
+              "changelog": "Lanzamiento de Platinum World Management System versión 26.09.11 con mejoras en auditoría e inventario.",
               "package": {
                 "url": "https://github.com/HakkinDavid/PWMS/releases/download/v26.09.11/pwms-android-release.apk",
                 "size_bytes": 90255671,
@@ -812,7 +832,7 @@
             {
               "version": "26.09.08",
               "release_date": "2026-09-08T07:53:36Z",
-              "changelog": "Lanzamiento de Platinum World Management System v26.09.08.",
+              "changelog": "Lanzamiento de Platinum World Management System versión 26.09.08 con optimización en consultas relacionales.",
               "package": {
                 "url": "https://github.com/HakkinDavid/PWMS/releases/download/v26.09.08/pwms-android-release.apk",
                 "size_bytes": 90288515,
@@ -828,7 +848,7 @@
             {
               "version": "26.09.01",
               "release_date": "2026-09-01T04:02:04Z",
-              "changelog": "Lanzamiento de Platinum World Management System v26.09.01.",
+              "changelog": "Lanzamiento de Platinum World Management System versión 26.09.01 con ajustes en el motor Drift.",
               "package": {
                 "url": "https://github.com/HakkinDavid/PWMS/releases/download/v26.09.01/pwms-android-release.apk",
                 "size_bytes": 89059111,
@@ -844,7 +864,7 @@
             {
               "version": "26.08.31",
               "release_date": "2026-08-31T07:22:30Z",
-              "changelog": "Lanzamiento de Platinum World Management System v26.08.31.",
+              "changelog": "Lanzamiento de Platinum World Management System versión 26.08.31 con trazabilidad de eventos históricos.",
               "package": {
                 "url": "https://github.com/HakkinDavid/PWMS/releases/download/v26.08.31/pwms-android-release.apk",
                 "size_bytes": 89124687,
@@ -860,7 +880,7 @@
             {
               "version": "26.08.28",
               "release_date": "2026-08-28T08:22:54Z",
-              "changelog": "Lanzamiento de Platinum World Management System v26.08.28.",
+              "changelog": "Lanzamiento de Platinum World Management System versión 26.08.28 con soporte extendido de entidades.",
               "package": {
                 "url": "https://github.com/HakkinDavid/PWMS/releases/download/v26.08.28/pwms-android-release.apk",
                 "size_bytes": 88534355,
@@ -876,7 +896,7 @@
             {
               "version": "26.08.16",
               "release_date": "2026-08-16T00:03:03Z",
-              "changelog": "Lanzamiento de Platinum World Management System v26.08.16.",
+              "changelog": "Lanzamiento inicial de Platinum World Management System versión 26.08.16 con base relacional en cuarta forma normal.",
               "package": {
                 "url": "https://github.com/HakkinDavid/PWMS/releases/download/v26.08.16/pwms-android-release.apk",
                 "size_bytes": 86466275,
@@ -894,18 +914,18 @@
       }
     },
     {
-      "id": "com.hakkin.smart-scheduler",
+      "id": "dev.bonsanbec.smart-scheduler",
       "slug": "smart-scheduler",
       "title": "Smart Scheduler",
       "category": "app",
       "developer": "HakkinDavid",
-      "summary": "Generador y optimizador de horarios académicos sin traslapes y con ranking por comodidad percibida.",
-      "description_markdown": "# Smart Scheduler\n\nGenerador inteligente y optimizador de combinaciones de horarios académicos y universitarios.\n\n### Características:\n- **Sin Traslapes**: Resolución de restricciones temporales para garantizar combinaciones de materias compatibles.\n- **Ranking de Comodidad Percibida**: Clasificación de combinaciones según cercanía de clases, minimización de huecos libres y preferencias horarias del estudiante.\n- Empaquetado nativo para macOS Apple Silicon en bundle `.app`.",
+      "summary": "Generador y optimizador de horarios académicos sin traslapes y con clasificación por comodidad percibida.",
+      "description_markdown": "# Smart Scheduler\n\nGenerador inteligente y optimizador de combinaciones de horarios académicos y universitarios.\n\n### Características:\n- **Sin Traslapes**: Resolución de restricciones temporales para garantizar combinaciones de materias compatibles.\n- **Clasificación por Comodidad Percibida**: Ordenación de combinaciones según cercanía de clases, minimización de huecos libres y preferencias horarias del estudiante.\n- **Empaquetado Nativo**: Distribución optimizada para macOS Apple Silicon en paquete de aplicación .app.",
       "tags": [
-        "Productivity",
-        "Education",
-        "Scheduler",
-        "Optimization",
+        "Productividad",
+        "Educación",
+        "Horarios",
+        "Optimización",
         "macOS"
       ],
       "assets": {
@@ -925,7 +945,7 @@
             {
               "version": "2.5.0",
               "release_date": "2026-10-01T14:30:00Z",
-              "changelog": "Versión 2.5: Optimización de ranking y nuevo bundle de aplicación para macOS Apple Silicon.",
+              "changelog": "Lanzamiento de Smart Scheduler versión 2.5.0 con optimización en la clasificación de horarios y nuevo paquete de aplicación para macOS Apple Silicon.",
               "package": {
                 "url": "https://github.com/HakkinDavid/smart-scheduler/releases/download/v2.5/smart-scheduler-macos-arm64.zip",
                 "size_bytes": 32060507,
@@ -950,7 +970,7 @@
             {
               "version": "2.0.0",
               "release_date": "2026-08-15T10:00:00Z",
-              "changelog": "Versión 2.0: Primera versión con interfaz visual y soporte de restricciones.",
+              "changelog": "Lanzamiento inicial de Smart Scheduler versión 2.0.0 con interfaz visual y soporte de restricciones.",
               "package": {
                 "url": "https://github.com/HakkinDavid/smart-scheduler/releases/download/v2.0/smart-scheduler-macos-arm64.zip",
                 "size_bytes": 32063818,
@@ -968,18 +988,18 @@
       }
     },
     {
-      "id": "com.hakkin.wiimote-userland-driver",
+      "id": "dev.bonsanbec.wiimote-userland-driver",
       "slug": "wiimote-userland-driver",
       "title": "Wiimote Userland Driver",
       "category": "tool",
       "developer": "HakkinDavid",
       "summary": "Utilidad de terminal en espacio de usuario para macOS que traduce entradas de Nintendo Wiimote a pulsaciones de teclado mediante IOHIDManager.",
-      "description_markdown": "# Wiimote Userland Driver\n\nControlador ligero en espacio de usuario para macOS que permite utilizar un mando Nintendo Wiimote como dispositivo de entrada estándar para juegos y aplicaciones fuera del emulador Dolphin.\n\n### Aspectos Técnicos:\n- **Entrada Basada en IOHIDManager**: Lee reportes de entrada del Wiimote sin requerir extensiones de kernel KEXT.\n- **Soporte Completo de Botones**: D-Pad, A/B, 1/2, +, -, HOME y combinaciones simultáneas de teclas.\n- **Emulación de Teclado**: Mapea acciones del mando a keycodes nativos del sistema operativo.",
+      "description_markdown": "# Wiimote Userland Driver\n\nControlador ligero en espacio de usuario para macOS que permite utilizar un mando Nintendo Wiimote como dispositivo de entrada estándar para juegos y aplicaciones fuera del emulador Dolphin.\n\n### Aspectos Técnicos:\n- **Entrada Basada en IOHIDManager**: Lee reportes de entrada del Wiimote sin requerir extensiones de kernel KEXT.\n- **Soporte Completo de Botones**: D-Pad, A/B, 1/2, +, -, HOME y combinaciones simultáneas de teclas.\n- **Emulación de Teclado**: Mapea acciones del mando a códigos nativos de pulsación del sistema operativo.",
       "tags": [
-        "Driver",
+        "Controlador",
         "HID",
         "macOS",
-        "Gaming",
+        "Videojuegos",
         "Nintendo",
         "Wiimote"
       ],
@@ -998,7 +1018,7 @@
             {
               "version": "1.0",
               "release_date": "2026-01-11T09:48:58Z",
-              "changelog": "Lanzamiento de Wiimote Userland Driver v1.0.",
+              "changelog": "Lanzamiento inicial de Wiimote Userland Driver versión 1.0 con soporte para IOHIDManager en macOS.",
               "package": {
                 "url": "https://github.com/HakkinDavid/WiimoteUserlandDriver/releases/download/v1.0/WiimoteUserlandDriver-mac-arm64",
                 "size_bytes": 51776,
@@ -1016,19 +1036,19 @@
       }
     },
     {
-      "id": "com.hakkin.languages-autohotkey",
+      "id": "dev.bonsanbec.languages-autohotkey",
       "slug": "languages-autohotkey",
       "title": "Language Input Hotkey",
       "category": "tool",
       "developer": "HakkinDavid",
       "summary": "Utilidad residente con AutoHotkey para escribir caracteres especiales en español y tonos pinyin sin cambiar la distribución del teclado.",
-      "description_markdown": "# Language Input Hotkey\n\nUtilidad residente en segundo plano desarrollada con AutoHotkey para agilizar la entrada de caracteres especiales en español y pinyin del tono uno al cuatro imitando las combinaciones de acceso rápido de Microsoft Word.\n\n### Binarios Disponibles:\n- `spanish-v1.0.exe`: Entrada rápida de vocales acentuadas, diéresis y signos de interrogación y admiración invertidos.\n- `pinyin-v1.0.exe`: Mapeo tonal para caracteres fonéticos en mandarín.",
+      "description_markdown": "# Language Input Hotkey\n\nUtilidad residente en segundo plano desarrollada con AutoHotkey para agilizar la entrada de caracteres especiales en español y tonos pinyin imitando las combinaciones de acceso rápido de Microsoft Word.\n\n### Módulos Disponibles:\n- **Módulo de Español**: Entrada rápida de vocales acentuadas, diéresis y signos de apertura de interrogación y exclamación.\n- **Módulo de Pinyin**: Mapeo tonal para caracteres fonéticos en mandarín.",
       "tags": [
-        "Utility",
-        "Typing",
-        "Languages",
+        "Utilidad",
+        "Escritura",
+        "Idiomas",
         "AutoHotkey",
-        "Productivity",
+        "Productividad",
         "Windows"
       ],
       "assets": {
@@ -1049,7 +1069,7 @@
             {
               "version": "1.1.0",
               "release_date": "2026-09-20T12:00:00Z",
-              "changelog": "Versión 1.1: Soporte completo de acentos en español con accesos rápidos estilo MS Word.",
+              "changelog": "Lanzamiento de Language Input Hotkey versión 1.1.0 con soporte completo de acentos en español mediante accesos rápidos estilo Microsoft Word.",
               "package": {
                 "url": "https://github.com/HakkinDavid/languages-autohotkey/releases/download/latest/spanish-v1.0.exe",
                 "size_bytes": 1262592,
@@ -1075,7 +1095,7 @@
             {
               "version": "1.0.0",
               "release_date": "2026-07-10T11:00:00Z",
-              "changelog": "Versión 1.0: Módulo de pinyin con mapeo tonal para caracteres en mandarín.",
+              "changelog": "Lanzamiento inicial de Language Input Hotkey versión 1.0.0 con módulo pinyin y mapeo tonal para caracteres en mandarín.",
               "package": {
                 "url": "https://github.com/HakkinDavid/languages-autohotkey/releases/download/latest/pinyin-v1.0.exe",
                 "size_bytes": 1298432,
@@ -1093,19 +1113,18 @@
       }
     },
     {
-      "id": "com.hakkin.cathelper",
+      "id": "dev.bonsanbec.cathelper",
       "slug": "cathelper",
       "title": "CAT Helper",
       "category": "tool",
       "developer": "HakkinDavid",
       "summary": "Calculadora de física y estadística matemática con temática felina dividida en física y probabilidad.",
-      "description_markdown": "# CAT Helper\n\nAplicación móvil Android concebida como asistente de cálculo en dos vertientes:\n\n### Modalidades:\n- **Calculadora de Física**: Resolución rápida de magnitudes mecánicas, cinemáticas y dinámicas.\n- **Calculadora Estadística y de Probabilidad**: Análisis combinatorio, distribuciones y cálculo probabilístico.\n- Todo integrado con una estética y temática felina distintiva.",
+      "description_markdown": "# CAT Helper\n\nAplicación móvil Android concebida como asistente de cálculo en dos vertientes:\n\n### Modalidades:\n- **Calculadora de Física**: Resolución rápida de magnitudes mecánicas, cinemáticas y dinámicas.\n- **Calculadora Estadística y de Probabilidad**: Análisis combinatorio, distribuciones y cálculo probabilístico.\n- **Diseño Temático**: Todo integrado con una estética y temática felina distintiva.",
       "tags": [
-        "Calculator",
-        "Physics",
-        "Statistics",
-        "Cats",
-        "Education",
+        "Calculadora",
+        "Física",
+        "Estadística",
+        "Educación",
         "Android"
       ],
       "assets": {
@@ -1128,7 +1147,7 @@
             {
               "version": "1.2",
               "release_date": "2023-05-24T16:07:21Z",
-              "changelog": "meow 3",
+              "changelog": "Lanzamiento de CAT Helper versión 1.2 con mejoras en las funciones de cálculo y optimización de interfaz.",
               "package": {
                 "url": "https://github.com/HakkinDavid/cathelper/releases/download/latest/CATHelper.apk",
                 "size_bytes": 6176525,
@@ -1154,7 +1173,7 @@
             {
               "version": "1.1",
               "release_date": "2023-05-24T02:20:39Z",
-              "changelog": "meow 2",
+              "changelog": "Lanzamiento de CAT Helper versión 1.1 con incorporación de fórmulas estadísticas adicionales.",
               "package": {
                 "url": "https://github.com/HakkinDavid/cathelper/releases/download/1.1/CATHelper.apk",
                 "size_bytes": 6228749,
@@ -1170,7 +1189,7 @@
             {
               "version": "1.0",
               "release_date": "2023-05-12T20:28:14Z",
-              "changelog": "meow",
+              "changelog": "Lanzamiento inicial de CAT Helper versión 1.0 con calculadoras de física y probabilidad.",
               "package": {
                 "url": "https://github.com/HakkinDavid/cathelper/releases/download/1.0/CATHelper.apk",
                 "size_bytes": 6126949,
@@ -1188,20 +1207,19 @@
       }
     },
     {
-      "id": "com.hakkin.catify-mod",
+      "id": "dev.bonsanbec.catify-mod",
       "slug": "catify-mod",
       "title": "CatifyMod Forge",
       "category": "tool",
       "developer": "HakkinDavid",
-      "summary": "Mod client-side para Minecraft 26.1 adaptado a Forge que transforma el modelo del jugador en gato, con soporte para skins personalizadas y el comando /catsize.",
-      "description_markdown": "# Catify Mod Forge\n\nModificación puramente client-side para Minecraft 26.1 adaptada a Forge que transforma visualmente el modelo del jugador en un gato.\n\n### Características:\n- **Cambio de Aspecto Visual**: No altera colisiones ni físicas del jugador, garantizando juego limpio.\n- **Variantes y Skins Personalizadas**: Soporta 11 skins vanilla y adición de texturas personalizadas en `data/catify/cat_enitity_skins` con el comando `/catvariant <nombre>`.\n- **Ajuste de Tamaño**: Comando `/catsize <small/normal/large>` para alternar el tamaño del modelo felino.\n- **Compatibilidad**: Sincronización visual en servidores multijugador.",
+      "summary": "Modificación para el cliente en Minecraft 26.1 adaptada a Forge que transforma el modelo del jugador en gato, con soporte para aspectos personalizados y ajuste de escala.",
+      "description_markdown": "# Catify Mod Forge\n\nModificación exclusiva para el cliente en Minecraft 26.1 adaptada a Forge que transforma visualmente el modelo del jugador en un gato.\n\n### Características:\n- **Cambio de Aspecto Visual**: No altera colisiones ni físicas del jugador, garantizando juego limpio.\n- **Variantes y Aspectos Personalizados**: Admite 11 aspectos originales y adición de texturas personalizadas en data/catify/cat_enitity_skins con el comando /catvariant <nombre>.\n- **Ajuste de Tamaño**: Comando /catsize <small/normal/large> para alternar el tamaño del modelo felino.\n- **Compatibilidad**: Sincronización visual en servidores multijugador.",
       "tags": [
         "Minecraft",
-        "Mod",
+        "Modificación",
         "Forge",
-        "Cats",
-        "Gaming",
-        "Client-Side"
+        "Videojuegos",
+        "Cliente"
       ],
       "assets": {
         "icon": "https://raw.githubusercontent.com/HakkinDavid/CatifyMod-Forge/master/src/main/resources/assets/catify/icon.png",
@@ -1224,7 +1242,7 @@
             {
               "version": "1.1.1",
               "release_date": "2026-06-13T05:23:05Z",
-              "changelog": "Lanzamiento de CatifyMod Forge v1.1.1.",
+              "changelog": "Lanzamiento de CatifyMod Forge versión 1.1.1 con optimizaciones de compatibilidad en Forge.",
               "package": {
                 "url": "https://github.com/HakkinDavid/CatifyMod-Forge/releases/download/26.1/catify-1.1.1.jar",
                 "size_bytes": 149086,
@@ -1250,7 +1268,7 @@
             {
               "version": "1.0.2",
               "release_date": "2026-05-26T09:19:07Z",
-              "changelog": "Lanzamiento de CatifyMod Forge v1.0.2.",
+              "changelog": "Lanzamiento inicial de CatifyMod Forge versión 1.0.2 con transformación visual de jugador a modelo felino.",
               "package": {
                 "url": "https://github.com/HakkinDavid/CatifyMod-Forge/releases/download/latest/catify-1.0.2.jar",
                 "size_bytes": 150902,
