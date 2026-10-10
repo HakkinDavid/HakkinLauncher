@@ -1,49 +1,49 @@
 {
   "version": "2.0.0",
-  "catalog_timestamp": "2026-10-10T10:32:21.854802+00:00",
+  "catalog_timestamp": "2026-10-10T23:22:30.863459+00:00",
   "launcher_meta": {
-    "latest_version": "26.10.10-09",
+    "latest_version": "26.10.10-23",
     "min_required_launcher_version": "1.0.0",
     "installers": {
       "windows-x64": {
         "format": "msi",
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.10-01/HakkinLauncher-windows-x64.msi",
-        "sha256": "7562656bb5e22ee53be7d2e904570a087b1c0543fd13c17d8fb3216c2ede4676",
-        "size_bytes": 1050000
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.10-23/HakkinLauncher-windows-x64.msi",
+        "sha256": "902c1c36d729666ce500112ba1911001aa806fd54430820b2aa01a72c9927382",
+        "size_bytes": 13246464
       },
       "macos": {
         "format": "dmg",
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.10-01/HakkinLauncher-macos.dmg",
-        "sha256": "7562656bb5e22ee53be7d2e904570a087b1c0543fd13c17d8fb3216c2ede4676",
-        "size_bytes": 1050000
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.10-23/HakkinLauncher-macos.dmg",
+        "sha256": "cd32792026729568494a868a3c9d3760d457303a66d520166887869a8dcf64db",
+        "size_bytes": 12752080
       },
       "linux-x64": {
         "format": "deb",
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.10-01/HakkinLauncher-linux-amd64.deb",
-        "sha256": "7562656bb5e22ee53be7d2e904570a087b1c0543fd13c17d8fb3216c2ede4676",
-        "size_bytes": 1050000
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.10-23/HakkinLauncher-linux-amd64.deb",
+        "sha256": "561bce38631da0533814209084a8b76fca25901820fdbae5ac842a5c8a647df1",
+        "size_bytes": 8790472
       }
     },
     "releases": {
-      "windows-x64": {
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.10-01/HakkinLauncher-windows-x64.zip",
-        "sha256": "7562656bb5e22ee53be7d2e904570a087b1c0543fd13c17d8fb3216c2ede4676",
-        "size_bytes": 1050000
+      "linux-x64": {
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.10-23/HakkinLauncher-linux-x64.zip",
+        "sha256": "4ac076d37efa277b882110d61ebb062f1f031fc5564a76cd6245a843476ed84e",
+        "size_bytes": 10898064
       },
       "macos-arm64": {
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.10-01/HakkinLauncher-macos-arm64.zip",
-        "sha256": "7562656bb5e22ee53be7d2e904570a087b1c0543fd13c17d8fb3216c2ede4676",
-        "size_bytes": 1050000
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.10-23/HakkinLauncher-macos-arm64.zip",
+        "sha256": "fb6909c81f2c9c52d253fafec116e1afeca2568b7d931c3d0c5f54c3ed1d3b2d",
+        "size_bytes": 11610645
       },
       "macos-x64": {
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.10-01/HakkinLauncher-macos-x64.zip",
-        "sha256": "7562656bb5e22ee53be7d2e904570a087b1c0543fd13c17d8fb3216c2ede4676",
-        "size_bytes": 1050000
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.10-23/HakkinLauncher-macos-x64.zip",
+        "sha256": "f2fd46e9bfa028b931351d535abe2db733bbe7eebf16c43bbfc1679a87d8b4e1",
+        "size_bytes": 11610645
       },
-      "linux-x64": {
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.10-01/HakkinLauncher-linux-x64.zip",
-        "sha256": "7562656bb5e22ee53be7d2e904570a087b1c0543fd13c17d8fb3216c2ede4676",
-        "size_bytes": 1050000
+      "windows-x64": {
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.10-23/HakkinLauncher-windows-x64.zip",
+        "sha256": "467091faea450b8f948f51d0f327c95f01f03e4f70b6da301d28f2868cc485c2",
+        "size_bytes": 12729805
       }
     }
   },
@@ -80,8 +80,8 @@
           "versions": [
             {
               "version": "26.10.08-13",
-              "release_date": "2026-10-08T20:27:07Z",
-              "changelog": "Lanzamiento de Tecate Simulator versión 26.10.08-13 con soporte optimizado para Windows y macOS.",
+              "release_date": "2026-10-08T20:22:34.508643+00:00",
+              "changelog": "Lanzamiento de Tecate Simulator versión 26.10.08-13.",
               "entry_point": "tecate.exe",
               "package": {
                 "url": "https://github.com/Bonsanbec/tecate-simulator/releases/download/26.10.08-13/tecate-windows.zip",
@@ -128,8 +128,8 @@
           "versions": [
             {
               "version": "26.10.08-13",
-              "release_date": "2026-10-08T20:27:07Z",
-              "changelog": "Lanzamiento de Tecate Simulator versión 26.10.08-13 con soporte optimizado para Windows y macOS.",
+              "release_date": "2026-10-08T20:22:34.508643+00:00",
+              "changelog": "Lanzamiento de Tecate Simulator versión 26.10.08-13.",
               "entry_point": "tecate.app",
               "package": {
                 "url": "https://github.com/Bonsanbec/tecate-simulator/releases/download/26.10.08-13/tecate-macos.zip",
