@@ -87,6 +87,7 @@ class AppTechnicalStrings {
   static const dirResources = 'Resources';
   static const dirContents = 'Contents';
   static const dirMacOs = 'MacOS';
+  static const dirCodeSignature = '_CodeSignature';
   static const dirToolsBin = 'tools/bin';
   static const dirDesktop = 'Desktop';
   static const dirStartMenu = 'Microsoft/Windows/Start Menu/Programs/Hakkin';
@@ -121,6 +122,7 @@ class AppTechnicalStrings {
   static const cmdXattr = 'xattr';
   static const cmdDitto = 'ditto';
   static const cmdUnzip = 'unzip';
+  static const cmdCodesign = 'codesign';
   static const cmdTasklist = 'tasklist';
   static const cmdKill = 'kill';
   static const cmdTaskkill = 'taskkill';
@@ -141,6 +143,10 @@ class AppTechnicalStrings {
   static const argMinusV = '-v';
   static const argMinusZero = '-0';
   static const argMinusNine = '-9';
+  static const argForce = '--force';
+  static const argDeep = '--deep';
+  static const argMinusS = '-s';
+  static const argMinus = '-';
   static const argSlashNh = '/nh';
   static const argSlashFi = '/fi';
   static const argSlashF = '/F';
@@ -206,7 +212,7 @@ class AppTechnicalStrings {
   static const keyVersions = 'versions';
   static const keyReleaseDate = 'release_date';
   static const keyChangelog = 'changelog';
-  static const keyExecutableRelativePath = 'executable_relative_path';
+  static const keyEntryPoint = 'entry_point';
   static const keyPackage = 'package';
   static const keyDeltaPatches = 'delta_patches';
   static const keyScripts = 'scripts';
@@ -297,9 +303,9 @@ class AppTechnicalStrings {
   // ---------------------------------------------------------------------------
   // Error Codes & Technical Tokens
   // ---------------------------------------------------------------------------
-  static const errorHashMismatch = 'Hash mismatch';
-  static const errorEmptyUrl = 'URL vacía';
-  static const errorUnsupportedPlatform = 'Plataforma no soportada';
+  static const errorHashMismatch = 'hash_mismatch';
+  static const errorEmptyUrl = 'empty_url';
+  static const errorUnsupportedPlatform = 'unsupported_platform';
 
   // ---------------------------------------------------------------------------
   // Helpers & Formatters

@@ -53,8 +53,8 @@ void main() {
 
           for (final ver in release.versions) {
             expect(ver.version, isNotEmpty);
-            expect(ver.executableRelativePath, isNotEmpty,
-                reason: 'App ${app.id} on $platformKey version ${ver.version} missing executable path');
+            expect(ver.entryPoint, isNotEmpty,
+                reason: 'App ${app.id} on $platformKey version ${ver.version} missing entry point');
 
             final pkg = ver.package;
             expect(pkg.url, startsWith('https://github.com/'));
@@ -78,7 +78,7 @@ void main() {
 
       final tecateWin = tecate.getPlatformRelease('windows-x64')!;
       expect(tecateWin.latestRelease.version, '26.10.08-13');
-      expect(tecateWin.latestRelease.executableRelativePath, 'tecate.exe');
+      expect(tecateWin.latestRelease.entryPoint, 'tecate.exe');
       expect(tecateWin.latestRelease.package.sizeBytes, 1084841300);
       expect(tecateWin.latestRelease.package.sha256, 'b38a07970facf3ef41569bac85aef707254c80e4251a0c401c6c207cfa671f29');
       // Versión histórica preservada en el catálogo v2.0
@@ -87,7 +87,7 @@ void main() {
 
       final tecateMac = tecate.getPlatformRelease('macos-arm64')!;
       expect(tecateMac.latestRelease.version, '26.10.08-13');
-      expect(tecateMac.latestRelease.executableRelativePath, 'tecate.app/Contents/MacOS/Tecate- Pueblo Mágico y Social');
+      expect(tecateMac.latestRelease.entryPoint, 'tecate.app');
       expect(tecateMac.latestRelease.package.sizeBytes, 1111734578);
       expect(tecateMac.latestRelease.package.sha256, 'a5ff201a1cfc14bce9fe53bfb1f1e02acb349deaef0ae3a34392fa2a34faa98d');
       // Versión histórica preservada en el catálogo v2.0
@@ -104,26 +104,25 @@ void main() {
 
       final fractoWin = fracto.getPlatformRelease('windows-x64')!;
       expect(fractoWin.latestRelease.version, '3.27');
-      expect(fractoWin.latestRelease.executableRelativePath, 'Fractochales v3.27/main.exe');
+      expect(fractoWin.latestRelease.entryPoint, 'Fractochales v3.27/main.exe');
       expect(fractoWin.latestRelease.package.sizeBytes, 29001895);
       expect(fractoWin.getRelease('1.64'), isNotNull);
-      expect(fractoWin.getRelease('1.64')!.executableRelativePath, 'main.exe');
+      expect(fractoWin.getRelease('1.64')!.entryPoint, 'main.exe');
       expect(fractoWin.getRelease('1.64')!.package.sizeBytes, 23238440);
 
       final fractoMac = fracto.getPlatformRelease('macos-arm64')!;
       expect(fractoMac.latestRelease.version, '3.27');
-      expect(fractoMac.latestRelease.executableRelativePath,
-          'fractochales-mac-arm64-v3.27.app/Contents/MacOS/Fractochales');
+      expect(fractoMac.latestRelease.entryPoint, 'fractochales-mac-arm64-v3.27.app');
       expect(fractoMac.latestRelease.package.sizeBytes, 29737927);
 
       final fractoAndroid = fracto.getPlatformRelease('android')!;
       expect(fractoAndroid.latestRelease.version, '3.27');
-      expect(fractoAndroid.latestRelease.executableRelativePath, 'fractochales-android-v3.27.apk');
+      expect(fractoAndroid.latestRelease.entryPoint, 'fractochales-android-v3.27.apk');
       expect(fractoAndroid.latestRelease.package.sizeBytes, 29535928);
 
       // 3. Verificación de firefighter-form
       final bomberos = manifest.apps.firstWhere((a) => a.id == 'com.hakkin.firefighter-form');
-      expect(bomberos.getPlatformRelease('windows-x64')!.latestRelease.executableRelativePath, 'bomberos.exe');
+      expect(bomberos.getPlatformRelease('windows-x64')!.latestRelease.entryPoint, 'bomberos.exe');
 
       // 4. Verificación de smart-scheduler
       final scheduler = manifest.apps.firstWhere((a) => a.id == 'com.hakkin.smart-scheduler');
@@ -131,8 +130,7 @@ void main() {
       expect(schedulerMac.versions.length, 2, reason: 'smart-scheduler must contain 2 versions');
       expect(schedulerMac.latestVersion, '2.5.0');
       expect(schedulerMac.availableVersions, ['2.5.0', '2.0.0']);
-      expect(schedulerMac.latestRelease.executableRelativePath,
-          'Smart Scheduler.app/Contents/MacOS/Smart Scheduler');
+      expect(schedulerMac.latestRelease.entryPoint, 'Smart Scheduler.app');
 
       // Verificar parche delta hacia 2.5.0 desde 2.0.0
       final schedulerDelta = schedulerMac.findDeltaFor('2.0.0', '2.5.0');
@@ -144,8 +142,8 @@ void main() {
       final languages = manifest.apps.firstWhere((a) => a.id == 'com.hakkin.languages-autohotkey');
       final languagesWin = languages.getPlatformRelease('windows-x64')!;
       expect(languagesWin.versions.length, 2, reason: 'languages-autohotkey must have 2 versions');
-      expect(languagesWin.getRelease('1.1.0')!.executableRelativePath, 'spanish-v1.0.exe');
-      expect(languagesWin.getRelease('1.0.0')!.executableRelativePath, 'pinyin-v1.0.exe');
+      expect(languagesWin.getRelease('1.1.0')!.entryPoint, 'spanish-v1.0.exe');
+      expect(languagesWin.getRelease('1.0.0')!.entryPoint, 'pinyin-v1.0.exe');
     }
 
     test('Valida docs/catalog.json generado contra el contrato Dart v2.0', () {

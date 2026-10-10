@@ -323,7 +323,7 @@ class AppVersionRelease {
   final String version;
   final DateTime? releaseDate;
   final String changelog;
-  final String executableRelativePath;
+  final String entryPoint;
   final PackageArtifact package;
   final List<DeltaUpdate> deltaPatches;
   final Scripts scripts;
@@ -332,7 +332,7 @@ class AppVersionRelease {
     required this.version,
     this.releaseDate,
     this.changelog = AppTechnicalStrings.empty,
-    required this.executableRelativePath,
+    required this.entryPoint,
     required this.package,
     this.deltaPatches = const [],
     this.scripts = const Scripts(),
@@ -342,7 +342,7 @@ class AppVersionRelease {
       : version = AppTechnicalStrings.defaultVersion,
         releaseDate = null,
         changelog = AppTechnicalStrings.empty,
-        executableRelativePath = AppTechnicalStrings.empty,
+        entryPoint = AppTechnicalStrings.empty,
         package = const PackageArtifact.empty(),
         deltaPatches = const [],
         scripts = const Scripts();
@@ -357,9 +357,8 @@ class AppVersionRelease {
           : null,
       changelog: json[AppTechnicalStrings.keyChangelog] as String? ??
           AppTechnicalStrings.empty,
-      executableRelativePath:
-          json[AppTechnicalStrings.keyExecutableRelativePath] as String? ??
-              AppTechnicalStrings.empty,
+      entryPoint: json[AppTechnicalStrings.keyEntryPoint] as String? ??
+          AppTechnicalStrings.empty,
       package: PackageArtifact.fromJson(
           json[AppTechnicalStrings.keyPackage] as Map<String, dynamic>? ?? {}),
       deltaPatches:
@@ -378,7 +377,7 @@ class AppVersionRelease {
         if (releaseDate != null)
           AppTechnicalStrings.keyReleaseDate: releaseDate!.toIso8601String(),
         AppTechnicalStrings.keyChangelog: changelog,
-        AppTechnicalStrings.keyExecutableRelativePath: executableRelativePath,
+        AppTechnicalStrings.keyEntryPoint: entryPoint,
         AppTechnicalStrings.keyPackage: package.toJson(),
         AppTechnicalStrings.keyDeltaPatches:
             deltaPatches.map((e) => e.toJson()).toList(),

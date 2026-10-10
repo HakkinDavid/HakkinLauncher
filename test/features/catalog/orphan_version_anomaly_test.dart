@@ -88,7 +88,7 @@ void main() {
           const AppVersionRelease(
             version: '2.0.0',
             changelog: 'Versión 2.0.0 estable',
-            executableRelativePath: 'test_app.exe',
+            entryPoint: 'test_app.exe',
             package: PackageArtifact(
               url: 'https://github.com/test/app/releases/download/v2.0.0/app.zip',
               sizeBytes: 1024,
@@ -110,7 +110,7 @@ void main() {
           const AppVersionRelease(
             version: '1.0.0',
             changelog: 'Versión 1.0.0 inicial',
-            executableRelativePath: 'test_app.exe',
+            entryPoint: 'test_app.exe',
             package: PackageArtifact(
               url: 'https://github.com/test/app/releases/download/v1.0.0/app.zip',
               sizeBytes: 900,

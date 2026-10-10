@@ -729,10 +729,10 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
                                   AppStrings.fieldReleaseDate,
                                   AppStrings.formatDate(selectedRelease.releaseDate!),
                                 ),
-                              if (selectedRelease.executableRelativePath.isNotEmpty)
+                              if (selectedRelease.entryPoint.isNotEmpty)
                                 _buildMetaRow(
-                                  AppStrings.fieldRelativeExecutable,
-                                  selectedRelease.executableRelativePath,
+                                  AppStrings.fieldEntryPoint,
+                                  selectedRelease.entryPoint,
                                 ),
                               if (selectedRelease.package.sizeBytes > 0)
                                 _buildMetaRow(
@@ -801,8 +801,8 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
     }
 
     if (isUpdating) {
-      final pct = updateStatus != null
-          ? AppStrings.percentClampedWithSpace(updateStatus.progress * 100)
+      final pct = (updateStatus != null && updateStatus.progress > 0)
+          ? AppStrings.percentInt(updateStatus.progress * 100)
           : AppTechnicalStrings.empty;
       return HakkinButton(
         text: AppStrings.installingWithPct(pct),

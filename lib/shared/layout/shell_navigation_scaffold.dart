@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:hakkin_launcher/core/constants/app_constants.dart';
 import 'package:hakkin_launcher/core/constants/app_strings.dart';
 import 'package:hakkin_launcher/core/constants/app_technical_strings.dart';
-import 'package:hakkin_launcher/core/platform/os_paths.dart';
 import 'package:hakkin_launcher/core/theme/app_colors.dart';
 import 'package:hakkin_launcher/features/catalog/presentation/controllers/catalog_controller.dart';
 import 'package:hakkin_launcher/features/self_update/services/self_update_service.dart';
@@ -125,52 +124,6 @@ class ShellNavigationScaffold extends ConsumerWidget {
                 ),
 
                 const Spacer(),
-
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceElevated,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: AppColors.surfaceBorder),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              width: 8,
-                              height: 8,
-                              decoration: const BoxDecoration(
-                                color: AppColors.success,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            const Text(
-                              AppStrings.statusOnline,
-                              style: TextStyle(
-                                color: AppColors.platinum,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          AppStrings.statusOs(OsPaths.getCurrentPlatformKey()),
-                          style: const TextStyle(
-                            color: AppColors.platinumMuted,
-                            fontSize: 10,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
               ],
             ),
           ),

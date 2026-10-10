@@ -54,6 +54,31 @@ class ShortcutService {
             0,
             appBundleIdx + AppTechnicalStrings.extApp.length,
           );
+
+          // Saneamiento preventivo del bundle antes de crear el enlace simbólico
+          try {
+            final codeSigDir = Directory(p.join(
+              targetToLink,
+              AppTechnicalStrings.dirContents,
+              AppTechnicalStrings.dirCodeSignature,
+            ));
+            if (!await codeSigDir.exists()) {
+              await Process.run(
+                AppTechnicalStrings.cmdCodesign,
+                [
+                  AppTechnicalStrings.argForce,
+                  AppTechnicalStrings.argDeep,
+                  AppTechnicalStrings.argMinusS,
+                  AppTechnicalStrings.argMinus,
+                  targetToLink,
+                ],
+              );
+            }
+            await Process.run(
+              AppTechnicalStrings.cmdXattr,
+              [AppTechnicalStrings.argMinusCr, targetToLink],
+            );
+          } catch (_) {}
         }
 
         final desktopPath = p.join(
@@ -69,6 +94,68 @@ class ShortcutService {
     } catch (e) {
       debugPrint(AppStrings.logDesktopShortcutError(e));
     }
+    return false;
+  }
+
+  /// Comprueba si ya existe un acceso directo para la aplicación en el Escritorio y lo actualiza.
+  static Future<bool> updateDesktopShortcutIfExists({
+    required String appTitle,
+    required String executablePath,
+    String? iconPath,
+  }) async {
+    try {
+      final userHome = Platform.environment[AppTechnicalStrings.envHome] ??
+          Platform.environment[AppTechnicalStrings.envUserProfile] ??
+          AppTechnicalStrings.empty;
+      if (userHome.isEmpty) return false;
+
+      if (Platform.isMacOS) {
+        final desktopPath = p.join(
+          userHome,
+          AppTechnicalStrings.dirDesktop,
+          appTitle,
+        );
+        final link = Link(desktopPath);
+        if (await link.exists()) {
+          return await createDesktopShortcut(
+            appTitle: appTitle,
+            executablePath: executablePath,
+            iconPath: iconPath,
+          );
+        }
+      } else if (Platform.isWindows) {
+        final desktopPath = p.join(
+          userHome,
+          AppTechnicalStrings.dirDesktop,
+          appTitle + AppTechnicalStrings.extLnk,
+        );
+        final file = File(desktopPath);
+        if (await file.exists()) {
+          return await createDesktopShortcut(
+            appTitle: appTitle,
+            executablePath: executablePath,
+            iconPath: iconPath,
+          );
+        }
+      } else if (Platform.isLinux) {
+        final slug = appTitle
+            .toLowerCase()
+            .replaceAll(AppTechnicalStrings.space, AppTechnicalStrings.underscore);
+        final desktopPath = p.join(
+          userHome,
+          AppTechnicalStrings.dirDesktop,
+          slug + AppTechnicalStrings.extDesktop,
+        );
+        final file = File(desktopPath);
+        if (await file.exists()) {
+          return await createDesktopShortcut(
+            appTitle: appTitle,
+            executablePath: executablePath,
+            iconPath: iconPath,
+          );
+        }
+      }
+    } catch (_) {}
     return false;
   }
 

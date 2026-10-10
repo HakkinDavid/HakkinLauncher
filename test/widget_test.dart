@@ -52,7 +52,7 @@ void main() {
                     "version": "1.2.0",
                     "release_date": "2026-10-08T00:00:00Z",
                     "changelog": "Versión 1.2.0 de prueba.",
-                    "executable_relative_path": "TestGame.app/Contents/MacOS/TestGame",
+                    "entry_point": "TestGame.app",
                     "package": {
                       "url": "https://example.com/test-1.2.0.zip",
                       "size_bytes": 1000000,
@@ -99,7 +99,7 @@ void main() {
 
       final release = app.getPlatformRelease('macos-arm64');
       expect(release, isNotNull);
-      expect(release!.latestRelease.executableRelativePath, 'TestGame.app/Contents/MacOS/TestGame');
+      expect(release!.latestRelease.entryPoint, 'TestGame.app');
       expect(release.protectedUserPaths, contains('saves/**'));
       expect(release.latestRelease.scripts.preInstall, 'scripts/pre.sh');
       expect(release.latestRelease.scripts.postInstall, 'scripts/setup.sh');

@@ -8,6 +8,7 @@ import 'package:hakkin_launcher/core/platform/component_manager.dart';
 import 'package:hakkin_launcher/core/platform/notification_service.dart';
 import 'package:hakkin_launcher/core/platform/os_paths.dart';
 import 'package:hakkin_launcher/core/platform/process_launcher.dart';
+import 'package:hakkin_launcher/core/platform/shortcut_service.dart';
 import 'package:hakkin_launcher/features/catalog/data/models/app_entry.dart';
 import 'package:hakkin_launcher/features/library/data/models/installed_app.dart';
 import 'package:hakkin_launcher/features/library/data/repositories/library_repository.dart';
@@ -165,7 +166,7 @@ class PatchEngine {
         )) {
           final mappedProgress = 0.05 + (dl.progress * 0.65);
           final speedStr = dl.speedFormatted.isNotEmpty
-              ? AppStrings.bulletPrefix(dl.speedFormatted)
+              ? AppStrings.speedSeparator(dl.speedFormatted)
               : AppTechnicalStrings.empty;
           yield UpdateStatus(
             stage: UpdateStage.downloading,
@@ -214,7 +215,7 @@ class PatchEngine {
         await _extractOrInstallPackage(
           zipFile,
           targetInstallDir,
-          targetRelease.executableRelativePath,
+          targetRelease.entryPoint,
         );
 
         // Restaurar datos de usuario protegidos
@@ -242,6 +243,7 @@ class PatchEngine {
           versionRelease: targetRelease,
           targetInstallDir: targetInstallDir,
           platformKey: platformKey,
+          isInitialInstall: installed == null,
         );
 
         await CleanerService.cleanTemporaryFiles();
@@ -314,7 +316,7 @@ class PatchEngine {
         )) {
           final mappedProgress = 0.05 + (dl.progress * 0.45);
           final speedStr = dl.speedFormatted.isNotEmpty
-              ? AppStrings.bulletPrefix(dl.speedFormatted)
+              ? AppStrings.speedSeparator(dl.speedFormatted)
               : AppTechnicalStrings.empty;
           yield UpdateStatus(
             stage: UpdateStage.downloading,
@@ -359,11 +361,11 @@ class PatchEngine {
           deltaSuccess = await _applyHDiffPatch(
             patchFile: patchFile,
             targetDirectory: targetInstallDir,
-            executableRelativePath: targetRelease.executableRelativePath,
+            entryPoint: targetRelease.entryPoint,
           );
 
           if (deltaSuccess && matchedDelta.targetSha256.isNotEmpty) {
-            var targetExePath = p.join(targetInstallDir.path, targetRelease.executableRelativePath);
+            var targetExePath = p.join(targetInstallDir.path, targetRelease.entryPoint);
             if (Platform.isMacOS) {
               final autoResolved = ProcessLauncher.resolveExecutablePath(targetExePath, targetInstallDir.path);
               if (autoResolved != null) {
@@ -419,6 +421,7 @@ class PatchEngine {
           versionRelease: targetRelease,
           targetInstallDir: targetInstallDir,
           platformKey: platformKey,
+          isInitialInstall: installed == null,
         );
 
         await CleanerService.cleanTemporaryFiles();
@@ -457,7 +460,7 @@ class PatchEngine {
       )) {
         final mappedProgress = 0.05 + (dl.progress * 0.65);
         final speedStr = dl.speedFormatted.isNotEmpty
-            ? AppStrings.bulletPrefix(dl.speedFormatted)
+            ? AppStrings.speedSeparator(dl.speedFormatted)
             : AppTechnicalStrings.empty;
         yield UpdateStatus(
           stage: UpdateStage.downloading,
@@ -535,7 +538,7 @@ class PatchEngine {
       await _extractOrInstallPackage(
         zipFile,
         targetInstallDir,
-        targetRelease.executableRelativePath,
+        targetRelease.entryPoint,
       );
 
       if (userBackups.isNotEmpty) {
@@ -566,6 +569,7 @@ class PatchEngine {
         versionRelease: targetRelease,
         targetInstallDir: targetInstallDir,
         platformKey: platformKey,
+        isInitialInstall: installed == null,
       );
 
       await CleanerService.cleanTemporaryFiles();
@@ -595,7 +599,7 @@ class PatchEngine {
   Future<bool> _applyHDiffPatch({
     required File patchFile,
     required Directory targetDirectory,
-    required String executableRelativePath,
+    required String entryPoint,
   }) async {
     try {
       if (!await targetDirectory.exists()) return false;
@@ -625,7 +629,7 @@ class PatchEngine {
       }
 
       // Fallback o modo binario único: parche directo sobre el ejecutable
-      final exeFile = File(p.join(targetDirectory.path, executableRelativePath));
+      final exeFile = File(p.join(targetDirectory.path, entryPoint));
       if (!await exeFile.exists()) {
         debugPrint(AppStrings.logExecutableNotFound(exeFile.path));
         return false;
@@ -646,7 +650,7 @@ class PatchEngine {
   Future<void> _extractOrInstallPackage(
     File downloadedFile,
     Directory targetDirectory,
-    String executableRelativePath,
+    String entryPoint,
   ) async {
     // 1. En macOS, utilizar ditto: preserva permisos POSIX, symlinks, atributos
     // y no carga archivos masivos en memoria heap de Dart.
@@ -704,7 +708,7 @@ class PatchEngine {
       }
     } else {
       // Si el paquete descargado es directamente un binario o ejecutable independiente
-      final destPath = p.join(targetDirectory.path, executableRelativePath);
+      final destPath = p.join(targetDirectory.path, entryPoint);
       final destFile = File(destPath);
       await destFile.parent.create(recursive: true);
       await downloadedFile.copy(destFile.path);
@@ -716,37 +720,44 @@ class PatchEngine {
     required AppVersionRelease versionRelease,
     required Directory targetInstallDir,
     required String platformKey,
+    bool isInitialInstall = false,
   }) async {
-    var exePath = p.join(targetInstallDir.path, versionRelease.executableRelativePath);
+    var exePath = p.join(targetInstallDir.path, versionRelease.entryPoint);
 
     if (Platform.isMacOS) {
-      // 1. Eliminar cuarentena de Gatekeeper en todo el directorio instalado y bundles .app
-      try {
-        await Process.run(
-          AppTechnicalStrings.cmdXattr,
-          [AppTechnicalStrings.argMinusCr, targetInstallDir.path],
-        );
-      } catch (_) {}
-
-      // 2. Si la ruta configurada en catálogo no existe, auto-resolver el binario real dentro de .app
+      // 1. Auto-resolver la ruta real si el bundle cambió de nombre o estructura
       final resolved = ProcessLauncher.resolveExecutablePath(exePath, targetInstallDir.path);
       if (resolved != null) {
-        exePath = resolved;
+        final appIdx = resolved.indexOf(AppTechnicalStrings.extApp);
+        if (appIdx != -1) {
+          exePath = resolved.substring(0, appIdx + AppTechnicalStrings.extApp.length);
+        } else {
+          exePath = resolved;
+        }
       }
 
-      // 3. Otorgar permisos +x al ejecutable y a cualquier binario dentro de Contents/MacOS
-      try {
-        await Process.run(
-          AppTechnicalStrings.cmdChmod,
-          [AppTechnicalStrings.argPlusX, exePath],
+      // 2. Si se trata de un bundle .app, sanear firma rota por parches y re-firmar ad-hoc
+      final appIdx = exePath.indexOf(AppTechnicalStrings.extApp);
+      if (appIdx != -1) {
+        final bundlePath = exePath.substring(
+          0,
+          appIdx + AppTechnicalStrings.extApp.length,
         );
-        final appIdx = exePath.indexOf(AppTechnicalStrings.extApp);
-        if (appIdx != -1) {
-          final bundlePath = exePath.substring(0, appIdx + 4);
-          await Process.run(
-            AppTechnicalStrings.cmdXattr,
-            [AppTechnicalStrings.argMinusCr, bundlePath],
-          );
+
+        // a. Purgar firma previa invalidada por el parche diferencial
+        try {
+          final codeSigDir = Directory(p.join(
+            bundlePath,
+            AppTechnicalStrings.dirContents,
+            AppTechnicalStrings.dirCodeSignature,
+          ));
+          if (await codeSigDir.exists()) {
+            await codeSigDir.delete(recursive: true);
+          }
+        } catch (_) {}
+
+        // b. Otorgar permisos +x a todos los binarios dentro de Contents/MacOS
+        try {
           final macosDir = p.join(
             bundlePath,
             AppTechnicalStrings.dirContents,
@@ -756,7 +767,45 @@ class PatchEngine {
             AppTechnicalStrings.cmdChmod,
             [AppTechnicalStrings.argMinusR, AppTechnicalStrings.argPlusX, macosDir],
           );
-        }
+        } catch (_) {}
+
+        // c. Re-firmar ad-hoc (--force --deep -s -) para que LaunchServices acepte el paquete
+        try {
+          await Process.run(
+            AppTechnicalStrings.cmdCodesign,
+            [
+              AppTechnicalStrings.argForce,
+              AppTechnicalStrings.argDeep,
+              AppTechnicalStrings.argMinusS,
+              AppTechnicalStrings.argMinus,
+              bundlePath,
+            ],
+          );
+        } catch (_) {}
+
+        // d. Limpiar atributos extendidos y de cuarentena del bundle
+        try {
+          await Process.run(
+            AppTechnicalStrings.cmdXattr,
+            [AppTechnicalStrings.argMinusCr, bundlePath],
+          );
+        } catch (_) {}
+      } else {
+        // Ejecutable independiente no empaquetado en .app
+        try {
+          await Process.run(
+            AppTechnicalStrings.cmdChmod,
+            [AppTechnicalStrings.argPlusX, exePath],
+          );
+        } catch (_) {}
+      }
+
+      // 3. Limpiar cuarentena de Gatekeeper en todo el directorio instalado
+      try {
+        await Process.run(
+          AppTechnicalStrings.cmdXattr,
+          [AppTechnicalStrings.argMinusCr, targetInstallDir.path],
+        );
       } catch (_) {}
     } else if (Platform.isLinux) {
       try {
@@ -779,5 +828,18 @@ class PatchEngine {
     );
 
     await _libraryRepository.saveInstalledApp(installedApp);
+
+    // 4. Gestión automática de accesos directos
+    if (isInitialInstall) {
+      await ShortcutService.createDesktopShortcut(
+        appTitle: app.title,
+        executablePath: exePath,
+      );
+    } else {
+      await ShortcutService.updateDesktopShortcutIfExists(
+        appTitle: app.title,
+        executablePath: exePath,
+      );
+    }
   }
 }

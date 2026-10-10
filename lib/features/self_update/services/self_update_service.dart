@@ -179,7 +179,7 @@ class SelfUpdateService {
       yield const SelfUpdateStatus(
         stage: SelfUpdateStage.error,
         message: AppStrings.selfUpdateNoPlatformPackage,
-        error: AppStrings.selfUpdateUnsupportedPlatform,
+        error: AppTechnicalStrings.errorUnsupportedPlatform,
       );
       return;
     }
@@ -193,7 +193,7 @@ class SelfUpdateService {
       yield const SelfUpdateStatus(
         stage: SelfUpdateStage.error,
         message: AppStrings.selfUpdateInvalidDownloadUrl,
-        error: AppStrings.selfUpdateEmptyUrl,
+        error: AppTechnicalStrings.errorEmptyUrl,
       );
       return;
     }
@@ -227,7 +227,7 @@ class SelfUpdateService {
       )) {
         final mappedProgress = 0.05 + (dl.progress * 0.65);
         final speedStr = dl.speedFormatted.isNotEmpty
-            ? AppStrings.bulletPrefix(dl.speedFormatted)
+            ? AppStrings.speedSeparator(dl.speedFormatted)
             : AppTechnicalStrings.empty;
         yield SelfUpdateStatus(
           stage: SelfUpdateStage.downloading,
