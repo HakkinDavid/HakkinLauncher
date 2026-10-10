@@ -58,9 +58,8 @@ light.exe -ext WixUIExtension -sval $mainObj $harvestedObj -out $outputMsi
 
 if (Test-Path $outputMsi) {
     $size = (Get-Item $outputMsi).Length
-    Write-Host "✅ Instalador MSI generado con éxito: $outputMsi ($size bytes)"
+    Write-Host "MSIOK."
 } else {
-    Write-Error "Fallo durante la generación del archivo MSI."
     exit 1
 }
 
