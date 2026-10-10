@@ -3,11 +3,6 @@ name: Generate & Sync Catalog
 on:
   workflow_dispatch:
     inputs:
-      sync_example:
-        description: 'Sincronizar docs/catalog_example.json (fallback offline)'
-        type: boolean
-        required: false
-        default: true
       generate_deltas:
         description: 'Generar también parches diferenciales HDiffPatch'
         type: boolean
@@ -81,9 +76,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .cache/hakkin_pkg_cache
-          key: deltas-pkg-${{ runner.os }}-${{ hashFiles('tools/catalog_overrides.json', 'docs/catalog.json') }}-${{ github.run_id }}
+          key: deltas-pkg-${{ runner.os }}-${{ hashFiles('docs/catalog.json') }}-${{ github.run_id }}
           restore-keys: |
-            deltas-pkg-${{ runner.os }}-${{ hashFiles('tools/catalog_overrides.json', 'docs/catalog.json') }}-
+            deltas-pkg-${{ runner.os }}-${{ hashFiles('docs/catalog.json') }}-
             deltas-pkg-${{ runner.os }}-
 
       - name: Run Unit Tests for Catalog & Deltas
@@ -98,10 +93,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.DELTAS_REPO_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           EXTRA_ARGS=()
-          if [ "${{ github.event.inputs.sync_example }}" != "false" ]; then
-            EXTRA_ARGS+=("--update-example")
-          fi
-
           if [ "${{ github.event.inputs.generate_deltas }}" = "true" ]; then
             EXTRA_ARGS+=("--generate-deltas")
             DELTAS_TARGET="${{ github.event.inputs.deltas_repo }}"
@@ -115,7 +106,7 @@ jobs:
             fi
           fi
 
-          echo "🔄 Sincronizando y regenerando launcher_meta desde GitHub Releases..."
+          echo "🔄 Sincronizando y regenerando launcher_meta en docs/catalog.json..."
           python3 scripts/release_hash_manager.py sync-launcher-meta
 
           echo "🚀 Generando catálogo de aplicaciones en el agregador..."
@@ -125,10 +116,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: catalog-artifacts
-          path: |
-            tools/launcher_meta.json
-            docs/catalog.json
-            docs/catalog_example.json
+          path: docs/catalog.json
           retention-days: 7
 
       - name: Commit and Push Updated Catalog
@@ -136,11 +124,11 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add tools/launcher_meta.json docs/catalog.json docs/catalog_example.json
+          git add docs/catalog.json
           if ! git diff --staged --quiet; then
-            git commit -m "chore(catalog): sincronizar catálogo y launcher_meta [skip ci]"
+            git commit -m "chore(catalog): sincronizar catálogo [skip ci]"
             git push origin HEAD:${{ github.ref_name }}
-            echo "✅ Catálogo y launcher_meta actualizados y subidos al repositorio."
+            echo "✅ Catálogo actualizado y subido al repositorio."
           else
-            echo "🟢 No hay cambios pendientes en el catálogo ni en launcher_meta."
+            echo "🟢 No hay cambios pendientes en el catálogo."
           fi

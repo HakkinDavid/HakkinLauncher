@@ -67,9 +67,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .cache/hakkin_pkg_cache
-          key: deltas-pkg-${{ runner.os }}-${{ hashFiles('tools/catalog_overrides.json', 'docs/catalog.json') }}-${{ github.run_id }}
+          key: deltas-pkg-${{ runner.os }}-${{ hashFiles('docs/catalog.json') }}-${{ github.run_id }}
           restore-keys: |
-            deltas-pkg-${{ runner.os }}-${{ hashFiles('tools/catalog_overrides.json', 'docs/catalog.json') }}-
+            deltas-pkg-${{ runner.os }}-${{ hashFiles('docs/catalog.json') }}-
             deltas-pkg-${{ runner.os }}-
 
       - name: Run Unit Tests for Delta and Catalog Generators
@@ -98,7 +98,6 @@ jobs:
           python3 tools/catalog_generator.py \
             --generate-deltas \
             --deltas-repo "$DELTAS_TARGET" \
-            --update-example \
             --pkg-cache-dir "$HAKKIN_PKG_CACHE_DIR" \
             "${EXTRA_ARGS[@]}"
 
@@ -106,9 +105,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add tools/launcher_meta.json docs/catalog.json docs/catalog_example.json
+          git add docs/catalog.json
           if ! git diff --staged --quiet; then
-            git commit -m "chore(catalog): sincronizar parches diferenciales y launcher_meta [skip ci]"
+            git commit -m "chore(catalog): sincronizar parches diferenciales [skip ci]"
             git push origin HEAD:${{ github.ref_name }}
             echo "✅ Catálogo actualizado y subido al repositorio."
           else

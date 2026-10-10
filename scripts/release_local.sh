@@ -19,8 +19,7 @@ set -euo pipefail
 #      - Sube únicamente los binarios modificados o nuevos.
 #      - Para los binarios no modificados, genera referencias directas de descarga
 #        hacia su release de origen en las notas y en el manifiesto.
-#      - Publica el nuevo `version_manifest.json`.
-#      - Actualiza automáticamente `docs/catalog.json` y `docs/catalog_example.json`.
+#      - Actualiza automáticamente `docs/catalog.json` (Single Source of Truth).
 #
 # Uso:
 #   ./scripts/release_local.sh [all|macos|windows|linux] [VERSION_TAG] [--force]

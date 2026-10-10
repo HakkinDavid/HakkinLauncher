@@ -6,7 +6,6 @@ import 'package:hakkin_launcher/features/catalog/data/models/app_entry.dart';
 void main() {
   group('Catalog Contract Verification Tests v2.0', () {
     const catalogPath = 'docs/catalog.json';
-    const examplePath = 'docs/catalog_example.json';
 
     void verifyManifestStructure(CatalogManifest manifest, String sourceName) {
       expect(manifest.version, '2.0.0', reason: '$sourceName: version must be 2.0.0');
@@ -157,16 +156,6 @@ void main() {
       final manifest = CatalogManifest.fromJson(decoded);
 
       verifyManifestStructure(manifest, 'catalog.json');
-    });
-
-    test('Valida docs/catalog_example.json sincronizado contra el contrato Dart v2.0', () {
-      final file = File(examplePath);
-      expect(file.existsSync(), isTrue, reason: '$examplePath must exist');
-      final content = file.readAsStringSync();
-      final decoded = jsonDecode(content) as Map<String, dynamic>;
-      final manifest = CatalogManifest.fromJson(decoded);
-
-      verifyManifestStructure(manifest, 'catalog_example.json');
     });
   });
 }

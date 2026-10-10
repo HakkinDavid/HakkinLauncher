@@ -1,13 +1,14 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
-import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/constants/app_technical_strings.dart';
 import '../models/app_entry.dart';
-import 'package:hakkin_launcher/features/self_update/services/self_update_service.dart';
 
-/// Repositorio para la obtención, persistencia en caché y fallback del catálogo de aplicaciones.
+/// Repositorio para la obtención dinámica y persistencia en caché del catálogo de aplicaciones.
+///
+/// Implementa Single Source of Truth basado exclusivamente en el catálogo remoto
+/// y caché local (SharedPreferences), sin empaquetar JSONs dentro de los activos de la aplicación.
 class CatalogRepository {
   final Dio _dio;
 
@@ -20,7 +21,7 @@ class CatalogRepository {
               ),
             );
 
-  /// Obtiene la URL configurada del catálogo.
+  /// Obtiene la URL configurada del catálogo (Single Source of Truth).
   Future<String> getCatalogUrl() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(AppConstants.prefCatalogUrlKey) ??
@@ -33,42 +34,12 @@ class CatalogRepository {
     await prefs.setString(AppConstants.prefCatalogUrlKey, url);
   }
 
-  /// Consulta directamente los metadatos oficiales del lanzador en GitHub (rama master)
-  /// para garantizar la detección de actualizaciones aunque el catálogo JSON remoto sufra desfase.
-  Future<LauncherMeta?> fetchLatestLauncherMeta() async {
-    try {
-      final res = await _dio.get<String>(
-        AppConstants.launcherMetaUrl,
-        options: Options(
-          responseType: ResponseType.plain,
-          headers: const {
-            AppTechnicalStrings.headerCacheControl:
-                AppTechnicalStrings.valNoCacheFull,
-            AppTechnicalStrings.headerPragma: AppTechnicalStrings.valNoCache,
-          },
-        ),
-        queryParameters: {
-          AppTechnicalStrings.paramCacheBuster:
-              DateTime.now().millisecondsSinceEpoch.toString()
-        },
-      );
-      if (res.statusCode == 200 && res.data != null && res.data!.isNotEmpty) {
-        final decoded = jsonDecode(res.data!) as Map<String, dynamic>;
-        final parsed = LauncherMeta.fromJson(decoded);
-        if (parsed.latestVersion.isNotEmpty && parsed.releases.isNotEmpty) {
-          return parsed;
-        }
-      }
-    } catch (_) {}
-    return null;
-  }
-
-  /// Carga el catálogo: intenta en caliente desde la red, con fallback a caché local y asset bundled.
+  /// Carga el catálogo de forma dinámica desde la red con persistencia y fallback en caché local.
+  ///
+  /// No incluye ni depende de archivos JSON bundled dentro del binario.
   Future<CatalogManifest> fetchCatalog({bool forceRefresh = false}) async {
     final prefs = await SharedPreferences.getInstance();
     final url = await getCatalogUrl();
-
-    CatalogManifest? networkManifest;
 
     final requestOptions = Options(
       responseType: ResponseType.plain,
@@ -88,7 +59,7 @@ class CatalogRepository {
           }
         : null;
 
-    // 1. Intentar descargar desde la URL principal
+    // 1. Obtención dinámica en caliente desde la red (Single Source of Truth)
     try {
       final response = await _dio.get<String>(
         url,
@@ -96,87 +67,33 @@ class CatalogRepository {
         queryParameters: queryParams,
       );
 
-      if (response.statusCode == 200 && response.data != null) {
+      if (response.statusCode == 200 && response.data != null && response.data!.isNotEmpty) {
         final jsonStr = response.data!;
         final decoded = jsonDecode(jsonStr) as Map<String, dynamic>;
-        networkManifest = CatalogManifest.fromJson(decoded);
+        final manifest = CatalogManifest.fromJson(decoded);
+
+        // Persistir en caché local inmediatamente
+        await prefs.setString(AppConstants.prefCachedCatalogJson, jsonStr);
+        return manifest;
       }
     } catch (_) {
-      // Si la URL principal falla, probar la URL de fallback (catalog_example.json en master)
-      if (url != AppConstants.fallbackCatalogUrl) {
-        try {
-          final fallbackResponse = await _dio.get<String>(
-            AppConstants.fallbackCatalogUrl,
-            options: requestOptions,
-            queryParameters: queryParams,
-          );
-          if (fallbackResponse.statusCode == 200 && fallbackResponse.data != null) {
-            final jsonStr = fallbackResponse.data!;
-            final decoded = jsonDecode(jsonStr) as Map<String, dynamic>;
-            networkManifest = CatalogManifest.fromJson(decoded);
-          }
-        } catch (_) {}
-      }
+      // Red no disponible o error HTTP: fallback transparente a caché local
     }
 
-    CatalogManifest? bundledManifest;
-    try {
-      final bundledStr =
-          await rootBundle.loadString(AppTechnicalStrings.catalogExampleAssetPath);
-      final decoded = jsonDecode(bundledStr) as Map<String, dynamic>;
-      bundledManifest = CatalogManifest.fromJson(decoded);
-    } catch (_) {}
-
-    CatalogManifest? resultManifest = networkManifest;
-
-    // Si la red no respondió y no es un forceRefresh, intentar con la caché local
-    if (resultManifest == null && !forceRefresh) {
-      final cached = prefs.getString(AppConstants.prefCachedCatalogJson);
-      if (cached != null && cached.isNotEmpty) {
-        try {
-          final decoded = jsonDecode(cached) as Map<String, dynamic>;
-          final cachedManifest = CatalogManifest.fromJson(decoded);
-          if (bundledManifest != null) {
-            final cachedTime = DateTime.tryParse(cachedManifest.catalogTimestamp);
-            final bundledTime = DateTime.tryParse(bundledManifest.catalogTimestamp);
-            if (bundledTime != null && (cachedTime == null || bundledTime.isAfter(cachedTime))) {
-              resultManifest = bundledManifest;
-            } else {
-              resultManifest = cachedManifest;
-            }
-          } else {
-            resultManifest = cachedManifest;
-          }
-        } catch (_) {}
-      }
+    // 2. Fallback a caché local persistente
+    final cached = prefs.getString(AppConstants.prefCachedCatalogJson);
+    if (cached != null && cached.isNotEmpty) {
+      try {
+        final decoded = jsonDecode(cached) as Map<String, dynamic>;
+        return CatalogManifest.fromJson(decoded);
+      } catch (_) {}
     }
 
-    // Si aún no tenemos manifiesto, usar el bundled o el vacío garantizando no-nulabilidad
-    CatalogManifest finalManifest = resultManifest ??
-        bundledManifest ??
-        const CatalogManifest(
-          version: AppTechnicalStrings.defaultVersion,
-          catalogTimestamp: AppTechnicalStrings.empty,
-          apps: [],
-        );
-
-    // 2. Consulta y reconciliación resiliente de launcher_meta en los canales oficiales de release
-    try {
-      final remoteLauncherMeta = await fetchLatestLauncherMeta();
-      if (remoteLauncherMeta != null) {
-        final currentMeta = finalManifest.launcherMeta;
-        if (currentMeta == null ||
-            SelfUpdateService.isNewerVersion(remoteLauncherMeta.latestVersion, currentMeta.latestVersion)) {
-          finalManifest = finalManifest.copyWith(launcherMeta: remoteLauncherMeta);
-        }
-      }
-    } catch (_) {}
-
-    // Persistir en caché local la última versión obtenida
-    try {
-      await prefs.setString(AppConstants.prefCachedCatalogJson, jsonEncode(finalManifest.toJson()));
-    } catch (_) {}
-
-    return finalManifest;
+    // 3. Fallback no-nulo seguro para arranque en frío sin conexión previa
+    return const CatalogManifest(
+      version: AppTechnicalStrings.defaultVersion,
+      catalogTimestamp: AppTechnicalStrings.empty,
+      apps: [],
+    );
   }
 }

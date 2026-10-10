@@ -54,7 +54,6 @@ flutter:
   uses-material-design: true
 
   assets:
-    - docs/catalog_example.json
     - assets/hakkinlauncher.png
     - assets/hakkinlauncher.ico
 

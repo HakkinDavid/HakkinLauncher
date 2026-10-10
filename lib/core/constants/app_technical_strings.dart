@@ -29,10 +29,6 @@ class AppTechnicalStrings {
 
   static const defaultCatalogUrl =
       'https://raw.githubusercontent.com/HakkinDavid/HakkinLauncher/master/docs/catalog.json';
-  static const fallbackCatalogUrl =
-      'https://raw.githubusercontent.com/HakkinDavid/HakkinLauncher/master/docs/catalog_example.json';
-  static const launcherMetaUrl =
-      'https://raw.githubusercontent.com/HakkinDavid/HakkinLauncher/master/tools/launcher_meta.json';
 
   static const defaultHpatchzVersion = 'v5.1.3';
   static const hpatchzDownloadBaseUrl =
@@ -55,7 +51,6 @@ class AppTechnicalStrings {
   // ---------------------------------------------------------------------------
   static const appIconPath = 'assets/hakkinlauncher.png';
   static const appIconIcoPath = 'assets/hakkinlauncher.ico';
-  static const catalogExampleAssetPath = 'docs/catalog_example.json';
   static const windowsRunnerAppIconPath = 'windows/runner/resources/app_icon.ico';
 
   // ---------------------------------------------------------------------------

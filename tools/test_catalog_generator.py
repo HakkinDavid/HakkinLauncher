@@ -91,7 +91,8 @@ class TestCatalogGenerator(unittest.TestCase):
         schema_path = os.path.join(workspace_root, "docs", "CATALOG_SCHEMA.json")
         catalog_path = os.path.join(workspace_root, "docs", "catalog.json")
 
-        manifest = generate_catalog(overrides_path, existing_catalog_path=catalog_path)
+        overrides = overrides_path if os.path.isfile(overrides_path) else None
+        manifest = generate_catalog(overrides_path=overrides, existing_catalog_path=catalog_path)
         self.assertTrue(validate_manifest(manifest, schema_path))
 
         # Comprobar que ninguna app tenga 64.0.0 o falsas versiones 1.0.0 en 26.xx

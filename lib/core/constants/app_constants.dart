@@ -19,10 +19,6 @@ class AppConstants {
 
   static const String defaultCatalogUrl = AppTechnicalStrings.defaultCatalogUrl;
 
-  static const String fallbackCatalogUrl = AppTechnicalStrings.fallbackCatalogUrl;
-
-  static const String launcherMetaUrl = AppTechnicalStrings.launcherMetaUrl;
-
   static const String prefCatalogUrlKey = AppTechnicalStrings.prefCatalogUrlKey;
   static const String prefCustomInstallPathKey =
       AppTechnicalStrings.prefCustomInstallPathKey;

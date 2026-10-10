@@ -265,7 +265,7 @@ jobs:
             echo "🟢 Todos los binarios están al día. Omitiendo duplicación de release."
           fi
 
-          # Regenerar launcher_meta.json posterior a publicar la versión en GitHub Releases
+          # Regenerar launcher_meta en docs/catalog.json posterior a publicar la versión en GitHub Releases
           python3 scripts/release_hash_manager.py sync-launcher-meta
 
           # Sincronizar catálogo en el agregador
@@ -275,7 +275,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add tools/launcher_meta.json docs/catalog.json docs/catalog_example.json lib/core/constants/app_constants.dart
+          git add docs/catalog.json lib/core/constants/app_constants.dart
           if ! git diff --staged --quiet; then
             git commit -m "chore(release): sincronizar catálogo y versión de lanzador [skip ci]"
             git push origin HEAD:${{ github.ref_name }}

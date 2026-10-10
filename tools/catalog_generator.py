@@ -430,25 +430,65 @@ def fetch_github_releases(repo, token=None):
     return []
 
 def generate_catalog(
-    overrides_path,
+    overrides_path=None,
     existing_catalog_path=None,
     generate_deltas=False,
     deltas_repo=DEFAULT_DELTAS_REPO,
     dry_run_deltas=False
 ):
-    with open(overrides_path, 'r', encoding='utf-8') as f:
-        overrides = json.load(f)
-
-    # Load existing catalog if available to merge historical versions and delta patches
+    # Load existing catalog if available to merge historical versions, delta patches and launcher_meta
+    existing_catalog_data = None
     existing_apps_map = {}
     if existing_catalog_path and os.path.exists(existing_catalog_path):
         try:
             with open(existing_catalog_path, 'r', encoding='utf-8') as f:
-                existing_data = json.load(f)
-                for a in existing_data.get("apps", []):
+                existing_catalog_data = json.load(f)
+                for a in existing_catalog_data.get("apps", []):
                     existing_apps_map[a["id"]] = a
         except Exception as e:
             print(f"Notice: Could not read existing catalog for merging: {e}", file=sys.stderr)
+
+    overrides = {}
+    if overrides_path and os.path.exists(overrides_path):
+        with open(overrides_path, 'r', encoding='utf-8') as f:
+            overrides = json.load(f)
+    elif existing_catalog_data:
+        # Derivar configuración directamente desde docs/catalog.json (Single Source of Truth)
+        for app in existing_catalog_data.get("apps", []):
+            repo = None
+            for pkey, pdata in app.get("platforms", {}).items():
+                for v in pdata.get("versions", []):
+                    pkg_url = v.get("package", {}).get("url", "")
+                    m = re.search(r'github\.com/([^/]+/[^/]+)/releases', pkg_url)
+                    if m:
+                        repo = m.group(1)
+                        break
+                if repo:
+                    break
+            if not repo:
+                repo = f"{app.get('developer', 'Hakkin')}/{app.get('slug', 'app')}"
+
+            platforms = {}
+            for pkey, pdata in app.get("platforms", {}).items():
+                first_ver = pdata.get("versions", [{}])[0]
+                platforms[pkey] = {
+                    "executable_relative_path": first_ver.get("executable_relative_path", ""),
+                    "protected_user_paths": pdata.get("protected_user_paths", []),
+                    "asset_pattern": ".*"
+                }
+
+            overrides[repo] = {
+                "id": app["id"],
+                "slug": app["slug"],
+                "title": app["title"],
+                "category": app.get("category", "app"),
+                "developer": app.get("developer", "Hakkin"),
+                "summary": app.get("summary", ""),
+                "description_markdown": app.get("description_markdown", ""),
+                "tags": app.get("tags", []),
+                "assets": app.get("assets", {}),
+                "platforms": platforms
+            }
 
     apps = []
 
@@ -699,13 +739,13 @@ def generate_catalog(
         app_entry = {
             "id": meta["id"],
             "slug": meta["slug"],
-            "title": meta["title"],
-            "category": meta.get("category", "app"),
-            "developer": meta.get("developer", "Hakkin"),
-            "summary": meta.get("summary", ""),
-            "description_markdown": meta.get("description_markdown", ""),
-            "tags": meta.get("tags", []),
-            "assets": {
+            "title": (existing_app.get("title") if existing_app and existing_app.get("title") else meta["title"]),
+            "category": (existing_app.get("category") if existing_app and existing_app.get("category") else meta.get("category", "app")),
+            "developer": (existing_app.get("developer") if existing_app and existing_app.get("developer") else meta.get("developer", "Hakkin")),
+            "summary": (existing_app.get("summary") if existing_app and existing_app.get("summary") else meta.get("summary", "")),
+            "description_markdown": (existing_app.get("description_markdown") if existing_app and existing_app.get("description_markdown") else meta.get("description_markdown", "")),
+            "tags": (existing_app.get("tags") if existing_app and existing_app.get("tags") else meta.get("tags", [])),
+            "assets": (existing_app.get("assets") if existing_app and existing_app.get("assets") else {
                 "icon": (meta.get("assets", {}).get("icon") if meta.get("assets", {}).get("icon") and not any(p in meta.get("assets", {}).get("icon", "") for p in ["unsplash.com", "placeholder"]) else None),
                 "poster": (meta.get("assets", {}).get("poster") if meta.get("assets", {}).get("poster") and not any(p in meta.get("assets", {}).get("poster", "") for p in ["unsplash.com", "placeholder"]) else None),
                 "banner": (meta.get("assets", {}).get("banner") if meta.get("assets", {}).get("banner") and not any(p in meta.get("assets", {}).get("banner", "") for p in ["unsplash.com", "placeholder"]) else None),
@@ -713,22 +753,25 @@ def generate_catalog(
                     s for s in (meta.get("assets", {}).get("screenshots") or [])
                     if s and not any(p in s for p in ["unsplash.com", "placeholder"])
                 ]
-            },
+            }),
             "latest_version": app_latest_version or "1.0.0",
             "platforms": platforms_dict
         }
 
         apps.append(app_entry)
 
-    # Launcher metadata definition from launcher_meta.json
-    launcher_meta_path = os.path.join(os.path.dirname(overrides_path), "launcher_meta.json")
+    # Launcher metadata definition from existing catalog or launcher_meta.json
     launcher_meta = None
-    if os.path.isfile(launcher_meta_path):
-        try:
-            with open(launcher_meta_path, "r", encoding="utf-8") as f:
-                launcher_meta = json.load(f)
-        except Exception as e:
-            print(f"Warning: could not load launcher_meta.json: {e}", file=sys.stderr)
+    if existing_catalog_data and existing_catalog_data.get("launcher_meta"):
+        launcher_meta = existing_catalog_data["launcher_meta"]
+    elif overrides_path:
+        launcher_meta_path = os.path.join(os.path.dirname(overrides_path), "launcher_meta.json")
+        if os.path.isfile(launcher_meta_path):
+            try:
+                with open(launcher_meta_path, "r", encoding="utf-8") as f:
+                    launcher_meta = json.load(f)
+            except Exception as e:
+                print(f"Warning: could not load launcher_meta.json: {e}", file=sys.stderr)
 
     if not launcher_meta:
         launcher_meta = {
@@ -886,11 +929,11 @@ def validate_manifest(manifest, schema_path):
     return True
 
 def main():
-    parser = argparse.ArgumentParser(description="HakkinLauncher Catalog Generator v2.0")
-    parser.add_argument("--overrides", default="tools/catalog_overrides.json", help="Path to catalog overrides file")
+    parser = argparse.ArgumentParser(description="HakkinLauncher Catalog Generator v2.0 (Single Source of Truth)")
+    parser.add_argument("--catalog", default="docs/catalog.json", help="Path to input catalog.json (Single Source of Truth)")
+    parser.add_argument("--overrides", default=None, help="Optional path to catalog overrides file")
     parser.add_argument("--schema", default="docs/CATALOG_SCHEMA.json", help="Path to CATALOG_SCHEMA.json")
     parser.add_argument("--output", default="docs/catalog.json", help="Output path for catalog.json")
-    parser.add_argument("--update-example", action="store_true", help="Sync docs/catalog_example.json")
     parser.add_argument("--generate-deltas", action="store_true", help="Generar parches diferenciales para saltos de versión")
     parser.add_argument("--deltas-repo", default=DEFAULT_DELTAS_REPO, help="Repositorio satélite de deltas (default: HakkinDavid/hakkin-launcher-deltas)")
     parser.add_argument("--dry-run-deltas", action="store_true", help="Simular generación de deltas sin publicar en GitHub")
@@ -901,9 +944,10 @@ def main():
     if args.pkg_cache_dir:
         os.environ["HAKKIN_PKG_CACHE_DIR"] = args.pkg_cache_dir
 
+    catalog_input = args.catalog if os.path.exists(args.catalog) else args.output
     manifest = generate_catalog(
-        args.overrides,
-        existing_catalog_path=args.output,
+        overrides_path=args.overrides,
+        existing_catalog_path=catalog_input,
         generate_deltas=args.generate_deltas,
         deltas_repo=args.deltas_repo,
         dry_run_deltas=args.dry_run_deltas
@@ -917,12 +961,6 @@ def main():
     with open(args.output, 'w', encoding='utf-8') as f:
         json.dump(manifest, f, indent=2, ensure_ascii=False)
     print(f"Generated catalog written to: {args.output}")
-
-    if args.update_example:
-        example_path = "docs/catalog_example.json"
-        with open(example_path, 'w', encoding='utf-8') as f:
-            json.dump(manifest, f, indent=2, ensure_ascii=False)
-        print(f"Synchronized asset fallback at: {example_path}")
 
 if __name__ == "__main__":
     main()

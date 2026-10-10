@@ -34,8 +34,36 @@ BUILD_DIR = os.path.join(WORKSPACE_ROOT, "build", "release")
 LOCAL_MANIFEST_PATH = os.path.join(BUILD_DIR, ".export_manifest.json")
 VERSION_MANIFEST_FILE = os.path.join(BUILD_DIR, "version_manifest.json")
 RELEASE_NOTES_FILE = os.path.join(BUILD_DIR, "release_notes.md")
-LAUNCHER_META_FILE = os.path.join(WORKSPACE_ROOT, "tools", "launcher_meta.json")
+CATALOG_FILE = os.path.join(WORKSPACE_ROOT, "docs", "catalog.json")
 MIN_VALID_SIZE = 1_000_000  # 1 MB mínimo para binarios empaquetados válidos
+
+
+def read_catalog_launcher_meta():
+    """Obtiene launcher_meta directamente desde el Single Source of Truth (docs/catalog.json)."""
+    if os.path.isfile(CATALOG_FILE):
+        try:
+            with open(CATALOG_FILE, "r", encoding="utf-8") as f:
+                cat = json.load(f)
+                return cat.get("launcher_meta") or {}
+        except Exception:
+            pass
+    return {}
+
+
+def update_catalog_launcher_meta(meta):
+    """Actualiza launcher_meta directamente dentro de docs/catalog.json."""
+    if os.path.isfile(CATALOG_FILE):
+        try:
+            with open(CATALOG_FILE, "r", encoding="utf-8") as f:
+                cat = json.load(f)
+            cat["launcher_meta"] = meta
+            cat["catalog_timestamp"] = datetime.now(timezone.utc).isoformat()
+            with open(CATALOG_FILE, "w", encoding="utf-8") as f:
+                json.dump(cat, f, indent=2, ensure_ascii=False)
+            return True
+        except Exception as e:
+            print(f"Error actualizando catalog.json: {e}", file=sys.stderr)
+    return False
 
 
 TARGET_CONFIG = {
@@ -363,13 +391,7 @@ def evaluate_release(local_files, remote_manifest_text, new_tag, force=False):
     clean_version_tag = re.sub(r'^v+', '', new_tag)
     display_tag = f"v{clean_version_tag}"
 
-    existing_meta = {}
-    if os.path.isfile(LAUNCHER_META_FILE):
-        try:
-            with open(LAUNCHER_META_FILE, "r", encoding="utf-8") as f:
-                existing_meta = json.load(f)
-        except Exception:
-            pass
+    existing_meta = read_catalog_launcher_meta()
 
     launcher_meta_data = {
         "latest_version": clean_version_tag,
@@ -385,8 +407,7 @@ def evaluate_release(local_files, remote_manifest_text, new_tag, force=False):
         }
     }
 
-    with open(LAUNCHER_META_FILE, "w", encoding="utf-8") as f:
-        json.dump(launcher_meta_data, f, indent=2)
+    update_catalog_launcher_meta(launcher_meta_data)
 
     update_app_constants_version(clean_version_tag)
 
@@ -426,7 +447,7 @@ def evaluate_release(local_files, remote_manifest_text, new_tag, force=False):
         "files_to_upload": files_to_upload,
         "manifest_path": VERSION_MANIFEST_FILE,
         "notes_path": RELEASE_NOTES_FILE,
-        "launcher_meta_path": LAUNCHER_META_FILE,
+        "catalog_path": CATALOG_FILE,
     }
 
     try:
@@ -581,23 +602,16 @@ def sync_launcher_meta_from_remote(repo=None):
         }
         print("ℹ️ No hay versiones publicadas en GitHub (todas borradas). launcher_meta restablecido de forma segura y resiliente.")
 
-    os.makedirs(os.path.dirname(LAUNCHER_META_FILE), exist_ok=True)
-    with open(LAUNCHER_META_FILE, "w", encoding="utf-8") as f:
-        json.dump(meta, f, indent=2)
+    update_catalog_launcher_meta(meta)
     return meta
 
 
 def sync_catalog():
-    """Ejecuta catalog_generator.py para actualizar docs/catalog.json y catalog_example.json."""
-    if os.path.isfile(LAUNCHER_META_FILE):
-        try:
-            with open(LAUNCHER_META_FILE, "r", encoding="utf-8") as f:
-                l_meta = json.load(f)
-                latest_ver = l_meta.get("latest_version")
-                if latest_ver:
-                    update_app_constants_version(latest_ver)
-        except Exception:
-            pass
+    """Ejecuta catalog_generator.py para actualizar docs/catalog.json como Single Source of Truth."""
+    l_meta = read_catalog_launcher_meta()
+    latest_ver = l_meta.get("latest_version")
+    if latest_ver:
+        update_app_constants_version(latest_ver)
 
     cat_gen = os.path.join(WORKSPACE_ROOT, "tools", "catalog_generator.py")
     if not os.path.isfile(cat_gen):
@@ -605,7 +619,7 @@ def sync_catalog():
         return False
     try:
         subprocess.run(
-            [sys.executable, cat_gen, "--update-example"],
+            [sys.executable, cat_gen],
             check=True,
             cwd=WORKSPACE_ROOT
         )
@@ -640,10 +654,10 @@ def main():
     p_eval.add_argument("files", nargs="+", help="Rutas de los binarios locales a evaluar")
 
     # Subcomando: sync-catalog
-    subparsers.add_parser("sync-catalog", help="Sincroniza docs/catalog.json con tools/launcher_meta.json")
+    subparsers.add_parser("sync-catalog", help="Sincroniza docs/catalog.json como Single Source of Truth")
 
     # Subcomando: sync-launcher-meta
-    p_meta = subparsers.add_parser("sync-launcher-meta", help="Regenera tools/launcher_meta.json desde el release remoto de GitHub")
+    p_meta = subparsers.add_parser("sync-launcher-meta", help="Regenera launcher_meta en docs/catalog.json desde el release remoto de GitHub")
     p_meta.add_argument("--repo", default=None, help="Repositorio owner/repo (opcional)")
 
     # Subcomando: set-version
