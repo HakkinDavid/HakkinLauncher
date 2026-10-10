@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/app_constants.dart';
-import '../../core/theme/app_colors.dart';
-import '../../features/catalog/data/models/app_entry.dart';
+import 'package:hakkin_launcher/core/constants/app_constants.dart';
+import 'package:hakkin_launcher/core/constants/app_strings.dart';
+import 'package:hakkin_launcher/core/constants/app_technical_strings.dart';
+import 'package:hakkin_launcher/core/theme/app_colors.dart';
+import 'package:hakkin_launcher/features/catalog/data/models/app_entry.dart';
 import 'hakkin_button.dart';
 import 'status_badge.dart';
 
@@ -30,7 +32,7 @@ class HeroCarousel extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             if (featuredApp.assets.banner != null &&
-                featuredApp.assets.banner!.startsWith('http'))
+                featuredApp.assets.banner!.startsWith(AppTechnicalStrings.schemeHttp))
               Image.network(
                 featuredApp.assets.banner!,
                 fit: BoxFit.cover,
@@ -66,7 +68,7 @@ class HeroCarousel extends StatelessWidget {
                       StatusBadge.tag(featuredApp.category),
                       const SizedBox(width: 8),
                       Text(
-                        'DESTACADO',
+                        AppStrings.featured,
                         style: TextStyle(
                           color: AppColors.celestialBlue,
                           fontSize: 12,
@@ -104,14 +106,14 @@ class HeroCarousel extends StatelessWidget {
                   Row(
                     children: [
                       HakkinButton(
-                        text: 'Ver en la Tienda',
+                        text: AppStrings.viewInStore,
                         icon: Icons.explore_outlined,
                         variant: HakkinButtonVariant.primaryPlatinum,
                         onPressed: onDetailsPressed,
                       ),
                       const SizedBox(width: 12),
                       HakkinButton(
-                        text: 'v${featuredApp.latestVersion}',
+                        text: AppTechnicalStrings.versionWithV(featuredApp.latestVersion),
                         variant: HakkinButtonVariant.secondary,
                         onPressed: null,
                       ),
@@ -127,9 +129,9 @@ class HeroCarousel extends StatelessWidget {
   }
 
   Widget _buildPlaceholder() {
-    if (featuredApp.id == 'dev.bonsanbec.hakkinlauncher' ||
-        featuredApp.id == 'hakkin_launcher' ||
-        featuredApp.id == 'HakkinLauncher') {
+    if (featuredApp.id == AppTechnicalStrings.launcherId1 ||
+        featuredApp.id == AppTechnicalStrings.launcherId2 ||
+        featuredApp.id == AppTechnicalStrings.launcherId3) {
       return Image.asset(AppConstants.appIconPath, fit: BoxFit.cover);
     }
     return Container(

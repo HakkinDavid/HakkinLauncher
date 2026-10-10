@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../../core/constants/app_constants.dart';
-import '../models/installed_app.dart';
+import 'package:hakkin_launcher/core/constants/app_constants.dart';
+import 'package:hakkin_launcher/features/library/data/models/installed_app.dart';
 
 /// Repositorio para la persistencia del estado de las aplicaciones instaladas.
 class LibraryRepository {

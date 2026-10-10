@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/constants/app_strings.dart';
+import '../../../../core/constants/app_technical_strings.dart';
 import '../../../../core/crypto/hash_validator.dart';
 import '../../../../core/platform/process_launcher.dart';
 import '../../../catalog/presentation/controllers/catalog_controller.dart';
@@ -30,7 +32,7 @@ class InstalledAppsNotifier extends StateNotifier<AsyncValue<List<InstalledApp>>
   Future<bool> launchApp(InstalledApp app) async {
     final args = <String>[];
     if (app.launchArguments != null && app.launchArguments!.trim().isNotEmpty) {
-      args.addAll(app.launchArguments!.trim().split(RegExp(r'\s+')));
+      args.addAll(app.launchArguments!.trim().split(RegExp(AppTechnicalStrings.regexWhitespace)));
     }
 
     var exePath = app.executablePath;
@@ -67,7 +69,10 @@ class InstalledAppsNotifier extends StateNotifier<AsyncValue<List<InstalledApp>>
   Future<Map<String, dynamic>> verifyAppIntegrity(String id) async {
     final app = await _repo.getInstalledApp(id);
     if (app == null) {
-      return {'isValid': false, 'message': 'Aplicación no registrada localmente'};
+      return {
+        AppTechnicalStrings.keyIsValid: false,
+        AppTechnicalStrings.keyMessage: AppStrings.appNotRegisteredLocally,
+      };
     }
 
     var exePath = app.executablePath;
@@ -79,8 +84,9 @@ class InstalledAppsNotifier extends StateNotifier<AsyncValue<List<InstalledApp>>
     final exeFile = File(exePath);
     if (!await exeFile.exists()) {
       return {
-        'isValid': false,
-        'message': 'El archivo ejecutable no existe en disco: ${app.executablePath}',
+        AppTechnicalStrings.keyIsValid: false,
+        AppTechnicalStrings.keyMessage:
+            AppStrings.executableNotFoundOnDisk(app.executablePath),
       };
     }
 
@@ -92,17 +98,22 @@ class InstalledAppsNotifier extends StateNotifier<AsyncValue<List<InstalledApp>>
       if (release != null) {
         if (release.isAnomalousVersion(app.installedVersion)) {
           return {
-            'isValid': false,
-            'isAnomalous': true,
-            'message':
-                'Anomalía detectada: la versión v${app.installedVersion} es huérfana o inexistente en el catálogo. Requiere actualización completa a v${release.latestVersion}.',
+            AppTechnicalStrings.keyIsValid: false,
+            AppTechnicalStrings.keyIsAnomalous: true,
+            AppTechnicalStrings.keyMessage: AppStrings.anomalyOrphanVersionDetected(
+              app.installedVersion,
+              release.latestVersion,
+            ),
           };
         }
         final versionInfo = release.getRelease(app.installedVersion) ?? release.latestRelease;
         if (versionInfo.package.sha256.isNotEmpty) {
           final size = await exeFile.length();
           if (size == 0) {
-            return {'isValid': false, 'message': 'El archivo ejecutable está vacío'};
+            return {
+              AppTechnicalStrings.keyIsValid: false,
+              AppTechnicalStrings.keyMessage: AppStrings.executableFileEmpty,
+            };
           }
         }
       }
@@ -110,9 +121,9 @@ class InstalledAppsNotifier extends StateNotifier<AsyncValue<List<InstalledApp>>
 
     final hash = await HashValidator.calculateSha256(exeFile);
     return {
-      'isValid': true,
-      'message': 'Todos los archivos verificados correctamente.',
-      'sha256': hash,
+      AppTechnicalStrings.keyIsValid: true,
+      AppTechnicalStrings.keyMessage: AppStrings.allFilesVerifiedSuccessfully,
+      AppTechnicalStrings.keySha256: hash,
     };
   }
 

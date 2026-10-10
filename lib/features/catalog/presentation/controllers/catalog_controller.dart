@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/constants/app_technical_strings.dart';
 import '../../data/models/app_entry.dart';
 import '../../data/repositories/catalog_repository.dart';
 
@@ -14,10 +15,12 @@ final catalogManifestProvider =
 });
 
 /// Filtro de búsqueda por texto
-final searchQueryProvider = StateProvider<String>((ref) => '');
+final searchQueryProvider =
+    StateProvider<String>((ref) => AppTechnicalStrings.empty);
 
 /// Filtro de categoría: 'all', 'game', 'app'
-final selectedCategoryProvider = StateProvider<String>((ref) => 'all');
+final selectedCategoryProvider =
+    StateProvider<String>((ref) => AppTechnicalStrings.categoryAll);
 
 /// Lista filtrada reactivamente de aplicaciones según búsqueda y categoría.
 final filteredAppsProvider = Provider.autoDispose<List<AppEntry>>((ref) {
@@ -28,7 +31,7 @@ final filteredAppsProvider = Provider.autoDispose<List<AppEntry>>((ref) {
   return manifestAsync.maybeWhen(
     data: (manifest) {
       return manifest.apps.where((app) {
-        if (category != 'all' && app.category != category) {
+        if (category != AppTechnicalStrings.categoryAll && app.category != category) {
           return false;
         }
 

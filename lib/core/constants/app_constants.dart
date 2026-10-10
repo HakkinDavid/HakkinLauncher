@@ -1,45 +1,51 @@
-/// Constantes globales de HakkinLauncher
+import 'app_strings.dart';
+import 'app_technical_strings.dart';
+
+/// Constantes globales de HakkinLauncher centralizadas.
+///
+/// Todas las cadenas de texto se derivan de [AppStrings] y [AppTechnicalStrings]
+/// garantizando que no existan strings literales en el código.
 class AppConstants {
   AppConstants._();
 
-  static const String appName = 'HakkinLauncher';
+  static const String appName = AppStrings.appName;
 
   /// Versión base sincronizada con el catálogo y releases oficiales.
-  static const String defaultAppVersion = '26.10.10-00';
+  static const String defaultAppVersion = AppTechnicalStrings.defaultAppVersion;
 
   /// Versión activa del lanzador inyectada en tiempo de compilación con `--dart-define=APP_VERSION=...`.
   /// Si no se especifica en la compilación, recurre a [defaultAppVersion].
-  static const String appVersion = String.fromEnvironment(
-    'APP_VERSION',
-    defaultValue: defaultAppVersion,
-  );
+  static const String appVersion = AppTechnicalStrings.appVersion;
 
-  static const String defaultCatalogUrl =
-      'https://raw.githubusercontent.com/HakkinDavid/HakkinLauncher/master/docs/catalog.json';
+  static const String defaultCatalogUrl = AppTechnicalStrings.defaultCatalogUrl;
 
-  static const String fallbackCatalogUrl =
-      'https://raw.githubusercontent.com/HakkinDavid/HakkinLauncher/master/docs/catalog_example.json';
+  static const String fallbackCatalogUrl = AppTechnicalStrings.fallbackCatalogUrl;
 
-  static const String launcherMetaUrl =
-      'https://raw.githubusercontent.com/HakkinDavid/HakkinLauncher/master/tools/launcher_meta.json';
+  static const String launcherMetaUrl = AppTechnicalStrings.launcherMetaUrl;
 
-  static const String prefCatalogUrlKey = 'hakkin_catalog_url';
-  static const String prefCustomInstallPathKey = 'hakkin_install_path';
-  static const String prefCloseToTrayKey = 'hakkin_close_to_tray';
-  static const String prefAutoCheckUpdatesKey = 'hakkin_auto_check_updates';
-  static const String prefCachedCatalogJson = 'hakkin_cached_catalog_json';
-  static const String prefInstalledAppsJson = 'hakkin_installed_apps_json';
+  static const String prefCatalogUrlKey = AppTechnicalStrings.prefCatalogUrlKey;
+  static const String prefCustomInstallPathKey =
+      AppTechnicalStrings.prefCustomInstallPathKey;
+  static const String prefCloseToTrayKey = AppTechnicalStrings.prefCloseToTrayKey;
+  static const String prefAutoCheckUpdatesKey =
+      AppTechnicalStrings.prefAutoCheckUpdatesKey;
+  static const String prefCachedCatalogJson =
+      AppTechnicalStrings.prefCachedCatalogJson;
+  static const String prefInstalledAppsJson =
+      AppTechnicalStrings.prefInstalledAppsJson;
 
-  static const Duration backgroundCheckInterval = Duration(hours: 4);
+  static const Duration backgroundCheckInterval =
+      AppTechnicalStrings.backgroundCheckInterval;
 
   static const double windowMinWidth = 1080;
   static const double windowMinHeight = 680;
 
-  static const String appIconPath = 'assets/hakkinlauncher.png';
-  static const String appIconIcoPath = 'assets/hakkinlauncher.ico';
+  static const String appIconPath = AppTechnicalStrings.appIconPath;
+  static const String appIconIcoPath = AppTechnicalStrings.appIconIcoPath;
 
   // Componentes externos autogestionados (HDiffPatch / hpatchz)
-  static const String defaultHpatchzVersion = 'v5.1.3';
+  static const String defaultHpatchzVersion =
+      AppTechnicalStrings.defaultHpatchzVersion;
   static const String hpatchzDownloadBaseUrl =
-      'https://github.com/sisong/HDiffPatch/releases/download/$defaultHpatchzVersion';
+      AppTechnicalStrings.hpatchzDownloadBaseUrl;
 }

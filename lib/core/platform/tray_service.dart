@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 import '../constants/app_constants.dart';
+import '../constants/app_strings.dart';
+import '../constants/app_technical_strings.dart';
 
 /// Servicio para la bandeja del sistema.
 class TrayService with TrayListener {
@@ -19,7 +21,7 @@ class TrayService with TrayListener {
       trayManager.addListener(instance);
 
       if (Platform.isWindows) {
-        final localIco = File('windows/runner/resources/app_icon.ico');
+        final localIco = File(AppTechnicalStrings.windowsRunnerAppIconPath);
         if (localIco.existsSync()) {
           await trayManager.setIcon(localIco.absolute.path);
         } else {
@@ -32,25 +34,25 @@ class TrayService with TrayListener {
       final menu = Menu(
         items: [
           MenuItem(
-            key: 'show_window',
-            label: 'Abrir HakkinLauncher',
+            key: AppTechnicalStrings.trayKeyShowWindow,
+            label: AppStrings.trayOpenLauncher,
           ),
           MenuItem.separator(),
           MenuItem(
-            key: 'check_updates',
-            label: 'Buscar Actualizaciones',
+            key: AppTechnicalStrings.trayKeyCheckUpdates,
+            label: AppStrings.trayCheckUpdates,
           ),
           MenuItem.separator(),
           MenuItem(
-            key: 'exit_app',
-            label: 'Salir',
+            key: AppTechnicalStrings.trayKeyExitApp,
+            label: AppStrings.trayExit,
           ),
         ],
       );
 
       await trayManager.setContextMenu(menu);
     } catch (e) {
-      debugPrint('Error inicializando bandeja: $e');
+      debugPrint(AppStrings.logTrayInitError(e));
     }
   }
 
@@ -67,12 +69,12 @@ class TrayService with TrayListener {
 
   @override
   void onTrayMenuItemClick(MenuItem menuItem) {
-    if (menuItem.key == 'show_window') {
+    if (menuItem.key == AppTechnicalStrings.trayKeyShowWindow) {
       windowManager.show();
       windowManager.focus();
-    } else if (menuItem.key == 'check_updates') {
+    } else if (menuItem.key == AppTechnicalStrings.trayKeyCheckUpdates) {
       onCheckUpdatesRequested?.call();
-    } else if (menuItem.key == 'exit_app') {
+    } else if (menuItem.key == AppTechnicalStrings.trayKeyExitApp) {
       windowManager.destroy();
       exit(0);
     }

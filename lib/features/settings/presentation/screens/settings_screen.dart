@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hakkin_launcher/core/constants/app_constants.dart';
+import 'package:hakkin_launcher/core/constants/app_strings.dart';
+import 'package:hakkin_launcher/core/constants/app_technical_strings.dart';
 import 'package:hakkin_launcher/core/housekeeping/cleaner_service.dart';
 import 'package:hakkin_launcher/core/platform/background_check_service.dart';
 import 'package:hakkin_launcher/core/platform/component_manager.dart';
@@ -22,9 +24,9 @@ class SettingsScreen extends ConsumerStatefulWidget {
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   final _customInstallPathController = TextEditingController();
   bool _closeToTray = true;
-  String _baseDir = '';
-  String _toolsDir = '';
-  String _hpatchzStatus = '';
+  String _baseDir = AppTechnicalStrings.empty;
+  String _toolsDir = AppTechnicalStrings.empty;
+  String _hpatchzStatus = AppTechnicalStrings.empty;
   bool _isVerifyingComponents = false;
   int _deletedFiles = -1;
   bool _isCheckingUpdates = false;
@@ -45,7 +47,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
-    final customPath = prefs.getString(AppConstants.prefCustomInstallPathKey) ?? '';
+    final customPath = prefs.getString(AppConstants.prefCustomInstallPathKey) ?? AppTechnicalStrings.empty;
     final closeToTray = prefs.getBool(AppConstants.prefCloseToTrayKey) ?? true;
     final baseDir = await OsPaths.getAppBaseDirectory();
     final defaultAppsDir = await OsPaths.getDefaultAppsInstallDirectory();
@@ -77,8 +79,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           SnackBar(
             content: Text(
               success
-                  ? 'Componentes verificados exitosamente: $newStatus'
-                  : 'Aviso: No se pudo verificar o descargar el motor de parches.',
+                  ? AppStrings.componentsVerifiedSuccess(newStatus)
+                  : AppStrings.noticeCouldNotVerifyPatchEngine,
             ),
           ),
         );
@@ -87,7 +89,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       if (mounted) {
         setState(() => _isVerifyingComponents = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al verificar componentes: $e')),
+          SnackBar(content: Text(AppStrings.errorVerifyingComponents(e))),
         );
       }
     }
@@ -101,7 +103,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ruta de instalación guardada con éxito')),
+        const SnackBar(content: Text(AppStrings.installPathSavedSuccess)),
       );
     }
   }
@@ -121,8 +123,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
         if (hasLauncherUpdate || updates.isNotEmpty) {
           final summaryMsg = hasLauncherUpdate
-              ? '¡Nueva versión de ${AppConstants.appName} v${manifest.launcherMeta!.latestVersion} disponible!'
-              : 'Se encontraron ${updates.length} actualización(es) disponible(s).';
+              ? AppStrings.newLauncherVersionReady(AppConstants.appName, manifest.launcherMeta!.latestVersion)
+              : AppStrings.updatesFoundCount(updates.length);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(summaryMsg),
@@ -133,9 +135,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Todo al día. Todas tus aplicaciones y el lanzador están en la versión más reciente.'),
+              content: Text(AppStrings.allUpToDateLong),
               backgroundColor: AppColors.surfaceElevated,
-              duration: const Duration(seconds: 3),
+              duration: Duration(seconds: 3),
             ),
           );
         }
@@ -145,7 +147,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         setState(() => _isCheckingUpdates = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error al comprobar actualizaciones: $e'),
+            content: Text(AppStrings.errorCheckingUpdates(e)),
             backgroundColor: AppColors.error,
           ),
         );
@@ -160,7 +162,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
     setState(() {
       _isSelfUpdating = true;
-      _selfUpdateStatusMessage = 'Iniciando actualización del lanzador...';
+      _selfUpdateStatusMessage = AppStrings.selfUpdateStarting;
     });
 
     final selfUpdateService = SelfUpdateService();
@@ -194,7 +196,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Configuración',
+              AppStrings.settingsTitle,
               style: TextStyle(
                 color: AppColors.platinum,
                 fontSize: 26,
@@ -204,7 +206,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
             const SizedBox(height: 6),
             const Text(
-              'Ajustes del lanzador, repositorio remoto y mantenimiento.',
+              AppStrings.settingsSubtitle,
               style: TextStyle(
                 color: AppColors.platinumMuted,
                 fontSize: 14,
@@ -240,7 +242,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Nueva versión de ${AppConstants.appName} disponible: v${launcherMeta.latestVersion}',
+                            AppStrings.newLauncherVersionAvailableBanner(AppConstants.appName, launcherMeta.latestVersion),
                             style: const TextStyle(
                               color: AppColors.platinum,
                               fontSize: 16,
@@ -250,7 +252,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           const SizedBox(height: 4),
                           Text(
                             _selfUpdateStatusMessage ??
-                                'Tu versión actual es v${AppConstants.appVersion}. Pulsa para actualizar y reiniciar automáticamente.',
+                                AppStrings.currentVersionNotice(AppConstants.appVersion),
                             style: const TextStyle(color: AppColors.platinumMuted, fontSize: 13),
                           ),
                         ],
@@ -258,7 +260,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                     const SizedBox(width: 16),
                     HakkinButton(
-                      text: _isSelfUpdating ? 'Actualizando...' : 'Actualizar Lanzador',
+                      text: _isSelfUpdating ? AppStrings.updating : AppStrings.updateLauncher,
                       isLoading: _isSelfUpdating,
                       icon: Icons.download_for_offline,
                       variant: HakkinButtonVariant.primaryPlatinum,
@@ -272,15 +274,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
 
             _buildSection(
-              title: 'Ruta de Instalación de Juegos y Software',
-              description:
-                  'Carpeta del sistema operativo donde se descargarán y extraerán los paquetes y binarios.',
+              title: AppStrings.installPathSectionTitle,
+              description: AppStrings.installPathSectionDescription,
               child: Column(
                 children: [
                   TextField(
                     controller: _customInstallPathController,
                     decoration: const InputDecoration(
-                      labelText: 'Directorio de Instalación',
+                      labelText: AppStrings.installDirectoryLabel,
                       prefixIcon: Icon(Icons.folder_open),
                     ),
                   ),
@@ -288,14 +289,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   Row(
                     children: [
                       HakkinButton(
-                        text: 'Guardar Ruta',
+                        text: AppStrings.savePath,
                         icon: Icons.save,
                         variant: HakkinButtonVariant.secondary,
                         onPressed: _saveInstallPath,
                       ),
                       const SizedBox(width: 12),
                       HakkinButton(
-                        text: 'Restaurar Ruta por Defecto',
+                        text: AppStrings.restoreDefaultPath,
                         variant: HakkinButtonVariant.secondary,
                         onPressed: () async {
                           final defaultDir = await OsPaths.getDefaultAppsInstallDirectory();
@@ -312,8 +313,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             const SizedBox(height: 24),
 
             _buildSection(
-              title: 'Segundo Plano y Actualizaciones',
-              description: 'Opciones de bandeja de sistema y sondeo automático.',
+              title: AppStrings.backgroundAndUpdatesTitle,
+              description: AppStrings.backgroundAndUpdatesDescription,
               child: Column(
                 children: [
                   SwitchListTile(
@@ -321,11 +322,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     contentPadding: EdgeInsets.zero,
                     activeThumbColor: AppColors.celestialBlue,
                     title: const Text(
-                      'Minimizar a la bandeja al cerrar la ventana',
+                      AppStrings.minimizeToTrayTitle,
                       style: TextStyle(color: AppColors.platinum, fontSize: 14),
                     ),
                     subtitle: const Text(
-                      'El lanzador permanecerá activo en la bandeja del sistema o barra de menú para verificar actualizaciones.',
+                      AppStrings.minimizeToTraySubtitle,
                       style: TextStyle(color: AppColors.platinumMuted, fontSize: 12),
                     ),
                     onChanged: (val) async {
@@ -340,8 +341,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     children: [
                       HakkinButton(
                         text: _isCheckingUpdates
-                            ? 'Buscando actualizaciones...'
-                            : 'Buscar Actualizaciones Ahora',
+                            ? AppStrings.checkingUpdates
+                            : AppStrings.checkUpdatesNow,
                         isLoading: _isCheckingUpdates,
                         icon: Icons.sync,
                         variant: HakkinButtonVariant.secondary,
@@ -356,14 +357,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             const SizedBox(height: 24),
 
             _buildSection(
-              title: 'Mantenimiento',
-              description:
-                  'Limpieza de archivos residuales de descargas y rotación de registros.',
+              title: AppStrings.maintenanceTitle,
+              description: AppStrings.maintenanceDescription,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   HakkinButton(
-                    text: 'Limpiar Archivos Temporales',
+                    text: AppStrings.cleanTemporaryFiles,
                     icon: Icons.cleaning_services_outlined,
                     variant: HakkinButtonVariant.secondary,
                     onPressed: _runHousekeeping,
@@ -371,15 +371,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   if (_deletedFiles >= 0) ...[
                     const SizedBox(height: 10),
                     Text(
-                      'Se eliminaron $_deletedFiles archivos temporales.',
+                      AppStrings.filesDeletedCount(_deletedFiles),
                       style: const TextStyle(color: AppColors.success, fontSize: 13),
                     ),
                   ],
                   const SizedBox(height: 12),
                   HakkinButton(
                     text: _isVerifyingComponents
-                        ? 'Verificando componentes...'
-                        : 'Verificar / Descargar Motor de Parches (hpatchz)',
+                        ? AppStrings.verifyingComponents
+                        : AppStrings.verifyPatchEngine,
                     isLoading: _isVerifyingComponents,
                     icon: Icons.build_circle_outlined,
                     variant: HakkinButtonVariant.secondary,
@@ -392,8 +392,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             const SizedBox(height: 24),
 
             _buildSection(
-              title: 'Información del Sistema',
-              description: 'Rutas locales utilizadas por HakkinLauncher.',
+              title: AppStrings.systemInfoTitle,
+              description: AppStrings.systemInfoDescription,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -423,13 +423,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildPathRow('Directorio Base:', _baseDir),
+                        _buildPathRow(AppStrings.labelBaseDir, _baseDir),
                         if (_toolsDir.isNotEmpty)
-                          _buildPathRow('Herramientas:', _toolsDir),
+                          _buildPathRow(AppStrings.labelToolsDir, _toolsDir),
                         if (_hpatchzStatus.isNotEmpty)
-                          _buildPathRow('Motor hpatchz:', _hpatchzStatus),
-                        _buildPathRow('Plataforma:', OsPaths.getCurrentPlatformKey()),
-                        _buildPathRow('Versión de Lanzador:', AppConstants.appVersion),
+                          _buildPathRow(AppStrings.labelHpatchzEngine, _hpatchzStatus),
+                        _buildPathRow(AppStrings.labelPlatform, OsPaths.getCurrentPlatformKey()),
+                        _buildPathRow(AppStrings.labelLauncherVersion, AppConstants.appVersion),
                       ],
                     ),
                   ),
@@ -499,7 +499,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               style: const TextStyle(
                 color: AppColors.platinum,
                 fontSize: 12,
-                fontFamily: 'monospace',
+                fontFamily: AppTechnicalStrings.fontFamilyMonospace,
               ),
             ),
           ),

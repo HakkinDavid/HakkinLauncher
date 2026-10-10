@@ -1,3 +1,5 @@
+import '../../../../core/constants/app_technical_strings.dart';
+
 /// Modelo que representa una aplicación o juego instalado localmente en el equipo.
 class InstalledApp {
   final String id;
@@ -26,35 +28,42 @@ class InstalledApp {
 
   factory InstalledApp.fromJson(Map<String, dynamic> json) {
     return InstalledApp(
-      id: json['id'] as String? ?? '',
-      title: json['title'] as String? ?? '',
-      installedVersion: json['installed_version'] as String? ?? '1.0.0',
-      executablePath: json['executable_path'] as String? ?? '',
-      installDirectory: json['install_directory'] as String? ?? '',
-      installedAt: json['installed_at'] != null
-          ? DateTime.tryParse(json['installed_at'].toString()) ?? DateTime.now()
+      id: json[AppTechnicalStrings.keyId] as String? ?? AppTechnicalStrings.empty,
+      title: json[AppTechnicalStrings.keyTitle] as String? ?? AppTechnicalStrings.empty,
+      installedVersion: json[AppTechnicalStrings.keyInstalledVersion] as String? ??
+          AppTechnicalStrings.defaultVersion,
+      executablePath: json[AppTechnicalStrings.keyExecutablePath] as String? ??
+          AppTechnicalStrings.empty,
+      installDirectory: json[AppTechnicalStrings.keyInstallDirectory] as String? ??
+          AppTechnicalStrings.empty,
+      installedAt: json[AppTechnicalStrings.keyInstalledAt] != null
+          ? DateTime.tryParse(json[AppTechnicalStrings.keyInstalledAt].toString()) ??
+              DateTime.now()
           : DateTime.now(),
-      lastLaunchedAt: json['last_launched_at'] != null
-          ? DateTime.tryParse(json['last_launched_at'].toString())
+      lastLaunchedAt: json[AppTechnicalStrings.keyLastLaunchedAt] != null
+          ? DateTime.tryParse(json[AppTechnicalStrings.keyLastLaunchedAt].toString())
           : null,
-      sizeBytes: (json['size_bytes'] as num?)?.toInt() ?? 0,
-      platformKey: json['platform_key'] as String? ?? '',
-      launchArguments: json['launch_arguments'] as String?,
+      sizeBytes:
+          (json[AppTechnicalStrings.keySizeBytes] as num?)?.toInt() ?? 0,
+      platformKey: json[AppTechnicalStrings.keyPlatformKey] as String? ??
+          AppTechnicalStrings.empty,
+      launchArguments: json[AppTechnicalStrings.keyLaunchArguments] as String?,
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'title': title,
-        'installed_version': installedVersion,
-        'executable_path': executablePath,
-        'install_directory': installDirectory,
-        'installed_at': installedAt.toIso8601String(),
+        AppTechnicalStrings.keyId: id,
+        AppTechnicalStrings.keyTitle: title,
+        AppTechnicalStrings.keyInstalledVersion: installedVersion,
+        AppTechnicalStrings.keyExecutablePath: executablePath,
+        AppTechnicalStrings.keyInstallDirectory: installDirectory,
+        AppTechnicalStrings.keyInstalledAt: installedAt.toIso8601String(),
         if (lastLaunchedAt != null)
-          'last_launched_at': lastLaunchedAt!.toIso8601String(),
-        'size_bytes': sizeBytes,
-        'platform_key': platformKey,
-        if (launchArguments != null) 'launch_arguments': launchArguments,
+          AppTechnicalStrings.keyLastLaunchedAt: lastLaunchedAt!.toIso8601String(),
+        AppTechnicalStrings.keySizeBytes: sizeBytes,
+        AppTechnicalStrings.keyPlatformKey: platformKey,
+        if (launchArguments != null)
+          AppTechnicalStrings.keyLaunchArguments: launchArguments,
       };
 
   InstalledApp copyWith({

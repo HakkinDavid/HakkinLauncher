@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/app_constants.dart';
-import '../../core/theme/app_colors.dart';
-import '../../features/catalog/data/models/app_entry.dart';
+import 'package:hakkin_launcher/core/constants/app_constants.dart';
+import 'package:hakkin_launcher/core/constants/app_technical_strings.dart';
+import 'package:hakkin_launcher/core/theme/app_colors.dart';
+import 'package:hakkin_launcher/features/catalog/data/models/app_entry.dart';
 import 'status_badge.dart';
 
 class AppCard extends StatefulWidget {
@@ -65,7 +66,7 @@ class _AppCardState extends State<AppCard> {
                     fit: StackFit.expand,
                     children: [
                       if (widget.app.assets.poster != null &&
-                          widget.app.assets.poster!.startsWith('http'))
+                          widget.app.assets.poster!.startsWith(AppTechnicalStrings.schemeHttp))
                         Image.network(
                           widget.app.assets.poster!,
                           fit: BoxFit.cover,
@@ -134,7 +135,7 @@ class _AppCardState extends State<AppCard> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'v${widget.app.latestVersion}',
+                          AppTechnicalStrings.versionWithV(widget.app.latestVersion),
                           style: const TextStyle(
                             color: AppColors.platinumDark,
                             fontSize: 11,
@@ -143,24 +144,24 @@ class _AppCardState extends State<AppCard> {
                         ),
                         Row(
                           children: [
-                            if (widget.app.platforms.containsKey('windows-x64') ||
-                                widget.app.platforms.containsKey('windows-x86'))
+                            if (widget.app.platforms.containsKey(AppTechnicalStrings.platformWindowsX64) ||
+                                widget.app.platforms.containsKey(AppTechnicalStrings.platformWindowsX86))
                               const Padding(
                                 padding: EdgeInsets.only(left: 4),
                                 child: Icon(Icons.window, size: 13, color: AppColors.platinumMuted),
                               ),
-                            if (widget.app.platforms.containsKey('macos-arm64') ||
-                                widget.app.platforms.containsKey('macos-x64'))
+                            if (widget.app.platforms.containsKey(AppTechnicalStrings.platformMacosArm64) ||
+                                widget.app.platforms.containsKey(AppTechnicalStrings.platformMacosX64))
                               const Padding(
                                 padding: EdgeInsets.only(left: 4),
                                 child: Icon(Icons.apple, size: 14, color: AppColors.platinumMuted),
                               ),
-                            if (widget.app.platforms.containsKey('android'))
+                            if (widget.app.platforms.containsKey(AppTechnicalStrings.platformAndroid))
                               const Padding(
                                 padding: EdgeInsets.only(left: 4),
                                 child: Icon(Icons.android, size: 14, color: AppColors.platinumMuted),
                               ),
-                            if (widget.app.platforms.containsKey('linux-x64'))
+                            if (widget.app.platforms.containsKey(AppTechnicalStrings.platformLinuxX64))
                               const Padding(
                                 padding: EdgeInsets.only(left: 4),
                                 child: Icon(Icons.terminal, size: 14, color: AppColors.platinumMuted),
@@ -191,16 +192,16 @@ class _AppCardState extends State<AppCard> {
   }
 
   Widget _buildPlaceholder() {
-    if (widget.app.id == 'dev.bonsanbec.hakkinlauncher' ||
-        widget.app.id == 'hakkin_launcher' ||
-        widget.app.id == 'HakkinLauncher') {
+    if (widget.app.id == AppTechnicalStrings.launcherId1 ||
+        widget.app.id == AppTechnicalStrings.launcherId2 ||
+        widget.app.id == AppTechnicalStrings.launcherId3) {
       return Image.asset(AppConstants.appIconPath, fit: BoxFit.cover);
     }
     return Container(
       color: AppColors.surfaceElevated,
       child: Center(
         child: Icon(
-          widget.app.category == 'game' ? Icons.sports_esports : Icons.apps,
+          widget.app.category == AppTechnicalStrings.categoryGame ? Icons.sports_esports : Icons.apps,
           size: 48,
           color: AppColors.surfaceBorder,
         ),

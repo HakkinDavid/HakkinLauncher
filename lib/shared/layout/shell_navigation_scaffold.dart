@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/constants/app_constants.dart';
-import '../../core/platform/os_paths.dart';
-import '../../core/theme/app_colors.dart';
-import '../../features/catalog/presentation/controllers/catalog_controller.dart';
-import '../../features/self_update/services/self_update_service.dart';
+import 'package:hakkin_launcher/core/constants/app_constants.dart';
+import 'package:hakkin_launcher/core/constants/app_strings.dart';
+import 'package:hakkin_launcher/core/constants/app_technical_strings.dart';
+import 'package:hakkin_launcher/core/platform/os_paths.dart';
+import 'package:hakkin_launcher/core/theme/app_colors.dart';
+import 'package:hakkin_launcher/features/catalog/presentation/controllers/catalog_controller.dart';
+import 'package:hakkin_launcher/features/self_update/services/self_update_service.dart';
 
 class ShellNavigationScaffold extends ConsumerWidget {
   final Widget child;
@@ -70,7 +72,7 @@ class ShellNavigationScaffold extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'HAKKIN',
+                            AppStrings.brandHakkin,
                             style: TextStyle(
                               color: AppColors.platinum,
                               fontSize: 16,
@@ -79,7 +81,7 @@ class ShellNavigationScaffold extends ConsumerWidget {
                             ),
                           ),
                           Text(
-                            'LAUNCHER',
+                            AppStrings.brandLauncher,
                             style: TextStyle(
                               color: AppColors.platinumDark,
                               fontSize: 10,
@@ -100,25 +102,25 @@ class ShellNavigationScaffold extends ConsumerWidget {
                   context: context,
                   icon: Icons.storefront_outlined,
                   activeIcon: Icons.storefront,
-                  label: 'Tienda',
-                  route: '/',
-                  isActive: location == '/',
+                  label: AppStrings.navStore,
+                  route: AppTechnicalStrings.routeRoot,
+                  isActive: location == AppTechnicalStrings.routeRoot,
                 ),
                 _buildNavItem(
                   context: context,
                   icon: Icons.collections_bookmark_outlined,
                   activeIcon: Icons.collections_bookmark,
-                  label: 'Biblioteca',
-                  route: '/library',
-                  isActive: location.startsWith('/library'),
+                  label: AppStrings.navLibrary,
+                  route: AppTechnicalStrings.routeLibrary,
+                  isActive: location.startsWith(AppTechnicalStrings.routeLibrary),
                 ),
                 _buildNavItem(
                   context: context,
                   icon: Icons.settings_outlined,
                   activeIcon: Icons.settings,
-                  label: 'Ajustes',
-                  route: '/settings',
-                  isActive: location.startsWith('/settings'),
+                  label: AppStrings.navSettings,
+                  route: AppTechnicalStrings.routeSettings,
+                  isActive: location.startsWith(AppTechnicalStrings.routeSettings),
                   hasBadge: hasLauncherUpdate,
                 ),
 
@@ -148,7 +150,7 @@ class ShellNavigationScaffold extends ConsumerWidget {
                             ),
                             const SizedBox(width: 8),
                             const Text(
-                              'En Línea',
+                              AppStrings.statusOnline,
                               style: TextStyle(
                                 color: AppColors.platinum,
                                 fontSize: 11,
@@ -159,7 +161,7 @@ class ShellNavigationScaffold extends ConsumerWidget {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          'S.O.: ${OsPaths.getCurrentPlatformKey()}',
+                          AppStrings.statusOs(OsPaths.getCurrentPlatformKey()),
                           style: const TextStyle(
                             color: AppColors.platinumMuted,
                             fontSize: 10,
@@ -233,7 +235,7 @@ class ShellNavigationScaffold extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Text(
-                      'NEW',
+                      AppStrings.badgeNew,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 9,

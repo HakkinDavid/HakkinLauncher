@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 import '../constants/app_constants.dart';
+import '../constants/app_strings.dart';
 
 /// Servicio para el control y ciclo de vida de la ventana en Desktop.
 class WindowService with WindowListener {
@@ -26,7 +27,7 @@ class WindowService with WindowListener {
         final prefs = await SharedPreferences.getInstance();
         instance._closeToTray = prefs.getBool(AppConstants.prefCloseToTrayKey) ?? true;
       } catch (e) {
-        debugPrint('Aviso al cargar preferencia closeToTray: $e');
+        debugPrint(AppStrings.logCloseToTrayPrefError(e));
       }
 
       const windowOptions = WindowOptions(
@@ -44,7 +45,7 @@ class WindowService with WindowListener {
           try {
             await windowManager.setIcon(AppConstants.appIconIcoPath);
           } catch (e) {
-            debugPrint('Aviso: No se pudo establecer icono de ventana: $e');
+            debugPrint(AppStrings.logWindowIconError(e));
           }
         }
         await windowManager.show();

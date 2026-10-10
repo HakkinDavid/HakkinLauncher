@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:local_notifier/local_notifier.dart';
+import '../constants/app_strings.dart';
 
 /// Servicio centralizado de notificaciones nativas de escritorio.
 class NotificationService {
@@ -15,12 +16,12 @@ class NotificationService {
 
     try {
       await localNotifier.setup(
-        appName: 'HakkinLauncher',
+        appName: AppStrings.appName,
         shortcutPolicy: ShortcutPolicy.requireCreate,
       );
       _initialized = true;
     } catch (e) {
-      debugPrint('Aviso: No se pudo inicializar local_notifier: $e');
+      debugPrint(AppStrings.logCouldNotInitLocalNotifier(e));
     }
   }
 
@@ -48,31 +49,31 @@ class NotificationService {
 
       await notification.show();
     } catch (e) {
-      debugPrint('Error emitiendo notificación: $e');
+      debugPrint(AppStrings.logErrorEmittingNotification(e));
     }
   }
 
   /// Notificación de instalación completada.
   static Future<void> notifyInstallCompleted(String appTitle) async {
     await showNotification(
-      title: 'Instalación completada',
-      body: '$appTitle está listo para ejecutarse.',
+      title: AppStrings.installationCompletedTitle,
+      body: AppStrings.appReadyToRun(appTitle),
     );
   }
 
   /// Notificación de actualización completada.
   static Future<void> notifyUpdateCompleted(String appTitle, String version) async {
     await showNotification(
-      title: 'Actualización completada',
-      body: '$appTitle se ha actualizado con éxito a la versión v$version.',
+      title: AppStrings.updateCompletedTitle,
+      body: AppStrings.updateCompletedBody(appTitle, version),
     );
   }
 
   /// Notificación de nueva actualización detectada en segundo plano.
   static Future<void> notifyUpdateAvailable(String appTitle, String newVersion) async {
     await showNotification(
-      title: 'Actualización disponible',
-      body: 'Hay una nueva versión v$newVersion disponible para $appTitle.',
+      title: AppStrings.updateAvailableTitle,
+      body: AppStrings.updateAvailableBody(appTitle, newVersion),
     );
   }
 }

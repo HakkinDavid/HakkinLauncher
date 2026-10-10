@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import '../../../../core/constants/app_strings.dart';
+import '../../../../core/constants/app_technical_strings.dart';
 
 /// Estado de progreso de una descarga activa.
 class DownloadProgress {
@@ -19,12 +21,12 @@ class DownloadProgress {
   });
 
   String get speedFormatted {
-    if (speedBytesPerSec <= 0) return '';
+    if (speedBytesPerSec <= 0) return AppTechnicalStrings.empty;
     final mb = speedBytesPerSec / (1024 * 1024);
-    return '${mb.toStringAsFixed(1)} MB/s';
+    return AppStrings.speedMbPerSec(mb.toStringAsFixed(1));
   }
 
-  String get percentageFormatted => '${(progress * 100).toStringAsFixed(1)}%';
+  String get percentageFormatted => AppStrings.percentage(progress * 100);
 }
 
 /// Servicio de descarga de paquetes y parches con soporte para reanudación HTTP y métricas.
@@ -72,7 +74,10 @@ class DownloaderService {
         final options = Options(
           responseType: ResponseType.stream,
           headers: (allowResume && existingLength > 0)
-              ? {'Range': 'bytes=$existingLength-'}
+              ? {
+                  AppTechnicalStrings.headerRange:
+                      AppTechnicalStrings.rangeBytes(existingLength)
+                }
               : null,
           followRedirects: true,
           validateStatus: (status) =>
@@ -97,7 +102,7 @@ class DownloaderService {
 
         final responseStream = response.data?.stream;
         if (responseStream == null) {
-          throw const FileSystemException('Respuesta de descarga vacía');
+          throw const FileSystemException(AppStrings.emptyDownloadResponse);
         }
 
         final isPartial = statusCode == 206;
@@ -108,13 +113,16 @@ class DownloaderService {
 
         // Determinar tamaño total
         int totalLength = 0;
-        final contentRange = response.headers.value('content-range');
-        if (contentRange != null && contentRange.contains('/')) {
-          final totalStr = contentRange.split('/').last.trim();
+        final contentRange =
+            response.headers.value(AppTechnicalStrings.headerContentRange);
+        if (contentRange != null && contentRange.contains(AppTechnicalStrings.slash)) {
+          final totalStr =
+              contentRange.split(AppTechnicalStrings.slash).last.trim();
           totalLength = int.tryParse(totalStr) ?? 0;
         } else {
-          final contentLength = response.headers.value('content-length');
-          final length = int.tryParse(contentLength ?? '') ?? 0;
+          final contentLength =
+              response.headers.value(AppTechnicalStrings.headerContentLength);
+          final length = int.tryParse(contentLength ?? AppTechnicalStrings.empty) ?? 0;
           totalLength = isAppending ? (existingLength + length) : length;
         }
 
@@ -130,8 +138,12 @@ class DownloaderService {
               : 0.0,
           speedBytesPerSec: 0.0,
           statusText: totalLength > 0
-              ? '${(currentReceived / 1048576).toStringAsFixed(1)} MB de ${(totalLength / 1048576).toStringAsFixed(1)} MB'
-              : '${(currentReceived / 1048576).toStringAsFixed(1)} MB descargados',
+              ? AppStrings.downloadProgressOf(
+                  (currentReceived / 1048576).toStringAsFixed(1),
+                  (totalLength / 1048576).toStringAsFixed(1),
+                )
+              : AppStrings.downloadedMb(
+                  (currentReceived / 1048576).toStringAsFixed(1)),
         );
 
         await for (final chunk in responseStream) {
@@ -156,8 +168,12 @@ class DownloaderService {
               progress: fraction,
               speedBytesPerSec: lastSpeed,
               statusText: totalLength > 0
-                  ? '${(currentReceived / 1048576).toStringAsFixed(1)} MB de ${(totalLength / 1048576).toStringAsFixed(1)} MB'
-                  : '${(currentReceived / 1048576).toStringAsFixed(1)} MB descargados',
+                  ? AppStrings.downloadProgressOf(
+                      (currentReceived / 1048576).toStringAsFixed(1),
+                      (totalLength / 1048576).toStringAsFixed(1),
+                    )
+                  : AppStrings.downloadedMb(
+                      (currentReceived / 1048576).toStringAsFixed(1)),
             );
           }
         }
@@ -173,8 +189,12 @@ class DownloaderService {
           progress: 1.0,
           speedBytesPerSec: lastSpeed,
           statusText: totalLength > 0
-              ? '${(totalLength / 1048576).toStringAsFixed(1)} MB de ${(totalLength / 1048576).toStringAsFixed(1)} MB'
-              : '${(currentReceived / 1048576).toStringAsFixed(1)} MB completados',
+              ? AppStrings.downloadProgressOf(
+                  (totalLength / 1048576).toStringAsFixed(1),
+                  (totalLength / 1048576).toStringAsFixed(1),
+                )
+              : AppStrings.completedMb(
+                  (currentReceived / 1048576).toStringAsFixed(1)),
         );
 
         return;
@@ -189,7 +209,7 @@ class DownloaderService {
         if (cancelToken?.isCancelled ?? false) {
           rethrow;
         }
-        debugPrint('Intento $attempt de descarga falló: $e');
+        debugPrint(AppStrings.logDownloadAttemptFail(attempt, e));
         if (attempt >= maxRetries) {
           rethrow;
         }

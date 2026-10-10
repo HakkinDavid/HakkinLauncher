@@ -1,3 +1,6 @@
+import '../../../../core/constants/app_strings.dart';
+import '../../../../core/constants/app_technical_strings.dart';
+
 /// Modelo de datos para el manifiesto del catálogo de HakkinLauncher
 class CatalogManifest {
   final String version;
@@ -14,22 +17,27 @@ class CatalogManifest {
 
   factory CatalogManifest.fromJson(Map<String, dynamic> json) {
     return CatalogManifest(
-      version: json['version'] as String? ?? '1.0.0',
-      catalogTimestamp: json['catalog_timestamp'] as String? ?? '',
-      launcherMeta: json['launcher_meta'] != null
-          ? LauncherMeta.fromJson(json['launcher_meta'] as Map<String, dynamic>)
+      version: json[AppTechnicalStrings.keyVersion] as String? ??
+          AppTechnicalStrings.defaultVersion,
+      catalogTimestamp:
+          json[AppTechnicalStrings.keyCatalogTimestamp] as String? ??
+              AppTechnicalStrings.empty,
+      launcherMeta: json[AppTechnicalStrings.keyLauncherMeta] != null
+          ? LauncherMeta.fromJson(
+              json[AppTechnicalStrings.keyLauncherMeta] as Map<String, dynamic>)
           : null,
-      apps: (json['apps'] as List<dynamic>? ?? [])
+      apps: (json[AppTechnicalStrings.keyApps] as List<dynamic>? ?? [])
           .map((e) => AppEntry.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'version': version,
-        'catalog_timestamp': catalogTimestamp,
-        if (launcherMeta != null) 'launcher_meta': launcherMeta!.toJson(),
-        'apps': apps.map((e) => e.toJson()).toList(),
+        AppTechnicalStrings.keyVersion: version,
+        AppTechnicalStrings.keyCatalogTimestamp: catalogTimestamp,
+        if (launcherMeta != null)
+          AppTechnicalStrings.keyLauncherMeta: launcherMeta!.toJson(),
+        AppTechnicalStrings.keyApps: apps.map((e) => e.toJson()).toList(),
       };
 
   CatalogManifest copyWith({
@@ -59,7 +67,8 @@ class LauncherMeta {
   });
 
   factory LauncherMeta.fromJson(Map<String, dynamic> json) {
-    final rawReleases = json['releases'] as Map<String, dynamic>? ?? {};
+    final rawReleases =
+        json[AppTechnicalStrings.keyReleases] as Map<String, dynamic>? ?? {};
     final releasesMap = <String, Map<String, dynamic>>{};
     rawReleases.forEach((key, value) {
       if (value is Map<String, dynamic>) {
@@ -68,17 +77,20 @@ class LauncherMeta {
     });
 
     return LauncherMeta(
-      latestVersion: json['latest_version'] as String? ?? '1.0.0',
-      minRequiredLauncherVersion: json['min_required_launcher_version'] as String?,
+      latestVersion: json[AppTechnicalStrings.keyLatestVersion] as String? ??
+          AppTechnicalStrings.defaultVersion,
+      minRequiredLauncherVersion:
+          json[AppTechnicalStrings.keyMinRequiredLauncherVersion] as String?,
       releases: releasesMap,
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'latest_version': latestVersion,
+        AppTechnicalStrings.keyLatestVersion: latestVersion,
         if (minRequiredLauncherVersion != null)
-          'min_required_launcher_version': minRequiredLauncherVersion,
-        'releases': releases,
+          AppTechnicalStrings.keyMinRequiredLauncherVersion:
+              minRequiredLauncherVersion,
+        AppTechnicalStrings.keyReleases: releases,
       };
 }
 
@@ -111,7 +123,8 @@ class AppEntry {
 
   factory AppEntry.fromJson(Map<String, dynamic> json) {
     final platformsMap = <String, PlatformRelease>{};
-    final rawPlatforms = json['platforms'] as Map<String, dynamic>? ?? {};
+    final rawPlatforms =
+        json[AppTechnicalStrings.keyPlatforms] as Map<String, dynamic>? ?? {};
     rawPlatforms.forEach((key, value) {
       if (value is Map<String, dynamic>) {
         platformsMap[key] = PlatformRelease.fromJson(value);
@@ -119,34 +132,47 @@ class AppEntry {
     });
 
     return AppEntry(
-      id: json['id'] as String? ?? '',
-      slug: json['slug'] as String? ?? '',
-      title: json['title'] as String? ?? '',
-      category: json['category'] as String? ?? 'game',
-      developer: json['developer'] as String? ?? 'Desarrollador',
-      summary: json['summary'] as String? ?? '',
-      descriptionMarkdown: json['description_markdown'] as String? ?? '',
-      tags: (json['tags'] as List<dynamic>? ?? []).map((e) => e.toString()).toList(),
-      assets: json['assets'] != null
-          ? AppAssets.fromJson(json['assets'] as Map<String, dynamic>)
+      id: json[AppTechnicalStrings.keyId] as String? ??
+          AppTechnicalStrings.empty,
+      slug: json[AppTechnicalStrings.keySlug] as String? ??
+          AppTechnicalStrings.empty,
+      title: json[AppTechnicalStrings.keyTitle] as String? ??
+          AppTechnicalStrings.empty,
+      category: json[AppTechnicalStrings.keyCategory] as String? ??
+          AppTechnicalStrings.categoryGame,
+      developer: json[AppTechnicalStrings.keyDeveloper] as String? ??
+          AppStrings.defaultDeveloper,
+      summary: json[AppTechnicalStrings.keySummary] as String? ??
+          AppTechnicalStrings.empty,
+      descriptionMarkdown:
+          json[AppTechnicalStrings.keyDescriptionMarkdown] as String? ??
+              AppTechnicalStrings.empty,
+      tags: (json[AppTechnicalStrings.keyTags] as List<dynamic>? ?? [])
+          .map((e) => e.toString())
+          .toList(),
+      assets: json[AppTechnicalStrings.keyAssets] != null
+          ? AppAssets.fromJson(
+              json[AppTechnicalStrings.keyAssets] as Map<String, dynamic>)
           : const AppAssets(),
-      latestVersion: json['latest_version'] as String? ?? '1.0.0',
+      latestVersion: json[AppTechnicalStrings.keyLatestVersion] as String? ??
+          AppTechnicalStrings.defaultVersion,
       platforms: platformsMap,
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'slug': slug,
-        'title': title,
-        'category': category,
-        'developer': developer,
-        'summary': summary,
-        'description_markdown': descriptionMarkdown,
-        'tags': tags,
-        'assets': assets.toJson(),
-        'latest_version': latestVersion,
-        'platforms': platforms.map((k, v) => MapEntry(k, v.toJson())),
+        AppTechnicalStrings.keyId: id,
+        AppTechnicalStrings.keySlug: slug,
+        AppTechnicalStrings.keyTitle: title,
+        AppTechnicalStrings.keyCategory: category,
+        AppTechnicalStrings.keyDeveloper: developer,
+        AppTechnicalStrings.keySummary: summary,
+        AppTechnicalStrings.keyDescriptionMarkdown: descriptionMarkdown,
+        AppTechnicalStrings.keyTags: tags,
+        AppTechnicalStrings.keyAssets: assets.toJson(),
+        AppTechnicalStrings.keyLatestVersion: latestVersion,
+        AppTechnicalStrings.keyPlatforms:
+            platforms.map((k, v) => MapEntry(k, v.toJson())),
       };
 
   bool supportsPlatform(String platformKey) {
@@ -193,20 +219,21 @@ class AppAssets {
 
   factory AppAssets.fromJson(Map<String, dynamic> json) {
     return AppAssets(
-      icon: json['icon'] as String?,
-      poster: json['poster'] as String?,
-      banner: json['banner'] as String?,
-      screenshots: (json['screenshots'] as List<dynamic>? ?? [])
-          .map((e) => e.toString())
-          .toList(),
+      icon: json[AppTechnicalStrings.keyIcon] as String?,
+      poster: json[AppTechnicalStrings.keyPoster] as String?,
+      banner: json[AppTechnicalStrings.keyBanner] as String?,
+      screenshots:
+          (json[AppTechnicalStrings.keyScreenshots] as List<dynamic>? ?? [])
+              .map((e) => e.toString())
+              .toList(),
     );
   }
 
   Map<String, dynamic> toJson() => {
-        if (icon != null) 'icon': icon,
-        if (poster != null) 'poster': poster,
-        if (banner != null) 'banner': banner,
-        'screenshots': screenshots,
+        if (icon != null) AppTechnicalStrings.keyIcon: icon,
+        if (poster != null) AppTechnicalStrings.keyPoster: poster,
+        if (banner != null) AppTechnicalStrings.keyBanner: banner,
+        AppTechnicalStrings.keyScreenshots: screenshots,
       };
 }
 
@@ -222,32 +249,38 @@ class PlatformRelease {
   });
 
   factory PlatformRelease.fromJson(Map<String, dynamic> json) {
-    final rawVersions = json['versions'] as List<dynamic>? ?? [];
+    final rawVersions =
+        json[AppTechnicalStrings.keyVersions] as List<dynamic>? ?? [];
     final versionsList = rawVersions
         .map((e) => AppVersionRelease.fromJson(e as Map<String, dynamic>))
         .toList();
 
     return PlatformRelease(
-      latestVersion: json['latest_version'] as String? ??
-          (versionsList.isNotEmpty ? versionsList.first.version : '1.0.0'),
-      protectedUserPaths: (json['protected_user_paths'] as List<dynamic>? ?? [])
-          .map((e) => e.toString())
-          .toList(),
+      latestVersion: json[AppTechnicalStrings.keyLatestVersion] as String? ??
+          (versionsList.isNotEmpty
+              ? versionsList.first.version
+              : AppTechnicalStrings.defaultVersion),
+      protectedUserPaths:
+          (json[AppTechnicalStrings.keyProtectedUserPaths] as List<dynamic>? ??
+                  [])
+              .map((e) => e.toString())
+              .toList(),
       versions: versionsList,
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'latest_version': latestVersion,
-        'protected_user_paths': protectedUserPaths,
-        'versions': versions.map((e) => e.toJson()).toList(),
+        AppTechnicalStrings.keyLatestVersion: latestVersion,
+        AppTechnicalStrings.keyProtectedUserPaths: protectedUserPaths,
+        AppTechnicalStrings.keyVersions: versions.map((e) => e.toJson()).toList(),
       };
 
   /// Obtiene la versión más reciente disponible
   AppVersionRelease get latestRelease => versions.firstWhere(
         (v) => v.version == latestVersion,
-        orElse: () =>
-            versions.isNotEmpty ? versions.first : const AppVersionRelease.empty(),
+        orElse: () => versions.isNotEmpty
+            ? versions.first
+            : const AppVersionRelease.empty(),
       );
 
   /// Obtiene una versión específica por su identificador
@@ -298,7 +331,7 @@ class AppVersionRelease {
   const AppVersionRelease({
     required this.version,
     this.releaseDate,
-    this.changelog = '',
+    this.changelog = AppTechnicalStrings.empty,
     required this.executableRelativePath,
     required this.package,
     this.deltaPatches = const [],
@@ -306,40 +339,50 @@ class AppVersionRelease {
   });
 
   const AppVersionRelease.empty()
-      : version = '1.0.0',
+      : version = AppTechnicalStrings.defaultVersion,
         releaseDate = null,
-        changelog = '',
-        executableRelativePath = '',
+        changelog = AppTechnicalStrings.empty,
+        executableRelativePath = AppTechnicalStrings.empty,
         package = const PackageArtifact.empty(),
         deltaPatches = const [],
         scripts = const Scripts();
 
   factory AppVersionRelease.fromJson(Map<String, dynamic> json) {
     return AppVersionRelease(
-      version: json['version'] as String? ?? '1.0.0',
-      releaseDate: json['release_date'] != null
-          ? DateTime.tryParse(json['release_date'].toString())
+      version: json[AppTechnicalStrings.keyVersion] as String? ??
+          AppTechnicalStrings.defaultVersion,
+      releaseDate: json[AppTechnicalStrings.keyReleaseDate] != null
+          ? DateTime.tryParse(
+              json[AppTechnicalStrings.keyReleaseDate].toString())
           : null,
-      changelog: json['changelog'] as String? ?? '',
-      executableRelativePath: json['executable_relative_path'] as String? ?? '',
-      package: PackageArtifact.fromJson(json['package'] as Map<String, dynamic>? ?? {}),
-      deltaPatches: (json['delta_patches'] as List<dynamic>? ?? [])
-          .map((e) => DeltaUpdate.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      scripts: json['scripts'] != null
-          ? Scripts.fromJson(json['scripts'] as Map<String, dynamic>)
+      changelog: json[AppTechnicalStrings.keyChangelog] as String? ??
+          AppTechnicalStrings.empty,
+      executableRelativePath:
+          json[AppTechnicalStrings.keyExecutableRelativePath] as String? ??
+              AppTechnicalStrings.empty,
+      package: PackageArtifact.fromJson(
+          json[AppTechnicalStrings.keyPackage] as Map<String, dynamic>? ?? {}),
+      deltaPatches:
+          (json[AppTechnicalStrings.keyDeltaPatches] as List<dynamic>? ?? [])
+              .map((e) => DeltaUpdate.fromJson(e as Map<String, dynamic>))
+              .toList(),
+      scripts: json[AppTechnicalStrings.keyScripts] != null
+          ? Scripts.fromJson(
+              json[AppTechnicalStrings.keyScripts] as Map<String, dynamic>)
           : const Scripts(),
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'version': version,
-        if (releaseDate != null) 'release_date': releaseDate!.toIso8601String(),
-        'changelog': changelog,
-        'executable_relative_path': executableRelativePath,
-        'package': package.toJson(),
-        'delta_patches': deltaPatches.map((e) => e.toJson()).toList(),
-        'scripts': scripts.toJson(),
+        AppTechnicalStrings.keyVersion: version,
+        if (releaseDate != null)
+          AppTechnicalStrings.keyReleaseDate: releaseDate!.toIso8601String(),
+        AppTechnicalStrings.keyChangelog: changelog,
+        AppTechnicalStrings.keyExecutableRelativePath: executableRelativePath,
+        AppTechnicalStrings.keyPackage: package.toJson(),
+        AppTechnicalStrings.keyDeltaPatches:
+            deltaPatches.map((e) => e.toJson()).toList(),
+        AppTechnicalStrings.keyScripts: scripts.toJson(),
       };
 }
 
@@ -355,22 +398,25 @@ class PackageArtifact {
   });
 
   const PackageArtifact.empty()
-      : url = '',
+      : url = AppTechnicalStrings.empty,
         sizeBytes = 0,
-        sha256 = '';
+        sha256 = AppTechnicalStrings.empty;
 
   factory PackageArtifact.fromJson(Map<String, dynamic> json) {
     return PackageArtifact(
-      url: json['url'] as String? ?? '',
-      sizeBytes: (json['size_bytes'] as num?)?.toInt() ?? 0,
-      sha256: json['sha256'] as String? ?? '',
+      url: json[AppTechnicalStrings.keyUrl] as String? ??
+          AppTechnicalStrings.empty,
+      sizeBytes:
+          (json[AppTechnicalStrings.keySizeBytes] as num?)?.toInt() ?? 0,
+      sha256: json[AppTechnicalStrings.keySha256] as String? ??
+          AppTechnicalStrings.empty,
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'url': url,
-        'size_bytes': sizeBytes,
-        'sha256': sha256,
+        AppTechnicalStrings.keyUrl: url,
+        AppTechnicalStrings.keySizeBytes: sizeBytes,
+        AppTechnicalStrings.keySha256: sha256,
       };
 }
 
@@ -395,24 +441,31 @@ class DeltaUpdate {
 
   factory DeltaUpdate.fromJson(Map<String, dynamic> json) {
     return DeltaUpdate(
-      fromVersion: json['from_version'] as String? ?? '',
-      toVersion: json['to_version'] as String? ?? '',
-      patchFormat: json['patch_format'] as String? ?? 'hdiff',
-      url: json['url'] as String? ?? '',
-      sizeBytes: (json['size_bytes'] as num?)?.toInt() ?? 0,
-      patchSha256: json['patch_sha256'] as String? ?? '',
-      targetSha256: json['target_sha256'] as String? ?? '',
+      fromVersion: json[AppTechnicalStrings.keyFromVersion] as String? ??
+          AppTechnicalStrings.empty,
+      toVersion: json[AppTechnicalStrings.keyToVersion] as String? ??
+          AppTechnicalStrings.empty,
+      patchFormat: json[AppTechnicalStrings.keyPatchFormat] as String? ??
+          AppTechnicalStrings.defaultPatchFormat,
+      url: json[AppTechnicalStrings.keyUrl] as String? ??
+          AppTechnicalStrings.empty,
+      sizeBytes:
+          (json[AppTechnicalStrings.keySizeBytes] as num?)?.toInt() ?? 0,
+      patchSha256: json[AppTechnicalStrings.keyPatchSha256] as String? ??
+          AppTechnicalStrings.empty,
+      targetSha256: json[AppTechnicalStrings.keyTargetSha256] as String? ??
+          AppTechnicalStrings.empty,
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'from_version': fromVersion,
-        'to_version': toVersion,
-        'patch_format': patchFormat,
-        'url': url,
-        'size_bytes': sizeBytes,
-        'patch_sha256': patchSha256,
-        'target_sha256': targetSha256,
+        AppTechnicalStrings.keyFromVersion: fromVersion,
+        AppTechnicalStrings.keyToVersion: toVersion,
+        AppTechnicalStrings.keyPatchFormat: patchFormat,
+        AppTechnicalStrings.keyUrl: url,
+        AppTechnicalStrings.keySizeBytes: sizeBytes,
+        AppTechnicalStrings.keyPatchSha256: patchSha256,
+        AppTechnicalStrings.keyTargetSha256: targetSha256,
       };
 }
 
@@ -424,13 +477,15 @@ class Scripts {
 
   factory Scripts.fromJson(Map<String, dynamic> json) {
     return Scripts(
-      preInstall: json['pre_install'] as String?,
-      postInstall: json['post_install'] as String?,
+      preInstall: json[AppTechnicalStrings.keyPreInstall] as String?,
+      postInstall: json[AppTechnicalStrings.keyPostInstall] as String?,
     );
   }
 
   Map<String, dynamic> toJson() => {
-        if (preInstall != null) 'pre_install': preInstall,
-        if (postInstall != null) 'post_install': postInstall,
+        if (preInstall != null)
+          AppTechnicalStrings.keyPreInstall: preInstall,
+        if (postInstall != null)
+          AppTechnicalStrings.keyPostInstall: postInstall,
       };
 }

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'app.dart';
+import 'core/constants/app_strings.dart';
 import 'core/housekeeping/cleaner_service.dart';
 import 'core/platform/background_check_service.dart';
 import 'core/platform/component_manager.dart';
@@ -27,7 +28,7 @@ void main() async {
       // Detección y aprovisionamiento automático de componentes third-party (hpatchz)
       unawaited(ComponentManager.instance.ensureComponentsReady());
     } catch (e) {
-      debugPrint('Aviso: Servicios de escritorio inicializados parcialmente: $e');
+      debugPrint(AppStrings.logDesktopServicesPartialInit(e));
     }
   }
 

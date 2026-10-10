@@ -3,9 +3,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/constants/app_technical_strings.dart';
 import '../models/app_entry.dart';
-
-import '../../self_update/services/self_update_service.dart';
+import 'package:hakkin_launcher/features/self_update/services/self_update_service.dart';
 
 /// Repositorio para la obtención, persistencia en caché y fallback del catálogo de aplicaciones.
 class CatalogRepository {
@@ -42,11 +42,15 @@ class CatalogRepository {
         options: Options(
           responseType: ResponseType.plain,
           headers: const {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
+            AppTechnicalStrings.headerCacheControl:
+                AppTechnicalStrings.valNoCacheFull,
+            AppTechnicalStrings.headerPragma: AppTechnicalStrings.valNoCache,
           },
         ),
-        queryParameters: {'_t': DateTime.now().millisecondsSinceEpoch.toString()},
+        queryParameters: {
+          AppTechnicalStrings.paramCacheBuster:
+              DateTime.now().millisecondsSinceEpoch.toString()
+        },
       );
       if (res.statusCode == 200 && res.data != null && res.data!.isNotEmpty) {
         final decoded = jsonDecode(res.data!) as Map<String, dynamic>;
@@ -70,13 +74,18 @@ class CatalogRepository {
       responseType: ResponseType.plain,
       headers: forceRefresh
           ? const {
-              'Cache-Control': 'no-cache, no-store, must-revalidate',
-              'Pragma': 'no-cache',
+              AppTechnicalStrings.headerCacheControl:
+                  AppTechnicalStrings.valNoCacheFull,
+              AppTechnicalStrings.headerPragma:
+                  AppTechnicalStrings.valNoCache,
             }
           : null,
     );
     final queryParams = forceRefresh
-        ? {'_t': DateTime.now().millisecondsSinceEpoch.toString()}
+        ? {
+            AppTechnicalStrings.paramCacheBuster:
+                DateTime.now().millisecondsSinceEpoch.toString()
+          }
         : null;
 
     // 1. Intentar descargar desde la URL principal
@@ -112,7 +121,8 @@ class CatalogRepository {
 
     CatalogManifest? bundledManifest;
     try {
-      final bundledStr = await rootBundle.loadString('docs/catalog_example.json');
+      final bundledStr =
+          await rootBundle.loadString(AppTechnicalStrings.catalogExampleAssetPath);
       final decoded = jsonDecode(bundledStr) as Map<String, dynamic>;
       bundledManifest = CatalogManifest.fromJson(decoded);
     } catch (_) {}
@@ -141,11 +151,12 @@ class CatalogRepository {
       }
     }
 
-    // Si aún no tenemos manifiesto, usar el bundled o el vacío
-    resultManifest ??= bundledManifest ??
+    // Si aún no tenemos manifiesto, usar el bundled o el vacío garantizando no-nulabilidad
+    CatalogManifest finalManifest = resultManifest ??
+        bundledManifest ??
         const CatalogManifest(
-          version: '1.0.0',
-          catalogTimestamp: '',
+          version: AppTechnicalStrings.defaultVersion,
+          catalogTimestamp: AppTechnicalStrings.empty,
           apps: [],
         );
 
@@ -153,19 +164,19 @@ class CatalogRepository {
     try {
       final remoteLauncherMeta = await fetchLatestLauncherMeta();
       if (remoteLauncherMeta != null) {
-        final currentMeta = resultManifest.launcherMeta;
+        final currentMeta = finalManifest.launcherMeta;
         if (currentMeta == null ||
             SelfUpdateService.isNewerVersion(remoteLauncherMeta.latestVersion, currentMeta.latestVersion)) {
-          resultManifest = resultManifest.copyWith(launcherMeta: remoteLauncherMeta);
+          finalManifest = finalManifest.copyWith(launcherMeta: remoteLauncherMeta);
         }
       }
     } catch (_) {}
 
     // Persistir en caché local la última versión obtenida
     try {
-      await prefs.setString(AppConstants.prefCachedCatalogJson, jsonEncode(resultManifest.toJson()));
+      await prefs.setString(AppConstants.prefCachedCatalogJson, jsonEncode(finalManifest.toJson()));
     } catch (_) {}
 
-    return resultManifest;
+    return finalManifest;
   }
 }

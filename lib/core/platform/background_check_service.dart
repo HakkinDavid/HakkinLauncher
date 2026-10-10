@@ -2,8 +2,10 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import '../../features/catalog/data/repositories/catalog_repository.dart';
 import '../../features/library/data/repositories/library_repository.dart';
-import '../../features/self_update/services/self_update_service.dart';
+import 'package:hakkin_launcher/features/self_update/services/self_update_service.dart';
 import '../constants/app_constants.dart';
+import '../constants/app_strings.dart';
+import '../constants/app_technical_strings.dart';
 import 'notification_service.dart';
 import 'os_paths.dart';
 
@@ -72,8 +74,8 @@ class BackgroundCheckService {
           updatesFound[AppConstants.appName] = latestLauncher;
           if (silent) {
             await NotificationService.showNotification(
-              title: 'Nueva versión de ${AppConstants.appName}',
-              body: 'La versión v$latestLauncher está lista para actualizar.',
+              title: AppStrings.newLauncherVersionTitle(AppConstants.appName),
+              body: AppStrings.newVersionReadyBody(latestLauncher),
             );
           }
         }
@@ -82,21 +84,21 @@ class BackgroundCheckService {
       if (!silent) {
         if (updatesFound.isNotEmpty) {
           final summary = updatesFound.entries
-              .map((e) => '${e.key} v${e.value}')
-              .join(', ');
+              .map((e) => e.key + AppTechnicalStrings.space + AppTechnicalStrings.versionWithV(e.value))
+              .join(AppTechnicalStrings.commaSpace);
           await NotificationService.showNotification(
-            title: 'Actualizaciones encontradas',
-            body: 'Disponibles para: $summary',
+            title: AppStrings.updatesFoundTitle,
+            body: AppStrings.updatesAvailableFor(summary),
           );
         } else {
           await NotificationService.showNotification(
-            title: 'Todo al día',
-            body: 'Todas tus aplicaciones y el lanzador están en la versión más reciente.',
+            title: AppStrings.allUpToDateTitle,
+            body: AppStrings.allUpToDateBody,
           );
         }
       }
     } catch (e) {
-      debugPrint('Error en comprobación de actualizaciones: $e');
+      debugPrint(AppStrings.errorCheckingUpdates(e));
     }
 
     return updatesFound;

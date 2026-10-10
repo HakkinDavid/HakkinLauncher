@@ -1,5 +1,5 @@
 import 'dart:io';
-import '../platform/os_paths.dart';
+import 'package:hakkin_launcher/core/platform/os_paths.dart';
 
 /// Servicio de mantenimiento del sistema.
 class CleanerService {

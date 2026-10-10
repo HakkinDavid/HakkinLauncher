@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/platform/os_paths.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../shared/widgets/app_card.dart';
-import '../../../../shared/widgets/hero_carousel.dart';
-import '../../../library/presentation/controllers/library_controller.dart';
-import '../controllers/catalog_controller.dart';
+import 'package:hakkin_launcher/core/constants/app_strings.dart';
+import 'package:hakkin_launcher/core/constants/app_technical_strings.dart';
+import 'package:hakkin_launcher/core/platform/os_paths.dart';
+import 'package:hakkin_launcher/core/theme/app_colors.dart';
+import 'package:hakkin_launcher/shared/widgets/app_card.dart';
+import 'package:hakkin_launcher/shared/widgets/hero_carousel.dart';
+import 'package:hakkin_launcher/features/library/presentation/controllers/library_controller.dart';
+import 'package:hakkin_launcher/features/catalog/presentation/controllers/catalog_controller.dart';
 
 class StoreScreen extends ConsumerWidget {
   const StoreScreen({super.key});
@@ -38,13 +40,13 @@ class StoreScreen extends ConsumerWidget {
               const Icon(Icons.error_outline, size: 48, color: AppColors.error),
               const SizedBox(height: 12),
               Text(
-                'Error al cargar el catálogo: $err',
+                AppStrings.errorLoadingCatalog(err),
                 style: const TextStyle(color: AppColors.platinum),
               ),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () => ref.refresh(catalogManifestProvider),
-                child: const Text('Reintentar'),
+                child: const Text(AppStrings.retry),
               ),
             ],
           ),
@@ -64,18 +66,18 @@ class StoreScreen extends ConsumerWidget {
                           onChanged: (val) =>
                               ref.read(searchQueryProvider.notifier).state = val,
                           decoration: const InputDecoration(
-                            hintText: 'Buscar videojuegos o herramientas...',
+                            hintText: AppStrings.searchCatalogHint,
                             prefixIcon: Icon(Icons.search, size: 20),
                           ),
                         ),
                       ),
                       const SizedBox(width: 16),
 
-                      _buildCategoryChip(ref, 'all', 'Todos'),
+                      _buildCategoryChip(ref, AppTechnicalStrings.categoryAll, AppStrings.categoryAll),
                       const SizedBox(width: 8),
-                      _buildCategoryChip(ref, 'game', 'Juegos'),
+                      _buildCategoryChip(ref, AppTechnicalStrings.categoryGame, AppStrings.categoryGames),
                       const SizedBox(width: 8),
-                      _buildCategoryChip(ref, 'app', 'Herramientas'),
+                      _buildCategoryChip(ref, AppTechnicalStrings.categoryApp, AppStrings.categoryTools),
                     ],
                   ),
                 ),
@@ -87,7 +89,8 @@ class StoreScreen extends ConsumerWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
                     child: HeroCarousel(
                       featuredApp: featured,
-                      onDetailsPressed: () => context.push('/app/${featured.id}'),
+                      onDetailsPressed: () =>
+                          context.push(AppTechnicalStrings.appDetailPath(featured.id)),
                     ),
                   ),
                 ),
@@ -98,7 +101,7 @@ class StoreScreen extends ConsumerWidget {
                   child: Row(
                     children: [
                       const Text(
-                        'Explorar Catálogo',
+                        AppStrings.exploreCatalog,
                         style: TextStyle(
                           color: AppColors.platinum,
                           fontSize: 20,
@@ -113,7 +116,7 @@ class StoreScreen extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          '${filteredApps.length}',
+                          filteredApps.length.toString(),
                           style: const TextStyle(
                             color: AppColors.platinumMuted,
                             fontSize: 12,
@@ -152,7 +155,8 @@ class StoreScreen extends ConsumerWidget {
                         isInstalled: isInstalled,
                         hasUpdate: hasUpdate,
                         isRunning: isRunning,
-                        onTap: () => context.push('/app/${app.id}'),
+                        onTap: () =>
+                            context.push(AppTechnicalStrings.appDetailPath(app.id)),
                       );
                     },
                     childCount: filteredApps.length,

@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/constants/app_constants.dart';
-import '../../../../core/platform/os_paths.dart';
-import '../../../../core/platform/shortcut_service.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../shared/widgets/hakkin_button.dart';
-import '../../../../shared/widgets/status_badge.dart';
-import '../../../catalog/data/models/app_entry.dart';
-import '../../../catalog/presentation/controllers/catalog_controller.dart';
-import '../../data/models/installed_app.dart';
-import '../controllers/library_controller.dart';
+import 'package:hakkin_launcher/core/constants/app_constants.dart';
+import 'package:hakkin_launcher/core/constants/app_strings.dart';
+import 'package:hakkin_launcher/core/constants/app_technical_strings.dart';
+import 'package:hakkin_launcher/core/platform/os_paths.dart';
+import 'package:hakkin_launcher/core/platform/shortcut_service.dart';
+import 'package:hakkin_launcher/core/theme/app_colors.dart';
+import 'package:hakkin_launcher/shared/widgets/hakkin_button.dart';
+import 'package:hakkin_launcher/shared/widgets/status_badge.dart';
+import 'package:hakkin_launcher/features/catalog/data/models/app_entry.dart';
+import 'package:hakkin_launcher/features/catalog/presentation/controllers/catalog_controller.dart';
+import 'package:hakkin_launcher/features/library/data/models/installed_app.dart';
+import 'package:hakkin_launcher/features/library/presentation/controllers/library_controller.dart';
 
 class LibraryScreen extends ConsumerWidget {
   const LibraryScreen({super.key});
@@ -35,7 +37,7 @@ class LibraryScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Mi Biblioteca',
+              AppStrings.myLibraryTitle,
               style: TextStyle(
                 color: AppColors.platinum,
                 fontSize: 26,
@@ -45,7 +47,7 @@ class LibraryScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 6),
             const Text(
-              'Programas y videojuegos instalados localmente en este equipo.',
+              AppStrings.myLibrarySubtitle,
               style: TextStyle(
                 color: AppColors.platinumMuted,
                 fontSize: 14,
@@ -58,7 +60,7 @@ class LibraryScreen extends ConsumerWidget {
                   child: CircularProgressIndicator(color: AppColors.platinum),
                 ),
                 error: (err, _) => Center(
-                  child: Text('Error cargando biblioteca: $err'),
+                  child: Text(AppStrings.errorLoadingLibrary(err)),
                 ),
                 data: (apps) {
                   if (apps.isEmpty) {
@@ -73,7 +75,7 @@ class LibraryScreen extends ConsumerWidget {
                           ),
                           const SizedBox(height: 16),
                           const Text(
-                            'Tu biblioteca está vacía',
+                            AppStrings.emptyLibraryTitle,
                             style: TextStyle(
                               color: AppColors.platinum,
                               fontSize: 18,
@@ -82,14 +84,14 @@ class LibraryScreen extends ConsumerWidget {
                           ),
                           const SizedBox(height: 8),
                           const Text(
-                            'Explora la tienda e instala tus primeros programas.',
+                            AppStrings.emptyLibrarySubtitle,
                             style: TextStyle(color: AppColors.platinumMuted),
                           ),
                           const SizedBox(height: 20),
                           HakkinButton(
-                            text: 'Ir a la Tienda',
+                            text: AppStrings.goToStore,
                             icon: Icons.storefront,
-                            onPressed: () => context.go('/'),
+                            onPressed: () => context.go(AppTechnicalStrings.routeRoot),
                           ),
                         ],
                       ),
@@ -162,8 +164,16 @@ class LibraryScreen extends ConsumerWidget {
                                   const SizedBox(height: 4),
                                   Text(
                                     isAnomalous
-                                        ? 'Anomalía: v${installedApp.installedVersion} huérfana en catálogo • Requiere actualización completa a v${catalogApp?.latestVersion ?? platformRelease.latestVersion}'
-                                        : 'Versión instalada: v${installedApp.installedVersion}${hasUpdate ? " - Actualización v${catalogApp?.latestVersion} disponible" : ""}',
+                                        ? AppStrings.anomalyInstalledVersionLabel(
+                                            installedApp.installedVersion,
+                                            catalogApp?.latestVersion ?? platformRelease.latestVersion,
+                                          )
+                                        : (hasUpdate
+                                            ? AppStrings.installedVersionWithUpdateLabel(
+                                                installedApp.installedVersion,
+                                                catalogApp?.latestVersion ?? AppTechnicalStrings.empty,
+                                              )
+                                            : AppStrings.installedVersionLabel(installedApp.installedVersion)),
                                     style: TextStyle(
                                       color: hasUpdate
                                           ? AppColors.warning
@@ -175,11 +185,11 @@ class LibraryScreen extends ConsumerWidget {
                                       installedApp.launchArguments!.isNotEmpty) ...[
                                     const SizedBox(height: 2),
                                     Text(
-                                      'Argumentos: ${installedApp.launchArguments}',
+                                      AppStrings.argumentsDisplay(installedApp.launchArguments!),
                                       style: const TextStyle(
                                         color: AppColors.celestialBlue,
                                         fontSize: 11,
-                                        fontFamily: 'monospace',
+                                        fontFamily: AppTechnicalStrings.fontFamilyMonospace,
                                       ),
                                     ),
                                   ],
@@ -189,18 +199,18 @@ class LibraryScreen extends ConsumerWidget {
 
                             if (hasUpdate && catalogApp != null) ...[
                               HakkinButton(
-                                text: isAnomalous ? 'Actualizar Completa' : 'Actualizar',
+                                text: isAnomalous ? AppStrings.updateFull : AppStrings.update,
                                 icon: isAnomalous ? Icons.system_update_alt : Icons.arrow_circle_up,
                                 variant: HakkinButtonVariant.primaryPlatinum,
                                 onPressed: isRunning
                                     ? null
-                                    : () => context.push('/app/${catalogApp.id}'),
+                                    : () => context.push(AppTechnicalStrings.appDetailPath(catalogApp.id)),
                               ),
                               const SizedBox(width: 10),
                             ],
 
                             HakkinButton(
-                              text: isRunning ? 'En Ejecución' : 'Jugar',
+                              text: isRunning ? AppStrings.running : AppStrings.play,
                               icon: isRunning ? Icons.hourglass_top : Icons.play_arrow,
                               variant: HakkinButtonVariant.successPlay,
                               onPressed: isRunning
@@ -215,13 +225,13 @@ class LibraryScreen extends ConsumerWidget {
                               icon: const Icon(Icons.more_vert, color: AppColors.platinumMuted),
                               color: AppColors.surfaceElevated,
                               onSelected: (val) async {
-                                if (val == 'versions') {
+                                if (val == AppTechnicalStrings.menuValueVersions) {
                                   if (catalogApp != null) {
-                                    context.push('/app/${catalogApp.id}');
+                                    context.push(AppTechnicalStrings.appDetailPath(catalogApp.id));
                                   }
-                                } else if (val == 'args') {
+                                } else if (val == AppTechnicalStrings.menuValueArgs) {
                                   _showArgumentsDialog(context, ref, installedApp);
-                                } else if (val == 'shortcut') {
+                                } else if (val == AppTechnicalStrings.menuValueShortcut) {
                                   final ok = await ShortcutService.createDesktopShortcut(
                                     appTitle: installedApp.title,
                                     executablePath: installedApp.executablePath,
@@ -230,12 +240,12 @@ class LibraryScreen extends ConsumerWidget {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(ok
-                                            ? 'Acceso directo en el Escritorio creado'
-                                            : 'No se pudo crear el acceso directo'),
+                                            ? AppStrings.desktopShortcutCreated
+                                            : AppStrings.couldNotCreateShortcut),
                                       ),
                                     );
                                   }
-                                } else if (val == 'startmenu') {
+                                } else if (val == AppTechnicalStrings.menuValueStartMenu) {
                                   final ok = await ShortcutService.createStartMenuEntry(
                                     appTitle: installedApp.title,
                                     executablePath: installedApp.executablePath,
@@ -244,76 +254,76 @@ class LibraryScreen extends ConsumerWidget {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(ok
-                                            ? 'Acceso añadido al Menú de Aplicaciones'
-                                            : 'No se pudo registrar en el Menú'),
+                                            ? AppStrings.startMenuEntryCreated
+                                            : AppStrings.couldNotCreateStartMenuEntry),
                                       ),
                                     );
                                   }
-                                } else if (val == 'verify') {
+                                } else if (val == AppTechnicalStrings.menuValueVerify) {
                                   _runIntegrityVerification(context, ref, installedApp);
-                                } else if (val == 'uninstall') {
+                                } else if (val == AppTechnicalStrings.menuValueUninstall) {
                                   _confirmUninstall(context, ref, installedApp);
                                 }
                               },
                               itemBuilder: (ctx) => [
                                 const PopupMenuItem(
-                                  value: 'versions',
+                                  value: AppTechnicalStrings.menuValueVersions,
                                   child: Row(
                                     children: [
                                       Icon(Icons.history, size: 18, color: AppColors.platinum),
                                       SizedBox(width: 8),
-                                      Text('Gestionar versiones'),
+                                      Text(AppStrings.manageVersions),
                                     ],
                                   ),
                                 ),
                                 const PopupMenuItem(
-                                  value: 'args',
+                                  value: AppTechnicalStrings.menuValueArgs,
                                   child: Row(
                                     children: [
                                       Icon(Icons.tune, size: 18, color: AppColors.platinum),
                                       SizedBox(width: 8),
-                                      Text('Argumentos de lanzamiento'),
+                                      Text(AppStrings.launchArguments),
                                     ],
                                   ),
                                 ),
                                 const PopupMenuItem(
-                                  value: 'shortcut',
+                                  value: AppTechnicalStrings.menuValueShortcut,
                                   child: Row(
                                     children: [
                                       Icon(Icons.desktop_windows, size: 18, color: AppColors.platinum),
                                       SizedBox(width: 8),
-                                      Text('Crear acceso en Escritorio'),
+                                      Text(AppStrings.createDesktopShortcut),
                                     ],
                                   ),
                                 ),
                                 const PopupMenuItem(
-                                  value: 'startmenu',
+                                  value: AppTechnicalStrings.menuValueStartMenu,
                                   child: Row(
                                     children: [
                                       Icon(Icons.apps, size: 18, color: AppColors.platinum),
                                       SizedBox(width: 8),
-                                      Text('Añadir al Menú Inicio'),
+                                      Text(AppStrings.addToStartMenu),
                                     ],
                                   ),
                                 ),
                                 const PopupMenuItem(
-                                  value: 'verify',
+                                  value: AppTechnicalStrings.menuValueVerify,
                                   child: Row(
                                     children: [
                                       Icon(Icons.verified_outlined, size: 18, color: AppColors.platinum),
                                       SizedBox(width: 8),
-                                      Text('Verificar integridad de archivos'),
+                                      Text(AppStrings.verifyFileIntegrity),
                                     ],
                                   ),
                                 ),
                                 const PopupMenuDivider(),
                                 const PopupMenuItem(
-                                  value: 'uninstall',
+                                  value: AppTechnicalStrings.menuValueUninstall,
                                   child: Row(
                                     children: [
                                       Icon(Icons.delete_outline, size: 18, color: AppColors.error),
                                       SizedBox(width: 8),
-                                      Text('Desinstalar', style: TextStyle(color: AppColors.error)),
+                                      Text(AppStrings.uninstall, style: TextStyle(color: AppColors.error)),
                                     ],
                                   ),
                                 ),
@@ -334,25 +344,25 @@ class LibraryScreen extends ConsumerWidget {
   }
 
   void _showArgumentsDialog(BuildContext context, WidgetRef ref, InstalledApp app) {
-    final controller = TextEditingController(text: app.launchArguments ?? '');
+    final controller = TextEditingController(text: app.launchArguments ?? AppTechnicalStrings.empty);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: Text('Argumentos para ${app.title}'),
+        title: Text(AppStrings.argumentsFor(app.title)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Parámetros o flags de línea de comandos al iniciar el juego/app:',
+              AppStrings.launchArgumentsParamDescription,
               style: TextStyle(color: AppColors.platinumMuted, fontSize: 13),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: controller,
               decoration: const InputDecoration(
-                hintText: 'ej. -windowed -novsync -fps 60',
+                hintText: AppStrings.launchArgumentsHint,
               ),
             ),
           ],
@@ -360,7 +370,7 @@ class LibraryScreen extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancelar'),
+            child: const Text(AppStrings.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -369,7 +379,7 @@ class LibraryScreen extends ConsumerWidget {
                   .updateLaunchArguments(app.id, controller.text.trim());
               Navigator.pop(ctx);
             },
-            child: const Text('Guardar'),
+            child: const Text(AppStrings.save),
           ),
         ],
       ),
@@ -388,7 +398,7 @@ class LibraryScreen extends ConsumerWidget {
     final result = await ref.read(installedAppsProvider.notifier).verifyAppIntegrity(app.id);
     if (context.mounted) {
       Navigator.pop(context); // cerrar loader
-      final isValid = result['isValid'] == true;
+      final isValid = result[AppTechnicalStrings.keyIsValid] == true;
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
@@ -400,17 +410,17 @@ class LibraryScreen extends ConsumerWidget {
                 color: isValid ? AppColors.success : AppColors.error,
               ),
               const SizedBox(width: 8),
-              Text(isValid ? 'Integridad verificada' : 'Fallo de integridad'),
+              Text(isValid ? AppStrings.integrityVerifiedTitle : AppStrings.integrityFailureTitle),
             ],
           ),
           content: Text(
-            result['message'].toString(),
+            result[AppTechnicalStrings.keyMessage].toString(),
             style: const TextStyle(color: AppColors.platinumMuted),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('Entendido'),
+              child: const Text(AppStrings.understood),
             ),
           ],
         ),
@@ -423,19 +433,19 @@ class LibraryScreen extends ConsumerWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: const Text('¿Desinstalar aplicación?'),
+        title: const Text(AppStrings.confirmUninstallTitle),
         content: Text(
-          'Se eliminarán los archivos de ${app.title}. Tus datos de partidas guardadas permanecerán protegidos.',
+          AppStrings.confirmUninstallContent(app.title),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancelar'),
+            child: const Text(AppStrings.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             child: const Text(
-              'Desinstalar',
+              AppStrings.uninstall,
               style: TextStyle(color: AppColors.error),
             ),
           ),
@@ -449,20 +459,20 @@ class LibraryScreen extends ConsumerWidget {
   }
 
   Widget _buildAppTileIcon(InstalledApp installedApp, AppEntry? catalogApp) {
-    if (installedApp.id == 'dev.bonsanbec.hakkinlauncher' ||
-        installedApp.id == 'hakkin_launcher' ||
-        installedApp.id == 'HakkinLauncher') {
+    if (installedApp.id == AppTechnicalStrings.launcherId1 ||
+        installedApp.id == AppTechnicalStrings.launcherId2 ||
+        installedApp.id == AppTechnicalStrings.launcherId3) {
       return Image.asset(AppConstants.appIconPath, fit: BoxFit.cover);
     }
     if (catalogApp?.assets.icon != null && catalogApp!.assets.icon!.isNotEmpty) {
       final iconUrl = catalogApp.assets.icon!;
-      if (iconUrl.startsWith('http')) {
+      if (iconUrl.startsWith(AppTechnicalStrings.schemeHttp)) {
         return Image.network(
           iconUrl,
           fit: BoxFit.cover,
           errorBuilder: (_, __, ___) => _buildDefaultCategoryIcon(catalogApp),
         );
-      } else if (iconUrl.startsWith('assets/')) {
+      } else if (iconUrl.startsWith(AppTechnicalStrings.schemeAssets)) {
         return Image.asset(iconUrl, fit: BoxFit.cover);
       }
     }
@@ -472,7 +482,7 @@ class LibraryScreen extends ConsumerWidget {
   Widget _buildDefaultCategoryIcon(AppEntry? catalogApp) {
     return Center(
       child: Icon(
-        catalogApp?.category == 'game' ? Icons.sports_esports : Icons.apps,
+        catalogApp?.category == AppTechnicalStrings.categoryGame ? Icons.sports_esports : Icons.apps,
         color: AppColors.celestialBlue,
         size: 28,
       ),

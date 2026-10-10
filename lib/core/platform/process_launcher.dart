@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
+import '../constants/app_strings.dart';
+import '../constants/app_technical_strings.dart';
 
 /// Servicio para la ejecución y monitorización de procesos.
 class ProcessLauncher {
@@ -46,16 +48,16 @@ class ProcessLauncher {
 
     // Lógica especializada para macOS y bundles .app
     String? appBundlePath;
-    final appIdx = targetPath.indexOf('.app');
+    final appIdx = targetPath.indexOf(AppTechnicalStrings.extApp);
     if (appIdx != -1) {
-      appBundlePath = targetPath.substring(0, appIdx + 4);
+      appBundlePath = targetPath.substring(0, appIdx + AppTechnicalStrings.extApp.length);
     } else if (installDir != null) {
       final dir = Directory(installDir);
       if (dir.existsSync()) {
         try {
           final entries = dir.listSync(recursive: false);
           for (final entry in entries) {
-            if (entry is Directory && entry.path.endsWith('.app')) {
+            if (entry is Directory && entry.path.endsWith(AppTechnicalStrings.extApp)) {
               appBundlePath = entry.path;
               break;
             }
@@ -66,15 +68,24 @@ class ProcessLauncher {
 
     if (appBundlePath != null && Directory(appBundlePath).existsSync()) {
       // 1. Intentar leer CFBundleExecutable de Info.plist
-      final plistFile = File(p.join(appBundlePath, 'Contents', 'Info.plist'));
+      final plistFile = File(p.join(
+        appBundlePath,
+        AppTechnicalStrings.dirContents,
+        AppTechnicalStrings.fileInfoPlist,
+      ));
       if (plistFile.existsSync()) {
         try {
           final content = plistFile.readAsStringSync();
-          final match = RegExp(r'<key>CFBundleExecutable<\/key>\s*<string>([^<]+)<\/string>')
+          final match = RegExp(AppTechnicalStrings.regexCFBundleExecutable)
               .firstMatch(content);
           if (match != null) {
             final exeName = match.group(1)!.trim();
-            final candidate = p.join(appBundlePath, 'Contents', 'MacOS', exeName);
+            final candidate = p.join(
+              appBundlePath,
+              AppTechnicalStrings.dirContents,
+              AppTechnicalStrings.dirMacOs,
+              exeName,
+            );
             if (File(candidate).existsSync()) {
               return candidate;
             }
@@ -83,7 +94,11 @@ class ProcessLauncher {
       }
 
       // 2. Fallback: buscar el ejecutable dentro de Contents/MacOS
-      final macOsDir = Directory(p.join(appBundlePath, 'Contents', 'MacOS'));
+      final macOsDir = Directory(p.join(
+        appBundlePath,
+        AppTechnicalStrings.dirContents,
+        AppTechnicalStrings.dirMacOs,
+      ));
       if (macOsDir.existsSync()) {
         try {
           final macFiles = macOsDir.listSync().whereType<File>().toList();
@@ -109,7 +124,7 @@ class ProcessLauncher {
       final currentPid = _runningPids[appId]!;
       final isAlive = await isPidAlive(currentPid);
       if (isAlive) {
-        debugPrint('La aplicación $appId ya está en ejecución (PID: $currentPid)');
+        debugPrint(AppStrings.logAppAlreadyRunning(appId, currentPid));
         return false;
       } else {
         _runningPids.remove(appId);
@@ -125,7 +140,7 @@ class ProcessLauncher {
         if (autoResolved != null) {
           resolvedExe = autoResolved;
         } else {
-          debugPrint('No se encontró el ejecutable en: $resolvedExe');
+          debugPrint(AppStrings.logExecutableNotFound(resolvedExe));
           return false;
         }
       }
@@ -133,18 +148,34 @@ class ProcessLauncher {
       final targetFile = File(resolvedExe);
 
       if (Platform.isMacOS || Platform.isLinux) {
-        await Process.run('chmod', ['+x', resolvedExe]);
+        await Process.run(
+          AppTechnicalStrings.cmdChmod,
+          [AppTechnicalStrings.argPlusX, resolvedExe],
+        );
       }
 
       if (Platform.isMacOS) {
         // Eliminar atributo de cuarentena de Gatekeeper para el binario y su bundle .app
-        await Process.run('xattr', ['-cr', resolvedExe]);
-        final appIdx = resolvedExe.indexOf('.app');
+        await Process.run(
+          AppTechnicalStrings.cmdXattr,
+          [AppTechnicalStrings.argMinusCr, resolvedExe],
+        );
+        final appIdx = resolvedExe.indexOf(AppTechnicalStrings.extApp);
         if (appIdx != -1) {
-          final bundlePath = resolvedExe.substring(0, appIdx + 4);
-          await Process.run('xattr', ['-cr', bundlePath]);
-          final macosDir = p.join(bundlePath, 'Contents', 'MacOS');
-          await Process.run('chmod', ['-R', '+x', macosDir]);
+          final bundlePath = resolvedExe.substring(0, appIdx + AppTechnicalStrings.extApp.length);
+          await Process.run(
+            AppTechnicalStrings.cmdXattr,
+            [AppTechnicalStrings.argMinusCr, bundlePath],
+          );
+          final macosDir = p.join(
+            bundlePath,
+            AppTechnicalStrings.dirContents,
+            AppTechnicalStrings.dirMacOs,
+          );
+          await Process.run(
+            AppTechnicalStrings.cmdChmod,
+            [AppTechnicalStrings.argMinusR, AppTechnicalStrings.argPlusX, macosDir],
+          );
         }
       }
 
@@ -152,9 +183,7 @@ class ProcessLauncher {
           ? workingDirectory
           : targetFile.parent.path;
 
-      // Lanzamiento desacoplado (spawn detached process): el juego o programa se ejecuta
-      // como un proceso independiente del sistema operativo, sin heredar descriptores
-      // de pipe (stdin/stdout/stderr) del launcher ni bloquearse si el launcher se cierra.
+      // Lanzamiento desacoplado (spawn detached process)
       final process = await Process.start(
         resolvedExe,
         arguments,
@@ -166,10 +195,10 @@ class ProcessLauncher {
       _startMonitoring();
       _notifyStateChange();
 
-      debugPrint('App $appId lanzada desacoplada exitosamente (PID: ${process.pid})');
+      debugPrint(AppStrings.logAppLaunched(appId, process.pid));
       return true;
     } catch (e) {
-      debugPrint('Error lanzando proceso desacoplado para $appId: $e');
+      debugPrint(AppStrings.logAppLaunchError(appId, e));
       _runningPids.remove(appId);
       _notifyStateChange();
       return false;
@@ -180,14 +209,24 @@ class ProcessLauncher {
   static Future<bool> isPidAlive(int pid) async {
     try {
       if (Platform.isWindows) {
-        final result = await Process.run('tasklist', ['/nh', '/fi', 'PID eq $pid']);
+        final result = await Process.run(
+          AppTechnicalStrings.cmdTasklist,
+          [
+            AppTechnicalStrings.argSlashNh,
+            AppTechnicalStrings.argSlashFi,
+            AppTechnicalStrings.pidFilter(pid),
+          ],
+        );
         if (result.exitCode == 0) {
           final out = result.stdout.toString().trim();
           return out.contains(pid.toString());
         }
         return false;
       } else {
-        final result = await Process.run('kill', ['-0', pid.toString()]);
+        final result = await Process.run(
+          AppTechnicalStrings.cmdKill,
+          [AppTechnicalStrings.argMinusZero, pid.toString()],
+        );
         return result.exitCode == 0;
       }
     } catch (_) {
@@ -218,7 +257,7 @@ class ProcessLauncher {
 
     if (toRemove.isNotEmpty) {
       for (final appId in toRemove) {
-        debugPrint('App $appId (PID ${_runningPids[appId]}) finalizó.');
+        debugPrint(AppStrings.logAppTerminated(appId, _runningPids[appId]!));
         _runningPids.remove(appId);
       }
       _notifyStateChange();
@@ -236,9 +275,19 @@ class ProcessLauncher {
     if (pid == null) return false;
     try {
       if (Platform.isWindows) {
-        await Process.run('taskkill', ['/F', '/PID', pid.toString()]);
+        await Process.run(
+          AppTechnicalStrings.cmdTaskkill,
+          [
+            AppTechnicalStrings.argSlashF,
+            AppTechnicalStrings.argSlashPid,
+            pid.toString(),
+          ],
+        );
       } else {
-        await Process.run('kill', ['-9', pid.toString()]);
+        await Process.run(
+          AppTechnicalStrings.cmdKill,
+          [AppTechnicalStrings.argMinusNine, pid.toString()],
+        );
       }
       _runningPids.remove(appId);
       _notifyStateChange();
@@ -259,22 +308,39 @@ class ProcessLauncher {
 
       ProcessResult result;
       if (Platform.isWindows) {
-        if (scriptPath.endsWith('.ps1')) {
-          result = await Process.run('powershell', ['-ExecutionPolicy', 'Bypass', '-File', scriptPath],
-              workingDirectory: workingDirectory);
+        if (scriptPath.endsWith(AppTechnicalStrings.extPs1)) {
+          result = await Process.run(
+            AppTechnicalStrings.cmdPowershell,
+            [
+              AppTechnicalStrings.argExecutionPolicy,
+              AppTechnicalStrings.argBypass,
+              AppTechnicalStrings.argMinusFile,
+              scriptPath,
+            ],
+            workingDirectory: workingDirectory,
+          );
         } else {
-          result = await Process.run('cmd', ['/c', scriptPath],
-              workingDirectory: workingDirectory);
+          result = await Process.run(
+            AppTechnicalStrings.cmdCmd,
+            [AppTechnicalStrings.argSlashC, scriptPath],
+            workingDirectory: workingDirectory,
+          );
         }
       } else {
-        await Process.run('chmod', ['+x', scriptPath]);
-        result = await Process.run('/bin/bash', [scriptPath],
-            workingDirectory: workingDirectory);
+        await Process.run(
+          AppTechnicalStrings.cmdChmod,
+          [AppTechnicalStrings.argPlusX, scriptPath],
+        );
+        result = await Process.run(
+          AppTechnicalStrings.binBash,
+          [scriptPath],
+          workingDirectory: workingDirectory,
+        );
       }
 
       return result.exitCode == 0;
     } catch (e) {
-      debugPrint('Error ejecutando script $scriptPath: $e');
+      debugPrint(AppStrings.logScriptError(scriptPath, e));
       return false;
     }
   }

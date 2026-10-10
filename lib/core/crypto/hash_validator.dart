@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:crypto/crypto.dart';
+import '../constants/app_strings.dart';
 
 /// Validador de integridad criptográfica mediante SHA-256.
 class HashValidator {
@@ -8,7 +9,7 @@ class HashValidator {
   /// Calcula el hash SHA-256 de un archivo en disco de forma asíncrona mediante streaming.
   static Future<String> calculateSha256(File file) async {
     if (!await file.exists()) {
-      throw FileSystemException('El archivo no existe', file.path);
+      throw FileSystemException(AppStrings.fileDoesNotExist, file.path);
     }
 
     final output = await sha256.bind(file.openRead()).first;

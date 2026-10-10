@@ -2,15 +2,17 @@ import 'dart:io';
 import 'package:archive/archive_io.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
-import '../../../../core/crypto/hash_validator.dart';
-import '../../../../core/housekeeping/cleaner_service.dart';
-import '../../../../core/platform/component_manager.dart';
-import '../../../../core/platform/notification_service.dart';
-import '../../../../core/platform/os_paths.dart';
-import '../../../../core/platform/process_launcher.dart';
-import '../../catalog/data/models/app_entry.dart';
-import '../../library/data/models/installed_app.dart';
-import '../../library/data/repositories/library_repository.dart';
+import 'package:hakkin_launcher/core/crypto/hash_validator.dart';
+import 'package:hakkin_launcher/core/housekeeping/cleaner_service.dart';
+import 'package:hakkin_launcher/core/platform/component_manager.dart';
+import 'package:hakkin_launcher/core/platform/notification_service.dart';
+import 'package:hakkin_launcher/core/platform/os_paths.dart';
+import 'package:hakkin_launcher/core/platform/process_launcher.dart';
+import 'package:hakkin_launcher/features/catalog/data/models/app_entry.dart';
+import 'package:hakkin_launcher/features/library/data/models/installed_app.dart';
+import 'package:hakkin_launcher/features/library/data/repositories/library_repository.dart';
+import 'package:hakkin_launcher/core/constants/app_strings.dart';
+import 'package:hakkin_launcher/core/constants/app_technical_strings.dart';
 import 'downloader_service.dart';
 
 enum UpdateStage {
@@ -55,8 +57,8 @@ class PatchEngine {
 
   /// Compara dos versiones semánticas para determinar si v1 es estrictamente menor que v2
   bool _isOlderVersion(String v1, String v2) {
-    final p1 = RegExp(r'\d+').allMatches(v1).map((m) => int.parse(m.group(0)!)).toList();
-    final p2 = RegExp(r'\d+').allMatches(v2).map((m) => int.parse(m.group(0)!)).toList();
+    final p1 = RegExp(AppTechnicalStrings.regexDigits).allMatches(v1).map((m) => int.parse(m.group(0)!)).toList();
+    final p2 = RegExp(AppTechnicalStrings.regexDigits).allMatches(v2).map((m) => int.parse(m.group(0)!)).toList();
     final maxLen = p1.length > p2.length ? p1.length : p2.length;
     for (var i = 0; i < maxLen; i++) {
       final n1 = i < p1.length ? p1[i] : 0;
@@ -77,7 +79,7 @@ class PatchEngine {
   }) async* {
     yield const UpdateStatus(
       stage: UpdateStage.checking,
-      message: 'Comprobando estado y versión de la aplicación...',
+      message: AppStrings.checkingAppStateAndVersion,
       progress: 0.05,
     );
 
@@ -85,8 +87,8 @@ class PatchEngine {
     if (platformRelease == null || platformRelease.versions.isEmpty) {
       yield const UpdateStatus(
         stage: UpdateStage.failed,
-        message: 'Esta aplicación no tiene versión para tu plataforma actual.',
-        error: 'Plataforma no soportada',
+        message: AppStrings.appHasNoVersionForPlatform,
+        error: AppTechnicalStrings.errorUnsupportedPlatform,
       );
       return;
     }
@@ -114,13 +116,16 @@ class PatchEngine {
       if (isAnomalousInstalled) {
         yield UpdateStatus(
           stage: UpdateStage.preservingUserData,
-          message: 'Anomalía detectada: versión v${installed.installedVersion} huérfana o inexistente en catálogo. Procediendo con actualización completa a v$targetVersionStr y protegiendo datos...',
+          message: AppStrings.anomalyDetectedCleanInstallMessage(
+            installed.installedVersion,
+            targetVersionStr,
+          ),
           progress: 0.1,
         );
       } else {
         yield UpdateStatus(
           stage: UpdateStage.preservingUserData,
-          message: 'Iniciando instalación limpia de v$targetVersionStr y protegiendo datos...',
+          message: AppStrings.startingCleanInstallMessage(targetVersionStr),
           progress: 0.1,
         );
       }
@@ -128,7 +133,9 @@ class PatchEngine {
       final userBackups = <String, List<int>>{};
       if (await targetInstallDir.exists() && platformRelease.protectedUserPaths.isNotEmpty) {
         for (final userRelPath in platformRelease.protectedUserPaths) {
-          final cleanedRel = userRelPath.replaceAll('**', '').replaceAll('*', '');
+          final cleanedRel = userRelPath
+              .replaceAll(AppTechnicalStrings.globDoubleStar, AppTechnicalStrings.empty)
+              .replaceAll(AppTechnicalStrings.globStar, AppTechnicalStrings.empty);
           final protectedFile = File(p.join(targetInstallDir.path, cleanedRel));
           if (await protectedFile.exists()) {
             userBackups[cleanedRel] = await protectedFile.readAsBytes();
@@ -140,28 +147,40 @@ class PatchEngine {
       final pkg = targetRelease.package;
       yield UpdateStatus(
         stage: UpdateStage.downloading,
-        message: 'Iniciando descarga de v$targetVersionStr (${(pkg.sizeBytes / 1048576).toStringAsFixed(1)} MB)...',
+        message: AppStrings.startingDownloadMessage(
+          targetVersionStr,
+          (pkg.sizeBytes / 1048576).toStringAsFixed(1),
+        ),
         progress: 0.05,
       );
 
-      final cleanZipPath = p.join(downloadsDir.path, '${app.slug}_v${targetVersionStr}_clean.zip');
+      final cleanZipPath = p.join(
+        downloadsDir.path,
+        AppTechnicalStrings.cleanZipFileName(app.slug, targetVersionStr),
+      );
       try {
         await for (final dl in _downloader.downloadFileStream(
           url: pkg.url,
           destinationPath: cleanZipPath,
         )) {
           final mappedProgress = 0.05 + (dl.progress * 0.65);
-          final speedStr = dl.speedFormatted.isNotEmpty ? ' • ${dl.speedFormatted}' : '';
+          final speedStr = dl.speedFormatted.isNotEmpty
+              ? AppStrings.bulletPrefix(dl.speedFormatted)
+              : AppTechnicalStrings.empty;
           yield UpdateStatus(
             stage: UpdateStage.downloading,
-            message: 'Descargando v$targetVersionStr: ${dl.statusText}$speedStr',
+            message: AppStrings.downloadingVersionMessage(
+              targetVersionStr,
+              dl.statusText,
+              speedStr,
+            ),
             progress: mappedProgress,
           );
         }
 
         yield const UpdateStatus(
           stage: UpdateStage.verifyingChecksum,
-          message: 'Verificando integridad criptográfica del paquete...',
+          message: AppStrings.verifyingPackageChecksum,
           progress: 0.72,
         );
 
@@ -172,8 +191,8 @@ class PatchEngine {
         if (!isPkgValid) {
           yield const UpdateStatus(
             stage: UpdateStage.failed,
-            message: 'Error de integridad: el hash SHA-256 no coincide.',
-            error: 'Hash mismatch',
+            message: AppStrings.checksumMismatchError,
+            error: AppTechnicalStrings.errorHashMismatch,
           );
           return;
         }
@@ -181,7 +200,7 @@ class PatchEngine {
         // Limpiar directorio objetivo garantizando instalación desde cero
         yield const UpdateStatus(
           stage: UpdateStage.extractingFullPackage,
-          message: 'Limpiando directorio y extrayendo paquete...',
+          message: AppStrings.cleaningDirAndExtracting,
           progress: 0.80,
         );
 
@@ -230,26 +249,26 @@ class PatchEngine {
         if (isAnomalousInstalled) {
           await NotificationService.notifyUpdateCompleted(
             app.title,
-            '$targetVersionStr (actualización completa)',
+            AppStrings.fullUpdateNotificationVersion(targetVersionStr),
           );
         } else {
           await NotificationService.notifyInstallCompleted(
-            '${app.title} - Instalación limpia v$targetVersionStr',
+            AppStrings.cleanInstallNotificationTitle(app.title, targetVersionStr),
           );
         }
 
         yield UpdateStatus(
           stage: UpdateStage.completed,
           message: isAnomalousInstalled
-              ? 'Actualización completa a v$targetVersionStr completada con éxito (anomalía corregida).'
-              : 'Instalación limpia de v$targetVersionStr completada con éxito.',
+              ? AppStrings.fullUpdateCompletedMessage(targetVersionStr)
+              : AppStrings.cleanInstallCompletedMessage(targetVersionStr),
           progress: 1.0,
         );
         return;
       } catch (e) {
         yield UpdateStatus(
           stage: UpdateStage.failed,
-          message: 'Error en instalación limpia: $e',
+          message: AppStrings.cleanInstallErrorMessage(e),
           error: e.toString(),
         );
         return;
@@ -276,11 +295,16 @@ class PatchEngine {
     if (shouldAttemptDelta && matchedDelta != null) {
       yield UpdateStatus(
         stage: UpdateStage.downloading,
-        message: 'Iniciando descarga de parche diferencial (${(matchedDelta.sizeBytes / 1048576).toStringAsFixed(1)} MB)...',
+        message: AppStrings.startingDeltaDownloadMessage(
+          (matchedDelta.sizeBytes / 1048576).toStringAsFixed(1),
+        ),
         progress: 0.05,
       );
 
-      final patchFilePath = p.join(downloadsDir.path, '${app.slug}_update.hdiff');
+      final patchFilePath = p.join(
+        downloadsDir.path,
+        AppTechnicalStrings.updatePatchFileName(app.slug),
+      );
       bool deltaSuccess = false;
 
       try {
@@ -289,17 +313,22 @@ class PatchEngine {
           destinationPath: patchFilePath,
         )) {
           final mappedProgress = 0.05 + (dl.progress * 0.45);
-          final speedStr = dl.speedFormatted.isNotEmpty ? ' • ${dl.speedFormatted}' : '';
+          final speedStr = dl.speedFormatted.isNotEmpty
+              ? AppStrings.bulletPrefix(dl.speedFormatted)
+              : AppTechnicalStrings.empty;
           yield UpdateStatus(
             stage: UpdateStage.downloading,
-            message: 'Descargando parche: ${dl.statusText}$speedStr',
+            message: AppStrings.downloadingPatchMessage(
+              dl.statusText,
+              speedStr,
+            ),
             progress: mappedProgress,
           );
         }
 
         yield const UpdateStatus(
           stage: UpdateStage.verifyingChecksum,
-          message: 'Verificando firma de seguridad del parche...',
+          message: AppStrings.verifyingPatchSecurity,
           progress: 0.55,
         );
 
@@ -311,7 +340,7 @@ class PatchEngine {
           if (targetRelease.scripts.preInstall != null && await targetInstallDir.exists()) {
             yield const UpdateStatus(
               stage: UpdateStage.runningPreScripts,
-              message: 'Ejecutando script previo a la actualización...',
+              message: AppStrings.runningPreScripts,
               progress: 0.65,
             );
             final preScriptPath = p.join(targetInstallDir.path, targetRelease.scripts.preInstall);
@@ -323,7 +352,7 @@ class PatchEngine {
 
           yield const UpdateStatus(
             stage: UpdateStage.applyingDelta,
-            message: 'Aplicando parche diferencial...',
+            message: AppStrings.applyingDeltaPatch,
             progress: 0.75,
           );
 
@@ -338,7 +367,7 @@ class PatchEngine {
             if (await exeFile.exists()) {
               final hashMatch = await HashValidator.verifySha256(exeFile, matchedDelta.targetSha256);
               if (!hashMatch) {
-                debugPrint('Aviso: Hash tras parche no coincide. Descartando delta.');
+                debugPrint(AppStrings.logPatchHashMismatch());
                 deltaSuccess = false;
               }
             } else {
@@ -347,7 +376,7 @@ class PatchEngine {
           }
         }
       } catch (e) {
-        debugPrint('Fallo al aplicar parche delta: $e. Activando fallback a paquete completo.');
+        debugPrint(AppStrings.logDeltaPatchError(e));
         deltaSuccess = false;
       }
 
@@ -372,23 +401,29 @@ class PatchEngine {
 
         yield const UpdateStatus(
           stage: UpdateStage.completed,
-          message: 'Actualización diferencial completada con éxito.',
+          message: AppStrings.deltaUpdateCompletedSuccess,
           progress: 1.0,
         );
         return;
       }
 
-      debugPrint('Activando descarga limpia de paquete completo como alternativa.');
+      debugPrint(AppStrings.logActivatingFullPackageFallback());
     }
 
     final pkg = targetRelease.package;
     yield UpdateStatus(
       stage: UpdateStage.downloading,
-      message: 'Iniciando descarga de v$targetVersionStr (${(pkg.sizeBytes / 1048576).toStringAsFixed(1)} MB)...',
+      message: AppStrings.startingDownloadMessage(
+        targetVersionStr,
+        (pkg.sizeBytes / 1048576).toStringAsFixed(1),
+      ),
       progress: 0.05,
     );
 
-    final fullPackageZipPath = p.join(downloadsDir.path, '${app.slug}_v${targetVersionStr}_full.zip');
+    final fullPackageZipPath = p.join(
+      downloadsDir.path,
+      AppTechnicalStrings.fullZipFileName(app.slug, targetVersionStr),
+    );
 
     try {
       await for (final dl in _downloader.downloadFileStream(
@@ -396,17 +431,23 @@ class PatchEngine {
         destinationPath: fullPackageZipPath,
       )) {
         final mappedProgress = 0.05 + (dl.progress * 0.65);
-        final speedStr = dl.speedFormatted.isNotEmpty ? ' • ${dl.speedFormatted}' : '';
+        final speedStr = dl.speedFormatted.isNotEmpty
+            ? AppStrings.bulletPrefix(dl.speedFormatted)
+            : AppTechnicalStrings.empty;
         yield UpdateStatus(
           stage: UpdateStage.downloading,
-          message: 'Descargando v$targetVersionStr: ${dl.statusText}$speedStr',
+          message: AppStrings.downloadingVersionMessage(
+            targetVersionStr,
+            dl.statusText,
+            speedStr,
+          ),
           progress: mappedProgress,
         );
       }
 
       yield const UpdateStatus(
         stage: UpdateStage.verifyingChecksum,
-        message: 'Verificando integridad criptográfica del paquete...',
+        message: AppStrings.verifyingPackageChecksum,
         progress: 0.72,
       );
 
@@ -417,8 +458,8 @@ class PatchEngine {
       if (!isFullValid) {
         yield const UpdateStatus(
           stage: UpdateStage.failed,
-          message: 'Error de integridad: el hash SHA-256 no coincide.',
-          error: 'Hash mismatch',
+          message: AppStrings.checksumMismatchError,
+          error: AppTechnicalStrings.errorHashMismatch,
         );
         return;
       }
@@ -428,12 +469,14 @@ class PatchEngine {
       if (await targetInstallDir.exists() && platformRelease.protectedUserPaths.isNotEmpty) {
         yield const UpdateStatus(
           stage: UpdateStage.preservingUserData,
-          message: 'Protegiendo partidas y configuraciones de usuario...',
+          message: AppStrings.protectingUserData,
           progress: 0.75,
         );
 
         for (final userRelPath in platformRelease.protectedUserPaths) {
-          final cleanedRel = userRelPath.replaceAll('**', '').replaceAll('*', '');
+          final cleanedRel = userRelPath
+              .replaceAll(AppTechnicalStrings.globDoubleStar, AppTechnicalStrings.empty)
+              .replaceAll(AppTechnicalStrings.globStar, AppTechnicalStrings.empty);
           final protectedFile = File(p.join(targetInstallDir.path, cleanedRel));
           if (await protectedFile.exists()) {
             userBackups[cleanedRel] = await protectedFile.readAsBytes();
@@ -444,7 +487,7 @@ class PatchEngine {
       if (targetRelease.scripts.preInstall != null && await targetInstallDir.exists()) {
         yield const UpdateStatus(
           stage: UpdateStage.runningPreScripts,
-          message: 'Ejecutando script pre-instalación...',
+          message: AppStrings.runningPreInstallScript,
           progress: 0.78,
         );
         final preScriptPath = p.join(targetInstallDir.path, targetRelease.scripts.preInstall);
@@ -456,7 +499,7 @@ class PatchEngine {
 
       yield const UpdateStatus(
         stage: UpdateStage.extractingFullPackage,
-        message: 'Extrayendo archivos de la aplicación...',
+        message: AppStrings.extractingAppFiles,
         progress: 0.82,
       );
 
@@ -483,7 +526,7 @@ class PatchEngine {
       if (targetRelease.scripts.postInstall != null) {
         yield const UpdateStatus(
           stage: UpdateStage.runningPostScripts,
-          message: 'Ejecutando script post-instalación...',
+          message: AppStrings.runningPostInstallScript,
           progress: 0.9,
         );
         final scriptPath = p.join(targetInstallDir.path, targetRelease.scripts.postInstall);
@@ -510,13 +553,13 @@ class PatchEngine {
 
       yield const UpdateStatus(
         stage: UpdateStage.completed,
-        message: 'Instalación completada correctamente.',
+        message: AppStrings.installationCompletedSuccess,
         progress: 1.0,
       );
     } catch (e) {
       yield UpdateStatus(
         stage: UpdateStage.failed,
-        message: 'Ocurrió un error durante la instalación: $e',
+        message: AppStrings.installationErrorMessage(e),
         error: e.toString(),
       );
     }
@@ -536,7 +579,7 @@ class PatchEngine {
       // Obtener la ruta resuelta o descargar hpatchz si no está presente
       final hpatchzCmd = await ComponentManager.instance.getHpatchzPath();
       if (hpatchzCmd == null) {
-        debugPrint('Aviso: hpatchz no está disponible ni se pudo descargar automáticamente.');
+        debugPrint(AppStrings.logHpatchzNotAvailable());
         return false;
       }
 
@@ -548,22 +591,22 @@ class PatchEngine {
       if (isDirectoryBundle) {
         final dirResult = await Process.run(
           hpatchzCmd,
-          ['-f', targetDirectory.path, patchFile.path, targetDirectory.path],
+          [AppTechnicalStrings.argMinusF, targetDirectory.path, patchFile.path, targetDirectory.path],
         );
         if (dirResult.exitCode == 0) {
           return true;
         }
-        debugPrint('Aviso: parche a nivel de directorio retornó ${dirResult.exitCode}, reintentando sobre ejecutable...');
+        debugPrint(AppStrings.logHpatchzDirExitCode(dirResult.exitCode));
       }
 
       // Fallback o modo binario único: parche directo sobre el ejecutable
       final result = await Process.run(
         hpatchzCmd,
-        ['-f', exeFile.path, patchFile.path, exeFile.path],
+        [AppTechnicalStrings.argMinusF, exeFile.path, patchFile.path, exeFile.path],
       );
       return result.exitCode == 0;
     } catch (e) {
-      debugPrint('Error ejecutando hpatchz: $e');
+      debugPrint(AppStrings.logHpatchzExecError(e));
       return false;
     }
   }
@@ -578,7 +621,10 @@ class PatchEngine {
     // y no carga archivos masivos en memoria heap de Dart.
     if (Platform.isMacOS) {
       try {
-        final dittoResult = await Process.run('ditto', ['-xk', downloadedFile.path, targetDirectory.path]);
+        final dittoResult = await Process.run(
+          AppTechnicalStrings.cmdDitto,
+          [AppTechnicalStrings.argMinusXk, downloadedFile.path, targetDirectory.path],
+        );
         if (dittoResult.exitCode == 0) {
           return;
         }
@@ -588,7 +634,16 @@ class PatchEngine {
     // 2. En Linux, intentar unzip nativo
     if (Platform.isLinux) {
       try {
-        final unzipResult = await Process.run('unzip', ['-q', '-o', downloadedFile.path, '-d', targetDirectory.path]);
+        final unzipResult = await Process.run(
+          AppTechnicalStrings.cmdUnzip,
+          [
+            AppTechnicalStrings.argMinusQ,
+            AppTechnicalStrings.argMinusO,
+            downloadedFile.path,
+            AppTechnicalStrings.argMinusD,
+            targetDirectory.path,
+          ],
+        );
         if (unzipResult.exitCode == 0) {
           return;
         }
@@ -636,7 +691,10 @@ class PatchEngine {
     if (Platform.isMacOS) {
       // 1. Eliminar cuarentena de Gatekeeper en todo el directorio instalado y bundles .app
       try {
-        await Process.run('xattr', ['-cr', targetInstallDir.path]);
+        await Process.run(
+          AppTechnicalStrings.cmdXattr,
+          [AppTechnicalStrings.argMinusCr, targetInstallDir.path],
+        );
       } catch (_) {}
 
       // 2. Si la ruta configurada en catálogo no existe, auto-resolver el binario real dentro de .app
@@ -647,18 +705,34 @@ class PatchEngine {
 
       // 3. Otorgar permisos +x al ejecutable y a cualquier binario dentro de Contents/MacOS
       try {
-        await Process.run('chmod', ['+x', exePath]);
-        final appIdx = exePath.indexOf('.app');
+        await Process.run(
+          AppTechnicalStrings.cmdChmod,
+          [AppTechnicalStrings.argPlusX, exePath],
+        );
+        final appIdx = exePath.indexOf(AppTechnicalStrings.extApp);
         if (appIdx != -1) {
           final bundlePath = exePath.substring(0, appIdx + 4);
-          await Process.run('xattr', ['-cr', bundlePath]);
-          final macosDir = p.join(bundlePath, 'Contents', 'MacOS');
-          await Process.run('chmod', ['-R', '+x', macosDir]);
+          await Process.run(
+            AppTechnicalStrings.cmdXattr,
+            [AppTechnicalStrings.argMinusCr, bundlePath],
+          );
+          final macosDir = p.join(
+            bundlePath,
+            AppTechnicalStrings.dirContents,
+            AppTechnicalStrings.dirMacOs,
+          );
+          await Process.run(
+            AppTechnicalStrings.cmdChmod,
+            [AppTechnicalStrings.argMinusR, AppTechnicalStrings.argPlusX, macosDir],
+          );
         }
       } catch (_) {}
     } else if (Platform.isLinux) {
       try {
-        await Process.run('chmod', ['+x', exePath]);
+        await Process.run(
+          AppTechnicalStrings.cmdChmod,
+          [AppTechnicalStrings.argPlusX, exePath],
+        );
       } catch (_) {}
     }
 

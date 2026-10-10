@@ -2,16 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/platform/os_paths.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../shared/widgets/hakkin_button.dart';
-import '../../../../shared/widgets/status_badge.dart';
-import '../../../catalog/data/models/app_entry.dart';
-import '../../../catalog/presentation/controllers/catalog_controller.dart';
-import '../../../library/data/models/installed_app.dart';
-import '../../../library/presentation/controllers/library_controller.dart';
-import '../../../updater/presentation/controllers/update_controller.dart';
-import '../../../updater/services/patch_engine.dart';
+import 'package:hakkin_launcher/core/constants/app_strings.dart';
+import 'package:hakkin_launcher/core/constants/app_technical_strings.dart';
+import 'package:hakkin_launcher/core/platform/os_paths.dart';
+import 'package:hakkin_launcher/core/theme/app_colors.dart';
+import 'package:hakkin_launcher/shared/widgets/hakkin_button.dart';
+import 'package:hakkin_launcher/shared/widgets/status_badge.dart';
+import 'package:hakkin_launcher/features/catalog/data/models/app_entry.dart';
+import 'package:hakkin_launcher/features/catalog/presentation/controllers/catalog_controller.dart';
+import 'package:hakkin_launcher/features/library/data/models/installed_app.dart';
+import 'package:hakkin_launcher/features/library/presentation/controllers/library_controller.dart';
+import 'package:hakkin_launcher/features/updater/presentation/controllers/update_controller.dart';
+import 'package:hakkin_launcher/features/updater/services/patch_engine.dart';
 
 class AppDetailScreen extends ConsumerStatefulWidget {
   final String appId;
@@ -36,37 +38,37 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
   }
 
   IconData _getPlatformIcon(String platformKey) {
-    if (platformKey.startsWith('windows')) return Icons.window;
-    if (platformKey.startsWith('macos')) return Icons.apple;
-    if (platformKey == 'android') return Icons.android;
-    if (platformKey.startsWith('linux')) return Icons.terminal;
+    if (platformKey.startsWith(AppTechnicalStrings.platformWindows)) return Icons.window;
+    if (platformKey.startsWith(AppTechnicalStrings.platformMacos)) return Icons.apple;
+    if (platformKey == AppTechnicalStrings.platformAndroid) return Icons.android;
+    if (platformKey.startsWith(AppTechnicalStrings.platformLinux)) return Icons.terminal;
     return Icons.devices;
   }
 
   String _getPlatformLabel(String platformKey) {
     switch (platformKey) {
-      case 'windows-x64':
-        return 'Windows x64';
-      case 'windows-x86':
-        return 'Windows 32-bit';
-      case 'macos-arm64':
-        return 'macOS Apple Silicon';
-      case 'macos-x64':
-        return 'macOS Intel';
-      case 'android':
-        return 'Android';
-      case 'linux-x64':
-        return 'Linux x64';
-      case 'ios':
-        return 'iOS';
+      case AppTechnicalStrings.platformWindowsX64:
+        return AppStrings.platformLabelWindowsX64;
+      case AppTechnicalStrings.platformWindowsX86:
+        return AppStrings.platformLabelWindowsX86;
+      case AppTechnicalStrings.platformMacosArm64:
+        return AppStrings.platformLabelMacosArm64;
+      case AppTechnicalStrings.platformMacosX64:
+        return AppStrings.platformLabelMacosX64;
+      case AppTechnicalStrings.platformAndroid:
+        return AppStrings.platformLabelAndroid;
+      case AppTechnicalStrings.platformLinuxX64:
+        return AppStrings.platformLabelLinuxX64;
+      case AppTechnicalStrings.platformIos:
+        return AppStrings.platformLabelIos;
       default:
         return platformKey;
     }
   }
 
   bool _isOlder(String v1, String v2) {
-    final p1 = RegExp(r'\d+').allMatches(v1).map((m) => int.parse(m.group(0)!)).toList();
-    final p2 = RegExp(r'\d+').allMatches(v2).map((m) => int.parse(m.group(0)!)).toList();
+    final p1 = RegExp(AppTechnicalStrings.regexDigits).allMatches(v1).map((m) => int.parse(m.group(0)!)).toList();
+    final p2 = RegExp(AppTechnicalStrings.regexDigits).allMatches(v2).map((m) => int.parse(m.group(0)!)).toList();
     final maxLen = p1.length > p2.length ? p1.length : p2.length;
     for (var i = 0; i < maxLen; i++) {
       final n1 = i < p1.length ? p1[i] : 0;
@@ -93,28 +95,28 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
           child: CircularProgressIndicator(color: AppColors.platinum),
         ),
         error: (err, _) => Center(
-          child: Text('Error: $err'),
+          child: Text(AppStrings.errorWithPrefix(err)),
         ),
         data: (manifest) {
           final app = manifest.apps.firstWhere(
             (a) => a.id == widget.appId,
             orElse: () => const AppEntry(
-              id: '',
-              slug: '',
-              title: 'No encontrado',
-              category: '',
-              developer: '',
-              summary: '',
-              descriptionMarkdown: '',
+              id: AppTechnicalStrings.empty,
+              slug: AppTechnicalStrings.empty,
+              title: AppStrings.notFound,
+              category: AppTechnicalStrings.empty,
+              developer: AppTechnicalStrings.empty,
+              summary: AppTechnicalStrings.empty,
+              descriptionMarkdown: AppTechnicalStrings.empty,
               tags: [],
               assets: AppAssets(),
-              latestVersion: '',
+              latestVersion: AppTechnicalStrings.empty,
               platforms: {},
             ),
           );
 
           if (app.id.isEmpty) {
-            return const Center(child: Text('Aplicación no encontrada en el catálogo'));
+            return const Center(child: Text(AppStrings.appNotFoundInCatalog));
           }
 
           final installedApps = installedAppsAsync.value ?? [];
@@ -163,12 +165,12 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
                     children: [
                       IconButton(
                         icon: const Icon(Icons.arrow_back, color: AppColors.platinum),
-                        tooltip: 'Volver',
+                        tooltip: AppStrings.back,
                         onPressed: () {
                           if (context.canPop()) {
                             context.pop();
                           } else {
-                            context.go('/');
+                            context.go(AppTechnicalStrings.routeRoot);
                           }
                         },
                       ),
@@ -202,7 +204,7 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
                         fit: StackFit.expand,
                         children: [
                           if (app.assets.banner != null &&
-                              app.assets.banner!.startsWith('http'))
+                              app.assets.banner!.startsWith(AppTechnicalStrings.schemeHttp))
                             Image.network(
                               app.assets.banner!,
                               fit: BoxFit.cover,
@@ -321,7 +323,7 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
                                                     return DropdownMenuItem<String>(
                                                       value: v,
                                                       child: Text(
-                                                        isLatest ? 'v$v - Reciente' : 'v$v',
+                                                        isLatest ? AppStrings.versionTagRecent(v) : AppStrings.versionTag(v),
                                                         style: const TextStyle(
                                                           color: AppColors.platinum,
                                                           fontSize: 12,
@@ -341,7 +343,7 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
                                             )
                                           else
                                             Text(
-                                              'v${app.latestVersion}',
+                                              AppTechnicalStrings.versionWithV(app.latestVersion),
                                               style: const TextStyle(
                                                 color: AppColors.platinumMuted,
                                                 fontSize: 13,
@@ -418,7 +420,7 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
                               ),
                               const SizedBox(width: 12),
                               Text(
-                                '${(updateStatus.progress * 100).toStringAsFixed(0)}%',
+                                AppStrings.percentInt(updateStatus.progress * 100),
                                 style: const TextStyle(
                                   color: AppColors.celestialBlue,
                                   fontSize: 13,
@@ -462,7 +464,7 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const Text(
-                                  'Error en la descarga o instalación',
+                                  AppStrings.downloadOrInstallErrorTitle,
                                   style: TextStyle(
                                     color: AppColors.platinum,
                                     fontSize: 14,
@@ -482,7 +484,7 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
                           ),
                           const SizedBox(width: 12),
                           HakkinButton(
-                            text: 'Reintentar',
+                            text: AppStrings.retry,
                             icon: Icons.refresh,
                             variant: HakkinButtonVariant.secondary,
                             onPressed: () {
@@ -496,7 +498,7 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
                           const SizedBox(width: 8),
                           IconButton(
                             icon: const Icon(Icons.close, color: AppColors.platinumMuted, size: 20),
-                            tooltip: 'Cerrar aviso',
+                            tooltip: AppStrings.closeNotice,
                             onPressed: () {
                               ref.read(updateProgressProvider.notifier).clearStatus(app.id);
                             },
@@ -530,7 +532,7 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const Text(
-                                  'Anomalía de versión detectada',
+                                  AppStrings.versionAnomalyDetectedTitle,
                                   style: TextStyle(
                                     color: AppColors.platinum,
                                     fontSize: 14,
@@ -539,7 +541,7 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  'La versión instalada v${installedApp.installedVersion} es huérfana o inexistente en el catálogo actual. Debe ser actualizada de manera completa.',
+                                  AppStrings.anomalyExplanation(installedApp.installedVersion),
                                   style: const TextStyle(
                                     color: AppColors.platinumMuted,
                                     fontSize: 12,
@@ -563,7 +565,7 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'Capturas de Pantalla',
+                          AppStrings.screenshotsTitle,
                           style: TextStyle(
                             color: AppColors.platinum,
                             fontSize: 18,
@@ -636,7 +638,7 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
                                         const Icon(Icons.history_edu, color: AppColors.celestialBlue, size: 20),
                                         const SizedBox(width: 8),
                                         Text(
-                                          'Notas de la Versión v${selectedRelease.version}',
+                                          AppStrings.versionNotes(selectedRelease.version),
                                           style: const TextStyle(
                                             color: AppColors.platinum,
                                             fontWeight: FontWeight.w700,
@@ -709,7 +711,7 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
-                                'Detalles Técnicos',
+                                AppStrings.technicalDetails,
                                 style: TextStyle(
                                   color: AppColors.platinum,
                                   fontSize: 16,
@@ -717,36 +719,36 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
                                 ),
                               ),
                               const Divider(height: 24),
-                              _buildMetaRow('Desarrollador', app.developer),
-                              _buildMetaRow('Categoría', app.category.toUpperCase()),
-                              _buildMetaRow('Plataforma Activa', _getPlatformLabel(activePlatformKey)),
-                              _buildMetaRow('Plataformas Disponibles', availablePlatformKeys.map(_getPlatformLabel).join(', ')),
-                              _buildMetaRow('Versión Seleccionada', 'v${selectedRelease.version}'),
+                              _buildMetaRow(AppStrings.fieldDeveloper, app.developer),
+                              _buildMetaRow(AppStrings.fieldCategory, app.category.toUpperCase()),
+                              _buildMetaRow(AppStrings.fieldActivePlatform, _getPlatformLabel(activePlatformKey)),
+                              _buildMetaRow(AppStrings.fieldAvailablePlatforms, availablePlatformKeys.map(_getPlatformLabel).join(AppTechnicalStrings.commaSpace)),
+                              _buildMetaRow(AppStrings.fieldSelectedVersion, AppTechnicalStrings.versionWithV(selectedRelease.version)),
                               if (selectedRelease.releaseDate != null)
                                 _buildMetaRow(
-                                  'Fecha de Versión',
-                                  '${selectedRelease.releaseDate!.day.toString().padLeft(2, '0')}/${selectedRelease.releaseDate!.month.toString().padLeft(2, '0')}/${selectedRelease.releaseDate!.year}',
+                                  AppStrings.fieldReleaseDate,
+                                  AppStrings.formatDate(selectedRelease.releaseDate!),
                                 ),
                               if (selectedRelease.executableRelativePath.isNotEmpty)
                                 _buildMetaRow(
-                                  'Ejecutable Relativo',
+                                  AppStrings.fieldRelativeExecutable,
                                   selectedRelease.executableRelativePath,
                                 ),
                               if (selectedRelease.package.sizeBytes > 0)
                                 _buildMetaRow(
-                                  'Tamaño de Descarga',
-                                  '${(selectedRelease.package.sizeBytes / 1048576).toStringAsFixed(1)} MB',
+                                  AppStrings.fieldDownloadSize,
+                                  AppStrings.megabytes((selectedRelease.package.sizeBytes / 1048576).toStringAsFixed(1)),
                                 ),
                               _buildMetaRow(
-                                'Soporte Diferencial',
+                                AppStrings.fieldDeltaSupport,
                                 selectedRelease.deltaPatches.isNotEmpty
-                                    ? 'Disponible: ${selectedRelease.deltaPatches.length} parches'
-                                    : 'Solo descarga completa',
+                                    ? AppStrings.deltaPatchesAvailable(selectedRelease.deltaPatches.length)
+                                    : AppStrings.deltaFullDownloadOnly,
                               ),
                               if (platformRelease != null && platformRelease.protectedUserPaths.isNotEmpty)
                                 _buildMetaRow(
-                                  'Rutas de Usuario',
-                                  '${platformRelease.protectedUserPaths.length} protegidas',
+                                  AppStrings.fieldUserPaths,
+                                  AppStrings.userPathsProtected(platformRelease.protectedUserPaths.length),
                                 ),
                             ],
                           ),
@@ -780,7 +782,7 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
     if (!isSupported) {
       if (canSwitchToHost) {
         return HakkinButton(
-          text: 'Cambiar a ${_getPlatformLabel(currentPlatform)}',
+          text: AppStrings.switchToPlatform(_getPlatformLabel(currentPlatform)),
           icon: _getPlatformIcon(currentPlatform),
           variant: HakkinButtonVariant.primaryPlatinum,
           onPressed: () {
@@ -792,7 +794,7 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
         );
       }
       return HakkinButton(
-        text: 'Disponible para ${_getPlatformLabel(activePlatformKey)}',
+        text: AppStrings.availableForPlatform(_getPlatformLabel(activePlatformKey)),
         variant: HakkinButtonVariant.secondary,
         onPressed: null,
       );
@@ -800,10 +802,10 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
 
     if (isUpdating) {
       final pct = updateStatus != null
-          ? ' ${(updateStatus.progress * 100).clamp(0, 100).toStringAsFixed(0)}%'
-          : '';
+          ? AppStrings.percentClampedWithSpace(updateStatus.progress * 100)
+          : AppTechnicalStrings.empty;
       return HakkinButton(
-        text: 'Instalando...$pct',
+        text: AppStrings.installingWithPct(pct),
         isLoading: true,
         variant: HakkinButtonVariant.primaryPlatinum,
         onPressed: null,
@@ -812,7 +814,7 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
 
     if (isRunning) {
       return const HakkinButton(
-        text: 'En Ejecución',
+        text: AppStrings.running,
         icon: Icons.hourglass_top,
         variant: HakkinButtonVariant.secondary,
         onPressed: null,
@@ -825,7 +827,7 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
 
       if (isAnomalous) {
         return HakkinButton(
-          text: 'Actualizar Completamente - v$selectedVersionStr',
+          text: AppStrings.updateFullyVersion(selectedVersionStr),
           icon: Icons.system_update_alt,
           variant: HakkinButtonVariant.primaryPlatinum,
           onPressed: () {
@@ -840,7 +842,7 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
 
       if (selectedVersionStr == installedApp.installedVersion) {
         return HakkinButton(
-          text: 'Jugar / Abrir - v$selectedVersionStr',
+          text: AppStrings.playOrOpenVersion(selectedVersionStr),
           icon: Icons.play_arrow,
           variant: HakkinButtonVariant.successPlay,
           onPressed: () {
@@ -851,7 +853,7 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
 
       if (_isOlder(selectedVersionStr, installedApp.installedVersion)) {
         return HakkinButton(
-          text: 'Instalación Limpia - v$selectedVersionStr',
+          text: AppStrings.cleanInstallVersion(selectedVersionStr),
           icon: Icons.warning_amber_rounded,
           variant: HakkinButtonVariant.secondary,
           onPressed: () {
@@ -865,7 +867,7 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
       }
 
       return HakkinButton(
-        text: 'Actualizar a v$selectedVersionStr',
+        text: AppStrings.updateToVersion(selectedVersionStr),
         icon: Icons.arrow_circle_up,
         variant: HakkinButtonVariant.primaryPlatinum,
         onPressed: () {
@@ -878,7 +880,7 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
     }
 
     return HakkinButton(
-      text: 'Instalar v$selectedVersionStr',
+      text: AppStrings.installVersion(selectedVersionStr),
       icon: Icons.download,
       variant: HakkinButtonVariant.primaryPlatinum,
       onPressed: () {
@@ -908,26 +910,22 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
             Icon(Icons.warning_amber_rounded, color: Colors.amberAccent),
             SizedBox(width: 8),
             Text(
-              'Instalación Limpia Requerida',
+              AppStrings.cleanInstallRequiredTitle,
               style: TextStyle(color: AppColors.platinum, fontSize: 18),
             ),
           ],
         ),
         content: Text(
-          'Tienes instalada la versión $currentVersion.\n\n'
-          'HakkinLauncher no permite degradar versiones sobre la instalación activa. '
-          'Para cambiar a la versión anterior, v$targetVersion, se realizará una instalación limpia desde cero.\n\n'
-          'Tus datos de usuario y partidas guardadas serán aislados y restaurados automáticamente.\n\n'
-          '¿Deseas proceder?',
+          AppStrings.cleanInstallWarningMessage(currentVersion, targetVersion),
           style: const TextStyle(color: AppColors.platinumMuted, fontSize: 13, height: 1.4),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancelar', style: TextStyle(color: AppColors.platinumMuted)),
+            child: const Text(AppStrings.cancel, style: TextStyle(color: AppColors.platinumMuted)),
           ),
           HakkinButton(
-            text: 'Proceder con Instalación Limpia',
+            text: AppStrings.proceedWithCleanInstall,
             variant: HakkinButtonVariant.primaryPlatinum,
             onPressed: () {
               Navigator.of(ctx).pop();

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_colors.dart';
+import 'package:hakkin_launcher/core/constants/app_strings.dart';
+import 'package:hakkin_launcher/core/theme/app_colors.dart';
 
 class StatusBadge extends StatelessWidget {
   final String label;
@@ -17,7 +18,7 @@ class StatusBadge extends StatelessWidget {
 
   factory StatusBadge.installed() {
     return const StatusBadge(
-      label: 'INSTALADO',
+      label: AppStrings.badgeInstalled,
       backgroundColor: Color(0x2610B981),
       textColor: AppColors.success,
       icon: Icons.check_circle_outline,
@@ -26,7 +27,7 @@ class StatusBadge extends StatelessWidget {
 
   factory StatusBadge.updateAvailable() {
     return const StatusBadge(
-      label: 'ACTUALIZAR',
+      label: AppStrings.badgeUpdateAvailable,
       backgroundColor: Color(0x26F59E0B),
       textColor: AppColors.warning,
       icon: Icons.arrow_circle_up,
@@ -35,7 +36,7 @@ class StatusBadge extends StatelessWidget {
 
   factory StatusBadge.running() {
     return const StatusBadge(
-      label: 'EN EJECUCIÓN',
+      label: AppStrings.badgeRunning,
       backgroundColor: Color(0x2638BDF8),
       textColor: AppColors.celestialBlue,
       icon: Icons.play_arrow,
@@ -44,7 +45,7 @@ class StatusBadge extends StatelessWidget {
 
   factory StatusBadge.anomaly() {
     return const StatusBadge(
-      label: 'ANOMALÍA',
+      label: AppStrings.badgeAnomaly,
       backgroundColor: Color(0x26EF4444),
       textColor: Color(0xFFF87171),
       icon: Icons.warning_amber_rounded,
