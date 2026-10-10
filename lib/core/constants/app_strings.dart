@@ -14,9 +14,9 @@ class AppStrings {
   static const navStore = 'Tienda';
   static const navLibrary = 'Biblioteca';
   static const navSettings = 'Ajustes';
-  static const statusOnline = 'En Línea';
-  static const badgeNew = 'NEW';
-  static String statusOs(String os) => 'S.O.: $os';
+  static const statusOnline = 'En línea';
+  static const badgeNew = 'NUEVO';
+  static String statusOs(String os) => 'Plataforma: $os';
 
   // ---------------------------------------------------------------------------
   // Generic Actions & Buttons
@@ -29,30 +29,30 @@ class AppStrings {
   static const closeNotice = 'Cerrar aviso';
   static const uninstall = 'Desinstalar';
   static const play = 'Jugar';
-  static const running = 'En Ejecución';
+  static const running = 'En ejecución';
   static const update = 'Actualizar';
-  static const updateFull = 'Actualizar Completa';
-  static const updateLauncher = 'Actualizar Lanzador';
+  static const updateFull = 'Actualizar completa';
+  static const updateLauncher = 'Actualizar lanzador';
   static const updating = 'Actualizando...';
   static const goToStore = 'Ir a la Tienda';
   static const viewInStore = 'Ver en la Tienda';
-  static const savePath = 'Guardar Ruta';
-  static const restoreDefaultPath = 'Restaurar Ruta por Defecto';
-  static const checkUpdatesNow = 'Buscar Actualizaciones Ahora';
+  static const savePath = 'Guardar ruta';
+  static const restoreDefaultPath = 'Restaurar ruta por defecto';
+  static const checkUpdatesNow = 'Buscar actualizaciones ahora';
   static const checkingUpdates = 'Buscando actualizaciones...';
-  static const cleanTemporaryFiles = 'Limpiar Archivos Temporales';
-  static const verifyPatchEngine =
-      'Verificar / Descargar Motor de Parches (hpatchz)';
+  static const cleanTemporaryFiles = 'Limpiar archivos temporales';
+  static const verifyPatchEngine = 'Verificar o descargar motor de parches';
   static const verifyingComponents = 'Verificando componentes...';
 
-  static String playOrOpenVersion(String version) => 'Jugar / Abrir - v$version';
+  static String playOrOpenVersion(String version) => 'Jugar v$version';
   static String installVersion(String version) => 'Instalar v$version';
   static String updateToVersion(String version) => 'Actualizar a v$version';
   static String updateFullyVersion(String version) =>
-      'Actualizar Completamente - v$version';
+      'Actualizar completa v$version';
   static String cleanInstallVersion(String version) =>
-      'Instalación Limpia - v$version';
-  static String installingWithPct(String pct) => 'Instalando...$pct';
+      'Instalación limpia v$version';
+  static String installingWithPct(String pct) =>
+      pct.isEmpty ? 'Instalando...' : 'Instalando $pct';
   static String availableForPlatform(String platform) =>
       'Disponible para $platform';
   static String switchToPlatform(String platform) => 'Cambiar a $platform';
@@ -65,13 +65,13 @@ class AppStrings {
   static const categoryGames = 'Juegos';
   static const categoryTools = 'Herramientas';
   static const featured = 'DESTACADO';
-  static const exploreCatalog = 'Explorar Catálogo';
+  static const exploreCatalog = 'Explorar catálogo';
   static const notFound = 'No encontrado';
   static const appNotFoundInCatalog =
-      'Aplicación no encontrada en el catálogo';
+      'Aplicación no encontrada en el catálogo.';
   static const defaultDeveloper = 'Desarrollador';
   static String errorLoadingCatalog(Object error) =>
-      'Error al cargar el catálogo: $error';
+      'Error al cargar el catálogo: $error.';
 
   // ---------------------------------------------------------------------------
   // Library Screen & Item Actions
@@ -84,26 +84,26 @@ class AppStrings {
       'Explora la tienda e instala tus primeros programas.';
   static const manageVersions = 'Gestionar versiones';
   static const launchArguments = 'Argumentos de lanzamiento';
-  static const createDesktopShortcut = 'Crear acceso en Escritorio';
-  static const addToStartMenu = 'Añadir al Menú Inicio';
+  static const createDesktopShortcut = 'Crear acceso directo en el Escritorio';
+  static const addToStartMenu = 'Añadir al menú de aplicaciones';
   static const verifyFileIntegrity = 'Verificar integridad de archivos';
   static const desktopShortcutCreated =
-      'Acceso directo en el Escritorio creado';
+      'Acceso directo creado en el escritorio.';
   static const couldNotCreateShortcut =
-      'No se pudo crear el acceso directo';
+      'No se pudo crear el acceso directo.';
   static const startMenuEntryCreated =
-      'Acceso añadido al Menú de Aplicaciones';
+      'Acceso añadido al menú de aplicaciones.';
   static const couldNotCreateStartMenuEntry =
-      'No se pudo registrar en el Menú';
+      'No se pudo registrar en el menú de aplicaciones.';
   static const integrityVerifiedTitle = 'Integridad verificada';
   static const integrityFailureTitle = 'Fallo de integridad';
   static const confirmUninstallTitle = '¿Desinstalar aplicación?';
   static const launchArgumentsParamDescription =
-      'Parámetros o flags de línea de comandos al iniciar el juego/app:';
+      'Parámetros de línea de comandos al iniciar la aplicación:';
   static const launchArgumentsHint = 'ej. -windowed -novsync -fps 60';
 
   static String errorLoadingLibrary(Object error) =>
-      'Error cargando biblioteca: $error';
+      'Error al cargar la biblioteca: $error.';
   static String argumentsFor(String title) => 'Argumentos para $title';
   static String confirmUninstallContent(String title) =>
       'Se eliminarán los archivos de $title. Tus datos de partidas guardadas permanecerán protegidos.';
@@ -111,10 +111,10 @@ class AppStrings {
       'Versión instalada: v$version';
   static String installedVersionWithUpdateLabel(
           String installed, String latest) =>
-      'Versión instalada: v$installed - Actualización v$latest disponible';
+      'Versión instalada: v$installed, actualización v$latest disponible';
   static String anomalyInstalledVersionLabel(
           String installed, String latest) =>
-      'Anomalía: v$installed huérfana en catálogo • Requiere actualización completa a v$latest';
+      'Anomalía: v$installed huérfana en catálogo, requiere actualización completa a v$latest';
   static String argumentsDisplay(String args) => 'Argumentos: $args';
 
   // ---------------------------------------------------------------------------
@@ -135,6 +135,7 @@ class AppStrings {
   static const fieldAvailablePlatforms = 'Plataformas Disponibles';
   static const fieldSelectedVersion = 'Versión Seleccionada';
   static const fieldReleaseDate = 'Fecha de Versión';
+  static const fieldEntryPoint = 'Punto de Entrada';
   static const fieldRelativeExecutable = 'Ejecutable Relativo';
   static const fieldDownloadSize = 'Tamaño de Descarga';
   static const fieldDeltaSupport = 'Soporte Diferencial';
@@ -148,7 +149,7 @@ class AppStrings {
   static const proceedWithCleanInstall = 'Proceder con Instalación Limpia';
 
   static String versionNotes(String version) => 'Notas de la Versión v$version';
-  static String versionTagRecent(String version) => 'v$version - Reciente';
+  static String versionTagRecent(String version) => 'v$version reciente';
   static String versionTag(String version) => 'v$version';
   static String deltaPatchesAvailable(int count) =>
       'Disponible: $count parches';
@@ -156,11 +157,10 @@ class AppStrings {
   static String anomalyExplanation(String installed) =>
       'La versión instalada v$installed es huérfana o inexistente en el catálogo actual. Debe ser actualizada de manera completa.';
   static String cleanInstallWarningMessage(
-      String currentVersion, String targetVersion) =>
-      'Tienes instalada la versión $currentVersion.\n\n'
-      'HakkinLauncher no permite degradar versiones sobre la instalación activa. '
+          String currentVersion, String targetVersion) =>
+      'Tienes instalada la versión v$currentVersion.\n\n'
       'Para cambiar a la versión anterior, v$targetVersion, se realizará una instalación limpia desde cero.\n\n'
-      'Tus datos de usuario y partidas guardadas serán aislados y restaurados automáticamente.\n\n'
+      'Tus datos de usuario y partidas guardadas permanecerán protegidos.\n\n'
       '¿Deseas proceder?';
 
   // Platform Display Labels
@@ -184,11 +184,11 @@ class AppStrings {
       'Carpeta del sistema operativo donde se descargarán y extraerán los paquetes y binarios.';
   static const installDirectoryLabel = 'Directorio de Instalación';
   static const installPathSavedSuccess =
-      'Ruta de instalación guardada con éxito';
+      'Ruta de instalación guardada con éxito.';
   static const backgroundAndUpdatesTitle =
       'Segundo Plano y Actualizaciones';
   static const backgroundAndUpdatesDescription =
-      'Opciones de bandeja de sistema y sondeo automático.';
+      'Opciones de bandeja del sistema y sondeo automático.';
   static const minimizeToTrayTitle =
       'Minimizar a la bandeja al cerrar la ventana';
   static const minimizeToTraySubtitle =
@@ -201,11 +201,11 @@ class AppStrings {
   static const systemInfoTitle = 'Información del Sistema';
   static const systemInfoDescription =
       'Rutas locales utilizadas por HakkinLauncher.';
-  static const labelBaseDir = 'Directorio Base:';
-  static const labelToolsDir = 'Herramientas:';
-  static const labelHpatchzEngine = 'Motor hpatchz:';
-  static const labelPlatform = 'Plataforma:';
-  static const labelLauncherVersion = 'Versión de Lanzador:';
+  static const labelBaseDir = 'Directorio base';
+  static const labelToolsDir = 'Herramientas';
+  static const labelHpatchzEngine = 'Motor hpatchz';
+  static const labelPlatform = 'Plataforma';
+  static const labelLauncherVersion = 'Versión del lanzador';
 
   static String newLauncherVersionAvailableBanner(
           String appName, String version) =>
@@ -215,17 +215,19 @@ class AppStrings {
   static String newLauncherVersionReady(String appName, String version) =>
       '¡Nueva versión de $appName v$version disponible!';
   static String updatesFoundCount(int count) =>
-      'Se encontraron $count actualización(es) disponible(s).';
+      count == 1
+          ? 'Se encontró 1 actualización disponible.'
+          : 'Se encontraron $count actualizaciones disponibles.';
   static const allUpToDateLong =
       'Todo al día. Todas tus aplicaciones y el lanzador están en la versión más reciente.';
   static String errorCheckingUpdates(Object error) =>
-      'Error al comprobar actualizaciones: $error';
+      'Error al comprobar actualizaciones: $error.';
   static String filesDeletedCount(int count) =>
       'Se eliminaron $count archivos temporales.';
   static String componentsVerifiedSuccess(String status) =>
-      'Componentes verificados exitosamente: $status';
+      'Componentes verificados exitosamente: $status.';
   static String errorVerifyingComponents(Object error) =>
-      'Error al verificar componentes: $error';
+      'Error al verificar componentes: $error.';
 
   // ---------------------------------------------------------------------------
   // Tray Menu
@@ -237,9 +239,8 @@ class AppStrings {
   // ---------------------------------------------------------------------------
   // Component Manager
   // ---------------------------------------------------------------------------
-  static const componentNotInstalled =
-      'No instalado (se descargará al iniciar o requerir)';
-  static String componentAvailable(String path) => 'Disponible ($path)';
+  static const componentNotInstalled = 'No instalado';
+  static String componentAvailable(String path) => 'Disponible en $path';
 
   // ---------------------------------------------------------------------------
   // Notifications
@@ -263,26 +264,24 @@ class AppStrings {
   static String newVersionReadyBody(String version) =>
       'La versión v$version está lista para actualizar.';
   static String updatesAvailableFor(String summary) =>
-      'Disponibles para: $summary';
+      'Disponibles para: $summary.';
 
   // ---------------------------------------------------------------------------
   // Downloader & Progress
   // ---------------------------------------------------------------------------
-  static const emptyDownloadResponse = 'Respuesta de descarga vacía';
+  static const emptyDownloadResponse = 'Respuesta de descarga vacía.';
   static String speedMbPerSec(String speed) => '$speed MB/s';
   static String percentage(double pct) => '${pct.toStringAsFixed(1)}%';
   static String downloadProgressOf(String currentMb, String totalMb) =>
       '$currentMb MB de $totalMb MB';
   static String downloadedMb(String mb) => '$mb MB descargados';
   static String completedMb(String mb) => '$mb MB completados';
-  static String bulletPrefix(String text) => ' • $text';
+  static String speedSeparator(String text) => ', $text';
   static String errorWithPrefix(Object err) => 'Error: $err';
   static String formatDate(DateTime date) =>
       '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
   static String megabytes(String mb) => '$mb MB';
   static String percentInt(double pct) => '${pct.toStringAsFixed(0)}%';
-  static String percentClampedWithSpace(double pct) =>
-      ' ${pct.clamp(0, 100).toStringAsFixed(0)}%';
 
   // ---------------------------------------------------------------------------
   // PatchEngine & Lifecycle
@@ -320,38 +319,38 @@ class AppStrings {
   static String startingCleanInstallMessage(String targetVersion) =>
       'Iniciando instalación limpia de v$targetVersion y protegiendo datos...';
   static String startingDownloadMessage(String version, String mb) =>
-      'Iniciando descarga de v$version ($mb MB)...';
+      'Iniciando descarga de v$version de $mb MB...';
   static String downloadingVersionMessage(
           String version, String status, String speed) =>
       'Descargando v$version: $status$speed';
   static String cleanInstallNotificationTitle(String title, String version) =>
-      '$title - Instalación limpia v$version';
+      '$title: Instalación limpia v$version';
   static String fullUpdateNotificationVersion(String version) =>
-      '$version (actualización completa)';
+      '$version, actualización completa';
   static String fullUpdateCompletedMessage(String version) =>
-      'Actualización completa a v$version completada con éxito (anomalía corregida).';
+      'Actualización completa a v$version completada con éxito y anomalía corregida.';
   static String cleanInstallCompletedMessage(String version) =>
       'Instalación limpia de v$version completada con éxito.';
   static String cleanInstallErrorMessage(Object error) =>
-      'Error en instalación limpia: $error';
+      'Error en instalación limpia: $error.';
   static String startingDeltaDownloadMessage(String mb) =>
-      'Iniciando descarga de parche diferencial ($mb MB)...';
+      'Iniciando descarga de parche diferencial de $mb MB...';
   static String downloadingPatchMessage(String status, String speed) =>
       'Descargando parche: $status$speed';
   static String installationErrorMessage(Object error) =>
-      'Ocurrió un error durante la instalación: $error';
+      'Ocurrió un error durante la instalación: $error.';
 
   // ---------------------------------------------------------------------------
   // Integrity Verifier & Crypto
   // ---------------------------------------------------------------------------
-  static const fileDoesNotExist = 'El archivo no existe';
+  static const fileDoesNotExist = 'El archivo no existe.';
   static const appNotRegisteredLocally =
-      'Aplicación no registrada localmente';
-  static const executableFileEmpty = 'El archivo ejecutable está vacío';
+      'Aplicación no registrada localmente.';
+  static const executableFileEmpty = 'El archivo ejecutable está vacío.';
   static const allFilesVerifiedSuccessfully =
       'Todos los archivos verificados correctamente.';
   static String executableNotFoundOnDisk(String path) =>
-      'El archivo ejecutable no existe en disco: $path';
+      'El archivo ejecutable no existe en disco: $path.';
   static String anomalyOrphanVersionDetected(
           String installed, String latest) =>
       'Anomalía detectada: la versión v$installed es huérfana o inexistente en el catálogo. Requiere actualización completa a v$latest.';
@@ -362,10 +361,10 @@ class AppStrings {
   static const selfUpdateChecking = 'Comprobando paquetes del lanzador...';
   static const selfUpdateNoPlatformPackage =
       'No hay paquete del lanzador para tu plataforma actual.';
-  static const selfUpdateUnsupportedPlatform = 'Plataforma no soportada';
+  static const selfUpdateUnsupportedPlatform = 'Plataforma no soportada.';
   static const selfUpdateInvalidDownloadUrl =
       'URL de descarga de la actualización no válida.';
-  static const selfUpdateEmptyUrl = 'URL vacía';
+  static const selfUpdateEmptyUrl = 'URL vacía.';
   static const selfUpdateVerifyingChecksum =
       'Verificando integridad del nuevo lanzador...';
   static const selfUpdateHashMismatchMessage =
@@ -379,7 +378,7 @@ class AppStrings {
   static const selfUpdateStarting =
       'Iniciando actualización del lanzador...';
   static const selfUpdateHttp404 =
-      'No se encontró el paquete de actualización en el servidor (HTTP 404 Not Found). Verifica que el release de la versión esté disponible en GitHub.';
+      'No se encontró el paquete de actualización en el servidor. Verifica que la entrega de la versión esté disponible en GitHub.';
   static const selfUpdateTimeout =
       'Tiempo de espera agotado al descargar la actualización. Comprueba tu conexión a internet.';
   static const selfUpdateConnectionError =
@@ -389,71 +388,71 @@ class AppStrings {
   static String selfUpdateDownloading(String status, String speed) =>
       'Descargando actualización: $status$speed';
   static String selfUpdateErrorGeneric(Object error) =>
-      'Error durante la auto-actualización: $error';
+      'Error durante la autoactualización: $error.';
   static String selfUpdateNetworkError(String message) =>
-      'Error de red durante la descarga ($message)';
+      'Error de red durante la descarga: $message.';
 
   // ---------------------------------------------------------------------------
   // Logs & Debug
   // ---------------------------------------------------------------------------
   static String logDesktopServicesPartialInit(Object error) =>
-      'Aviso: Servicios de escritorio inicializados parcialmente: $error';
+      'Aviso: Servicios de escritorio inicializados parcialmente: $error.';
   static String logCouldNotInitLocalNotifier(Object error) =>
-      'Aviso: No se pudo inicializar local_notifier: $error';
+      'Aviso: No se pudo inicializar local_notifier: $error.';
   static String logErrorEmittingNotification(Object error) =>
-      'Error emitiendo notificación: $error';
+      'Error al emitir notificación: $error.';
   static String logErrorCheckingHpatchz(Object error) =>
-      'Aviso buscando hpatchz existente: $error';
+      'Aviso al buscar hpatchz existente: $error.';
   static String logErrorPermissions(String path, Object error) =>
-      'Aviso asignando permisos a $path: $error';
+      'Aviso al asignar permisos a $path: $error.';
   static String logHpatchzReady(String path) =>
-      'Componente hpatchz listo en: $path';
+      'Componente hpatchz listo en: $path.';
   static String logHpatchzNotFound() =>
       'Componente hpatchz no encontrado. Iniciando descarga automática...';
   static String logHpatchzPlatformNotSupported() =>
-      'Plataforma no soportada para descarga automática de hpatchz';
+      'Plataforma no soportada para descarga automática de hpatchz.';
   static String logDownloadingHpatchz(String url) =>
-      'Descargando hpatchz desde: $url';
+      'Descargando hpatchz desde: $url.';
   static String logEmptyHpatchzDownload() =>
       'Error: Descarga de hpatchz vacía.';
   static String logHpatchzNotFoundInZip() =>
       'Error: No se encontró el binario hpatchz dentro del archivo ZIP.';
   static String logHpatchzVerified(String out) =>
-      'hpatchz instalado y verificado: $out';
+      'hpatchz instalado y verificado: $out.';
   static String logHpatchzVerifyWarning(Object error) =>
-      'Aviso al verificar ejecución de hpatchz: $error';
+      'Aviso al verificar ejecución de hpatchz: $error.';
   static String logHpatchzInstalled(String path) =>
-      'hpatchz instalado exitosamente en: $path';
+      'hpatchz instalado exitosamente en: $path.';
   static String logHpatchzDownloadFail(Object error) =>
-      'Fallo al descargar o instalar hpatchz: $error';
+      'Fallo al descargar o instalar hpatchz: $error.';
   static String logAppAlreadyRunning(String appId, int pid) =>
-      'La aplicación $appId ya está en ejecución (PID: $pid)';
+      'La aplicación $appId ya está en ejecución con PID $pid.';
   static String logExecutableNotFound(String path) =>
-      'No se encontró el ejecutable en: $path';
+      'No se encontró el ejecutable en: $path.';
   static String logAppLaunched(String appId, int pid) =>
-      'App $appId lanzada desacoplada exitosamente (PID: $pid)';
+      'Aplicación $appId iniciada desacoplada exitosamente con PID $pid.';
   static String logAppLaunchError(String appId, Object error) =>
-      'Error lanzando proceso desacoplado para $appId: $error';
+      'Error al iniciar proceso desacoplado para $appId: $error.';
   static String logAppTerminated(String appId, int pid) =>
-      'App $appId (PID $pid) finalizó.';
+      'Aplicación $appId con PID $pid finalizó.';
   static String logScriptError(String path, Object error) =>
-      'Error ejecutando script $path: $error';
+      'Error al ejecutar script $path: $error.';
   static String logDesktopShortcutError(Object error) =>
-      'Error creando acceso directo de escritorio: $error';
+      'Error al crear acceso directo en el escritorio: $error.';
   static String logStartMenuError(Object error) =>
-      'Error registrando en menú de aplicaciones: $error';
+      'Error al registrar en el menú de aplicaciones: $error.';
   static String logTrayInitError(Object error) =>
-      'Error inicializando bandeja: $error';
+      'Error al inicializar la bandeja del sistema: $error.';
   static String logCloseToTrayPrefError(Object error) =>
-      'Aviso al cargar preferencia closeToTray: $error';
+      'Aviso al cargar preferencia de bandeja del sistema: $error.';
   static String logWindowIconError(Object error) =>
-      'Aviso: No se pudo establecer icono de ventana: $error';
+      'Aviso: No se pudo establecer el icono de ventana: $error.';
   static String logDownloadAttemptFail(int attempt, Object error) =>
-      'Intento $attempt de descarga falló: $error';
+      'Intento $attempt de descarga falló: $error.';
   static String logPatchHashMismatch() =>
-      'Aviso: Hash tras parche no coincide. Descartando delta.';
+      'Aviso: La suma de verificación tras aplicar el parche no coincide. Descartando parche diferencial.';
   static String logDeltaPatchError(Object error) =>
-      'Fallo al aplicar parche delta: $error. Activando fallback a paquete completo.';
+      'Fallo al aplicar el parche diferencial: $error. Activando alternativa de respaldo con descarga completa.';
   static String logActivatingFullPackageFallback() =>
       'Activando descarga limpia de paquete completo como alternativa.';
   static String logHpatchzNotAvailable() =>
@@ -461,5 +460,5 @@ class AppStrings {
   static String logHpatchzDirExitCode(int code) =>
       'Aviso: parche a nivel de directorio retornó $code, reintentando sobre ejecutable...';
   static String logHpatchzExecError(Object error) =>
-      'Error ejecutando hpatchz: $error';
+      'Error al ejecutar hpatchz: $error.';
 }
