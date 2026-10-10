@@ -280,6 +280,36 @@ def clean_version(tag="", release_name="", filename="", url=""):
 
     return "1.0.0"
 
+def format_changelog(changelog_text, title, version):
+    """
+    Normaliza el changelog según las normas de docs/strings.md (Sección 2.6):
+    - Mayúscula inicial y punto final obligatorio.
+    - Prohíbe volcados crudos de Git, enlaces Markdown, tablas truncadas y notas informales.
+    """
+    if not changelog_text:
+        return f"Lanzamiento de {title} versión {version}."
+
+    cl = str(changelog_text).strip()
+
+    prohibited_patterns = [
+        r'\*\*Full Changelog\*\*',
+        r'Merge branch',
+        r'Update release\.yaml',
+        r'\| Plataforma \|',
+        r'^(meow(\s+\d+)?)$'
+    ]
+    for pattern in prohibited_patterns:
+        if re.search(pattern, cl, flags=re.IGNORECASE):
+            return f"Lanzamiento de {title} versión {version} con mejoras y correcciones."
+
+    if len(cl) > 0 and not cl[0].isupper():
+        cl = cl[0].upper() + cl[1:]
+
+    if not cl.endswith('.'):
+        cl = cl + '.'
+
+    return cl
+
 def parse_version_tuple(v):
     """Convert version string to comparable tuple (e.g. '2.5.0' -> (2, 5, 0), '26.10.08-13' -> (26, 10, 8, 13))"""
     parts = re.findall(r'\d+', str(v))
@@ -363,11 +393,12 @@ class ManifestAdapter:
             for target_plat_key in candidate_keys:
                 if target_plat_key in supported_platforms:
                     plat_info = supported_platforms[target_plat_key]
+                    exe_rel = plat_info.get("entry_point") or plat_info.get("executable_relative_path", binary_info.get("filename", "app"))
                     v_entry = {
                         "version": str(release_ver),
                         "release_date": published_at,
-                        "changelog": f"Lanzamiento de {app_meta.get('title', 'app')} v{release_ver}.",
-                        "executable_relative_path": plat_info.get("executable_relative_path", binary_info.get("filename", "app")),
+                        "changelog": format_changelog(f"Lanzamiento de {app_meta.get('title', 'app')} versión {release_ver}.", app_meta.get('title', 'app'), str(release_ver)),
+                        "entry_point": exe_rel,
                         "package": {
                             "url": download_url,
                             "size_bytes": size_bytes,
@@ -471,8 +502,9 @@ def generate_catalog(
             platforms = {}
             for pkey, pdata in app.get("platforms", {}).items():
                 first_ver = pdata.get("versions", [{}])[0]
+                entry_exe = first_ver.get("entry_point") or first_ver.get("executable_relative_path", "")
                 platforms[pkey] = {
-                    "executable_relative_path": first_ver.get("executable_relative_path", ""),
+                    "entry_point": entry_exe,
                     "protected_user_paths": pdata.get("protected_user_paths", []),
                     "asset_pattern": ".*"
                 }
@@ -552,11 +584,12 @@ def generate_catalog(
                                 "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
                             }
 
+                    exe_rel = v_def.get("entry_point") or v_def.get("executable_relative_path") or plat_info.get("entry_point") or plat_info.get("executable_relative_path", "app")
                     v_entry = {
                         "version": v_str,
                         "release_date": v_def.get("release_date", "2026-10-08T00:00:00Z"),
-                        "changelog": v_def.get("changelog", f"Notas de la versión {v_str}."),
-                        "executable_relative_path": v_def.get("executable_relative_path", plat_info.get("executable_relative_path", "app")),
+                        "changelog": format_changelog(v_def.get("changelog", f"Notas de la versión {v_str}."), meta['title'], v_str),
+                        "entry_point": exe_rel,
                         "package": pkg,
                         "delta_patches": v_def.get("delta_patches", []),
                         "scripts": v_def.get("scripts", {"pre_install": None, "post_install": None})
@@ -602,14 +635,14 @@ def generate_catalog(
                                 else:
                                     size, sha256 = resolve_asset_metadata(url, direct_sha=None, direct_size=size)
 
-                                exe_rel = fn if fn.endswith(".jar") else plat_info.get("executable_paths", {}).get(v_str, plat_info.get("executable_relative_path", fn))
-                                changelog = body if body else f"Lanzamiento de {meta['title']} v{v_str}."
+                                exe_rel = fn if fn.endswith(".jar") else plat_info.get("executable_paths", {}).get(v_str, plat_info.get("entry_point") or plat_info.get("executable_relative_path", fn))
+                                changelog = format_changelog(body if body else f"Lanzamiento de {meta['title']} versión {v_str}.", meta['title'], v_str)
 
                                 v_entry = {
                                     "version": v_str,
                                     "release_date": pub_date,
                                     "changelog": changelog,
-                                    "executable_relative_path": exe_rel,
+                                    "entry_point": exe_rel,
                                     "package": {
                                         "url": url,
                                         "size_bytes": size,
@@ -633,12 +666,12 @@ def generate_catalog(
                             if v_str in seen_versions:
                                 continue
 
-                            exe_rel = fn if fn.endswith(".jar") else plat_info.get("executable_paths", {}).get(v_str, plat_info.get("executable_relative_path", fn))
+                            exe_rel = fn if fn.endswith(".jar") else plat_info.get("executable_paths", {}).get(v_str, plat_info.get("entry_point") or plat_info.get("executable_relative_path", fn))
                             v_entry = {
                                 "version": v_str,
                                 "release_date": "2026-10-08T00:00:00Z",
-                                "changelog": f"Lanzamiento de {meta['title']} v{v_str}.",
-                                "executable_relative_path": exe_rel,
+                                "changelog": format_changelog(f"Lanzamiento de {meta['title']} versión {v_str}.", meta['title'], v_str),
+                                "entry_point": exe_rel,
                                 "package": {
                                     "url": cached_url,
                                     "size_bytes": cached_info["size_bytes"],
@@ -673,6 +706,11 @@ def generate_catalog(
                         if old_pkg.get("size_bytes", 0) <= 0 or len(old_pkg.get("sha256", "")) != 64:
                             continue
                         if old_ver and old_ver not in seen_versions and old_url not in seen_urls:
+                            if "entry_point" not in old_v and "executable_relative_path" in old_v:
+                                old_v["entry_point"] = old_v["executable_relative_path"]
+                            if "executable_relative_path" not in old_v and "entry_point" in old_v:
+                                old_v["executable_relative_path"] = old_v["entry_point"]
+                            old_v["changelog"] = format_changelog(old_v.get("changelog"), meta['title'], old_ver)
                             versions_list.append(old_v)
                             seen_versions.add(old_ver)
                             seen_urls.add(old_url)
@@ -910,8 +948,7 @@ def validate_manifest(manifest, schema_path):
             for v_obj in pval["versions"]:
                 assert "version" in v_obj and v_obj["version"], f"Platform {pkey} missing version string"
                 assert v_obj["version"] != "64.0.0", f"Corrupt phantom version 64.0.0 found in {app['id']} {pkey}"
-                assert "executable_relative_path" in v_obj and v_obj["executable_relative_path"], \
-                    f"Platform {pkey} missing executable_relative_path"
+                assert ("entry_point" in v_obj and v_obj["entry_point"]), f"Platform {pkey} missing entry_point / executable_relative_path"
                 assert "package" in v_obj, f"Platform {pkey} missing package"
                 pkg = v_obj["package"]
                 assert "url" in pkg and pkg["url"].startswith("https://"), f"Invalid package url in {pkey}"

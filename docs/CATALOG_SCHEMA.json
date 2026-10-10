@@ -77,12 +77,15 @@
                   "minItems": 1,
                   "items": {
                     "type": "object",
-                    "required": ["version", "executable_relative_path", "package"],
+                    "required": ["version", "package"],
+                    "anyOf": [
+                      { "required": ["entry_point"] }
+                    ],
                     "properties": {
                       "version": { "type": "string" },
                       "release_date": { "type": ["string", "null"] },
                       "changelog": { "type": "string" },
-                      "executable_relative_path": { "type": "string" },
+                      "entry_point": { "type": "string" },
                       "package": {
                         "type": "object",
                         "required": ["url", "sha256", "size_bytes"],

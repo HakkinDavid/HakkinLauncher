@@ -240,7 +240,7 @@ class DeltaGenerator:
                     zf.extractall(to_dir)
 
                 # Calcular hash del ejecutable objetivo en la versión nueva
-                exe_rel = to_release.get("executable_relative_path", "")
+                exe_rel = to_release.get("entry_point", "")
                 target_exe_path = os.path.join(to_dir, exe_rel)
                 if os.path.isfile(target_exe_path):
                     target_binary_sha256 = compute_sha256(target_exe_path)
