@@ -37,6 +37,7 @@ class CatalogRepository {
   /// para garantizar la detección de actualizaciones aunque el catálogo JSON remoto sufra desfase.
   Future<LauncherMeta?> fetchLatestLauncherMeta() async {
     try {
+      final res = await _dio.get<String>(
         AppConstants.launcherMetaUrl,
         options: Options(
           responseType: ResponseType.plain,
