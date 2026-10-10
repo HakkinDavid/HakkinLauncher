@@ -136,7 +136,7 @@
               "version": "0.0.1",
               "release_date": "2026-09-28T06:01:26Z",
               "changelog": "**Full Changelog**: https://github.com/Bonsanbec/tecate-simulator/commits/latest",
-              "executable_relative_path": "tecate.app/Contents/MacOS/Tecate- Pueblo Mágico y Social",
+              "executable_relative_path": "Tecate Simulator Facade MVP.app/Contents/MacOS/Tecate Simulator Facade MVP",
               "package": {
                 "url": "https://github.com/Bonsanbec/tecate-simulator/releases/download/latest/tecate-macos-v0.0.1-release.zip",
                 "size_bytes": 798030827,
