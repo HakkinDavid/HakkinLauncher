@@ -98,9 +98,29 @@ void main() {
       // 2. Verificación de fractochales
       final fracto = manifest.apps.firstWhere((a) => a.id == 'com.bonsanbec.fractochales');
       expect(fracto.title, 'Fractochales');
+      expect(fracto.latestVersion, '3.27');
+      expect(fracto.supportsPlatform('windows-x64'), isTrue);
+      expect(fracto.supportsPlatform('macos-arm64'), isTrue);
+      expect(fracto.supportsPlatform('android'), isTrue);
+
       final fractoWin = fracto.getPlatformRelease('windows-x64')!;
-      expect(fractoWin.latestRelease.executableRelativePath, 'main.exe');
+      expect(fractoWin.latestRelease.version, '3.27');
+      expect(fractoWin.latestRelease.executableRelativePath, 'Fractochales v3.27/main.exe');
       expect(fractoWin.latestRelease.package.sizeBytes, 29001895);
+      expect(fractoWin.getRelease('1.64'), isNotNull);
+      expect(fractoWin.getRelease('1.64')!.executableRelativePath, 'main.exe');
+      expect(fractoWin.getRelease('1.64')!.package.sizeBytes, 23238440);
+
+      final fractoMac = fracto.getPlatformRelease('macos-arm64')!;
+      expect(fractoMac.latestRelease.version, '3.27');
+      expect(fractoMac.latestRelease.executableRelativePath,
+          'fractochales-mac-arm64-v3.27.app/Contents/MacOS/Fractochales');
+      expect(fractoMac.latestRelease.package.sizeBytes, 29737927);
+
+      final fractoAndroid = fracto.getPlatformRelease('android')!;
+      expect(fractoAndroid.latestRelease.version, '3.27');
+      expect(fractoAndroid.latestRelease.executableRelativePath, 'fractochales-android-v3.27.apk');
+      expect(fractoAndroid.latestRelease.package.sizeBytes, 29535928);
 
       // 3. Verificación de firefighter-form
       final bomberos = manifest.apps.firstWhere((a) => a.id == 'com.hakkin.firefighter-form');

@@ -1,6 +1,6 @@
 {
   "version": "2.0.0",
-  "catalog_timestamp": "2026-10-09T22:52:34.852701+00:00",
+  "catalog_timestamp": "2026-10-09T23:52:24.047947+00:00",
   "launcher_meta": {
     "latest_version": "26.10.09-20",
     "min_required_launcher_version": "1.0.0",
@@ -60,8 +60,8 @@
           "versions": [
             {
               "version": "26.10.08-13",
-              "release_date": "2026-10-08T20:22:34.508643+00:00",
-              "changelog": "Lanzamiento de Tecate Simulator v26.10.08-13.",
+              "release_date": "2026-10-08T20:27:07Z",
+              "changelog": "| Plataforma | Archivo | Tamaño | SHA-256 | Descarga |\r\n| :--- | :--- | :--- | :--- | :--- |\r\n| **macOS (Apple Silicon & Intel Universal)** | `tecate-macos.zip` | 1060.2 MB | `a5ff201a1cfc...` | [Descargar (v26.10.08-13)](https://github.com/Bonsanbec/tecate-simulator/releases/download/26.10.08-13/tecate-macos.zip) |\r\n| **Windows (x86_64 Desktop)** | `tecate-windows.zip` | 1034.6 MB | `b38a07970fac...` | [Descargar (v26.10.08-13)](https://github.com/Bonsanbec/tecate-simulator/releases/download/26.10.08-13/tecate-windows.zip) |",
               "executable_relative_path": "tecate.exe",
               "package": {
                 "url": "https://github.com/Bonsanbec/tecate-simulator/releases/download/26.10.08-13/tecate-windows.zip",
@@ -108,8 +108,8 @@
           "versions": [
             {
               "version": "26.10.08-13",
-              "release_date": "2026-10-08T20:22:34.508643+00:00",
-              "changelog": "Lanzamiento de Tecate Simulator v26.10.08-13.",
+              "release_date": "2026-10-08T20:27:07Z",
+              "changelog": "| Plataforma | Archivo | Tamaño | SHA-256 | Descarga |\r\n| :--- | :--- | :--- | :--- | :--- |\r\n| **macOS (Apple Silicon & Intel Universal)** | `tecate-macos.zip` | 1060.2 MB | `a5ff201a1cfc...` | [Descargar (v26.10.08-13)](https://github.com/Bonsanbec/tecate-simulator/releases/download/26.10.08-13/tecate-macos.zip) |\r\n| **Windows (x86_64 Desktop)** | `tecate-windows.zip` | 1034.6 MB | `b38a07970fac...` | [Descargar (v26.10.08-13)](https://github.com/Bonsanbec/tecate-simulator/releases/download/26.10.08-13/tecate-windows.zip) |",
               "executable_relative_path": "tecate.app/Contents/MacOS/Tecate- Pueblo Mágico y Social",
               "package": {
                 "url": "https://github.com/Bonsanbec/tecate-simulator/releases/download/26.10.08-13/tecate-macos.zip",
@@ -189,7 +189,7 @@
               "version": "3.27",
               "release_date": "2026-10-09T22:08:47Z",
               "changelog": "**Full Changelog**: https://github.com/Bonsanbec/fractochales/compare/v1.64-prod-2D...v3.27",
-              "executable_relative_path": "main.exe",
+              "executable_relative_path": "Fractochales v3.27/main.exe",
               "package": {
                 "url": "https://github.com/Bonsanbec/fractochales/releases/download/v3.27/fractochales-win-x86_64-v3.27.zip",
                 "size_bytes": 29001895,
@@ -220,6 +220,50 @@
                 "url": "https://github.com/Bonsanbec/fractochales/releases/download/v1.64-prod-2D/fractochales-win-x86_64-v1.64.zip",
                 "size_bytes": 23238440,
                 "sha256": "ad9f2a2dff17726a5d516817059441bc181aee2666a3197118b3a9afa4127693"
+              },
+              "delta_patches": [],
+              "scripts": {
+                "pre_install": null,
+                "post_install": null
+              }
+            }
+          ]
+        },
+        "macos-arm64": {
+          "latest_version": "3.27",
+          "protected_user_paths": [],
+          "versions": [
+            {
+              "version": "3.27",
+              "release_date": "2026-10-09T22:08:47Z",
+              "changelog": "**Full Changelog**: https://github.com/Bonsanbec/fractochales/compare/v1.64-prod-2D...v3.27",
+              "executable_relative_path": "fractochales-mac-arm64-v3.27.app/Contents/MacOS/Fractochales",
+              "package": {
+                "url": "https://github.com/Bonsanbec/fractochales/releases/download/v3.27/fractochales-mac-arm64-v3.27.app.zip",
+                "size_bytes": 29737927,
+                "sha256": "8cac6560d462c0709d87c4dede8fadaf79e1b95d68b2fbad2516a94f570433c3"
+              },
+              "delta_patches": [],
+              "scripts": {
+                "pre_install": null,
+                "post_install": null
+              }
+            }
+          ]
+        },
+        "android": {
+          "latest_version": "3.27",
+          "protected_user_paths": [],
+          "versions": [
+            {
+              "version": "3.27",
+              "release_date": "2026-10-09T22:08:47Z",
+              "changelog": "**Full Changelog**: https://github.com/Bonsanbec/fractochales/compare/v1.64-prod-2D...v3.27",
+              "executable_relative_path": "fractochales-android-v3.27.apk",
+              "package": {
+                "url": "https://github.com/Bonsanbec/fractochales/releases/download/v3.27/fractochales-android-v3.27.apk",
+                "size_bytes": 29535928,
+                "sha256": "ba1c10b162c071b56f3d2cd8ab5a995bb110718ecf3fa1d5ec7161c351e64e11"
               },
               "delta_patches": [],
               "scripts": {

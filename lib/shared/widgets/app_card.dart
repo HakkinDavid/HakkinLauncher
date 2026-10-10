@@ -143,7 +143,8 @@ class _AppCardState extends State<AppCard> {
                         ),
                         Row(
                           children: [
-                            if (widget.app.platforms.containsKey('windows-x64'))
+                            if (widget.app.platforms.containsKey('windows-x64') ||
+                                widget.app.platforms.containsKey('windows-x86'))
                               const Padding(
                                 padding: EdgeInsets.only(left: 4),
                                 child: Icon(Icons.window, size: 13, color: AppColors.platinumMuted),
@@ -153,6 +154,16 @@ class _AppCardState extends State<AppCard> {
                               const Padding(
                                 padding: EdgeInsets.only(left: 4),
                                 child: Icon(Icons.apple, size: 14, color: AppColors.platinumMuted),
+                              ),
+                            if (widget.app.platforms.containsKey('android'))
+                              const Padding(
+                                padding: EdgeInsets.only(left: 4),
+                                child: Icon(Icons.android, size: 14, color: AppColors.platinumMuted),
+                              ),
+                            if (widget.app.platforms.containsKey('linux-x64'))
+                              const Padding(
+                                padding: EdgeInsets.only(left: 4),
+                                child: Icon(Icons.terminal, size: 14, color: AppColors.platinumMuted),
                               ),
                           ],
                         ),

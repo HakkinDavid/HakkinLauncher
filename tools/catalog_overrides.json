@@ -65,8 +65,22 @@
     },
     "platforms": {
       "windows-x64": {
-        "executable_relative_path": "main.exe",
+        "executable_relative_path": "Fractochales v3.27/main.exe",
+        "executable_paths": {
+          "3.27": "Fractochales v3.27/main.exe",
+          "1.64": "main.exe"
+        },
         "asset_pattern": "fractochales-win.*\\.zip",
+        "protected_user_paths": []
+      },
+      "macos-arm64": {
+        "executable_relative_path": "fractochales-mac-arm64-v3.27.app/Contents/MacOS/Fractochales",
+        "asset_pattern": "fractochales-mac.*\\.zip",
+        "protected_user_paths": []
+      },
+      "android": {
+        "executable_relative_path": "fractochales-android-v3.27.apk",
+        "asset_pattern": "fractochales-android.*\\.apk",
         "protected_user_paths": []
       }
     }

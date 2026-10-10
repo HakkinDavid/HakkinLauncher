@@ -112,6 +112,12 @@ class TestCatalogGenerator(unittest.TestCase):
                     self.assertIn("26.09.08", versions)
                     self.assertNotIn("1.0.0", versions)
 
+                # Si es Fractochales, verificar que soporta windows-x64, macos-arm64 y android
+                if app["id"] == "com.bonsanbec.fractochales":
+                    self.assertIn("windows-x64", app["platforms"])
+                    self.assertIn("macos-arm64", app["platforms"])
+                    self.assertIn("android", app["platforms"])
+
     def test_purge_orphaned_and_nonexistent_versions_removes_invalid_entries(self):
         # Manifiesto con versión válida, versión con paquete corrupto, versión fantasma
         # y parche delta apuntando a versión inexistente (huérfana)

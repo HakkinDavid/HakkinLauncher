@@ -23,7 +23,46 @@ class AppDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
+  String? _selectedPlatform;
   String? _selectedVersion;
+
+  @override
+  void didUpdateWidget(covariant AppDetailScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.appId != widget.appId) {
+      _selectedPlatform = null;
+      _selectedVersion = null;
+    }
+  }
+
+  IconData _getPlatformIcon(String platformKey) {
+    if (platformKey.startsWith('windows')) return Icons.window;
+    if (platformKey.startsWith('macos')) return Icons.apple;
+    if (platformKey == 'android') return Icons.android;
+    if (platformKey.startsWith('linux')) return Icons.terminal;
+    return Icons.devices;
+  }
+
+  String _getPlatformLabel(String platformKey) {
+    switch (platformKey) {
+      case 'windows-x64':
+        return 'Windows x64';
+      case 'windows-x86':
+        return 'Windows 32-bit';
+      case 'macos-arm64':
+        return 'macOS Apple Silicon';
+      case 'macos-x64':
+        return 'macOS Intel';
+      case 'android':
+        return 'Android';
+      case 'linux-x64':
+        return 'Linux x64';
+      case 'ios':
+        return 'iOS';
+      default:
+        return platformKey;
+    }
+  }
 
   bool _isOlder(String v1, String v2) {
     final p1 = RegExp(r'\d+').allMatches(v1).map((m) => int.parse(m.group(0)!)).toList();
@@ -87,15 +126,32 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
               updateStatus.stage != UpdateStage.completed &&
               updateStatus.stage != UpdateStage.failed;
 
-          final platformRelease = app.getPlatformRelease(currentPlatform);
-          final isSupported = platformRelease != null && platformRelease.versions.isNotEmpty;
+          final availablePlatformKeys = app.platforms.keys.toList();
 
-          // Seleccionar versión actual o fallback a la última versión
-          final selectedVersionStr = _selectedVersion ??
-              (platformRelease != null ? platformRelease.latestVersion : app.latestVersion);
+          // Resolución de plataforma activa:
+          // 1. Si el usuario seleccionó una plataforma manualmente y existe en la app, usarla.
+          // 2. Si no, si la plataforma actual del equipo es soportada, preferir la plataforma actual.
+          // 3. De lo contrario, usar la primera plataforma disponible en la app.
+          final activePlatformKey = (_selectedPlatform != null && app.platforms.containsKey(_selectedPlatform))
+              ? _selectedPlatform!
+              : (app.platforms.containsKey(currentPlatform)
+                  ? currentPlatform
+                  : (availablePlatformKeys.isNotEmpty ? availablePlatformKeys.first : currentPlatform));
+
+          final platformRelease = app.getPlatformRelease(activePlatformKey);
+          final isNativeToHost = activePlatformKey == currentPlatform;
+          final isSupported = isNativeToHost && platformRelease != null && platformRelease.versions.isNotEmpty;
+          final canSwitchToHost = !isNativeToHost && app.supportsPlatform(currentPlatform);
+
+          // Versiones disponibles para la plataforma activa
+          final availableVersions = platformRelease?.availableVersions ?? [];
+          final selectedVersionStr = (_selectedVersion != null && availableVersions.contains(_selectedVersion))
+              ? _selectedVersion!
+              : (platformRelease?.latestVersion ?? app.latestVersion);
+
           final selectedRelease = platformRelease?.getRelease(selectedVersionStr) ??
               platformRelease?.latestRelease ??
-              const AppVersionRelease.empty();
+              (platformRelease?.versions.isNotEmpty == true ? platformRelease!.versions.first : const AppVersionRelease.empty());
 
           return CustomScrollView(
             slivers: [
@@ -177,8 +233,67 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
                                           StatusBadge.tag(app.category),
                                           const SizedBox(width: 10),
 
-                                          // Selector de Versiones Históricas
-                                          if (isSupported && platformRelease.availableVersions.isNotEmpty)
+                                          // Selector de Plataformas Disponibles
+                                          if (availablePlatformKeys.length > 1)
+                                            Container(
+                                              margin: const EdgeInsets.only(right: 8),
+                                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                              decoration: BoxDecoration(
+                                                color: AppColors.surfaceElevated.withValues(alpha: 0.9),
+                                                borderRadius: BorderRadius.circular(8),
+                                                border: Border.all(color: AppColors.surfaceBorder),
+                                              ),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: availablePlatformKeys.map((pk) {
+                                                  final isSelected = pk == activePlatformKey;
+                                                  return InkWell(
+                                                    borderRadius: BorderRadius.circular(6),
+                                                    onTap: () {
+                                                      setState(() {
+                                                        _selectedPlatform = pk;
+                                                        _selectedVersion = null;
+                                                      });
+                                                    },
+                                                    child: AnimatedContainer(
+                                                      duration: const Duration(milliseconds: 150),
+                                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                      decoration: BoxDecoration(
+                                                        color: isSelected
+                                                            ? AppColors.celestialBlue.withValues(alpha: 0.25)
+                                                            : Colors.transparent,
+                                                        borderRadius: BorderRadius.circular(6),
+                                                        border: isSelected
+                                                            ? Border.all(color: AppColors.celestialBlue, width: 1)
+                                                            : Border.all(color: Colors.transparent, width: 1),
+                                                      ),
+                                                      child: Row(
+                                                        mainAxisSize: MainAxisSize.min,
+                                                        children: [
+                                                          Icon(
+                                                            _getPlatformIcon(pk),
+                                                            size: 13,
+                                                            color: isSelected ? AppColors.celestialBlue : AppColors.platinumMuted,
+                                                          ),
+                                                          const SizedBox(width: 5),
+                                                          Text(
+                                                            _getPlatformLabel(pk),
+                                                            style: TextStyle(
+                                                              color: isSelected ? AppColors.platinum : AppColors.platinumMuted,
+                                                              fontSize: 11,
+                                                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  );
+                                                }).toList(),
+                                              ),
+                                            ),
+
+                                          // Selector de Versiones Históricas para la plataforma activa
+                                          if (availableVersions.isNotEmpty)
                                             Container(
                                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                               decoration: BoxDecoration(
@@ -201,8 +316,8 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
                                                     fontSize: 12,
                                                     fontWeight: FontWeight.w600,
                                                   ),
-                                                  items: platformRelease.availableVersions.map((v) {
-                                                    final isLatest = v == platformRelease.latestVersion;
+                                                  items: availableVersions.map((v) {
+                                                    final isLatest = platformRelease != null && v == platformRelease.latestVersion;
                                                     return DropdownMenuItem<String>(
                                                       value: v,
                                                       child: Text(
@@ -251,7 +366,10 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
                                 _buildActionButton(
                                   app: app,
                                   selectedVersionStr: selectedVersionStr,
+                                  activePlatformKey: activePlatformKey,
+                                  currentPlatform: currentPlatform,
                                   isSupported: isSupported,
+                                  canSwitchToHost: canSwitchToHost,
                                   isInstalled: isInstalled,
                                   isRunning: isRunning,
                                   isUpdating: isUpdating,
@@ -601,34 +719,35 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
                               const Divider(height: 24),
                               _buildMetaRow('Desarrollador', app.developer),
                               _buildMetaRow('Categoría', app.category.toUpperCase()),
+                              _buildMetaRow('Plataforma Activa', _getPlatformLabel(activePlatformKey)),
+                              _buildMetaRow('Plataformas Disponibles', availablePlatformKeys.map(_getPlatformLabel).join(', ')),
                               _buildMetaRow('Versión Seleccionada', 'v${selectedRelease.version}'),
                               if (selectedRelease.releaseDate != null)
                                 _buildMetaRow(
                                   'Fecha de Versión',
                                   '${selectedRelease.releaseDate!.day.toString().padLeft(2, '0')}/${selectedRelease.releaseDate!.month.toString().padLeft(2, '0')}/${selectedRelease.releaseDate!.year}',
                                 ),
-                              if (isSupported) ...[
+                              if (selectedRelease.executableRelativePath.isNotEmpty)
                                 _buildMetaRow(
                                   'Ejecutable Relativo',
                                   selectedRelease.executableRelativePath,
                                 ),
+                              if (selectedRelease.package.sizeBytes > 0)
                                 _buildMetaRow(
                                   'Tamaño de Descarga',
                                   '${(selectedRelease.package.sizeBytes / 1048576).toStringAsFixed(1)} MB',
                                 ),
-                                _buildMetaRow(
-                                  'Soporte Diferencial',
-                                  selectedRelease.deltaPatches.isNotEmpty
-                                      ? 'Disponible: ${selectedRelease.deltaPatches.length} parches'
-                                      : 'Solo descarga completa',
-                                ),
+                              _buildMetaRow(
+                                'Soporte Diferencial',
+                                selectedRelease.deltaPatches.isNotEmpty
+                                    ? 'Disponible: ${selectedRelease.deltaPatches.length} parches'
+                                    : 'Solo descarga completa',
+                              ),
+                              if (platformRelease != null && platformRelease.protectedUserPaths.isNotEmpty)
                                 _buildMetaRow(
                                   'Rutas de Usuario',
-                                  platformRelease.protectedUserPaths.isNotEmpty
-                                      ? '${platformRelease.protectedUserPaths.length} protegidas'
-                                      : 'Ninguna',
+                                  '${platformRelease.protectedUserPaths.length} protegidas',
                                 ),
-                              ],
                             ],
                           ),
                         ),
@@ -647,7 +766,10 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
   Widget _buildActionButton({
     required AppEntry app,
     required String selectedVersionStr,
+    required String activePlatformKey,
+    required String currentPlatform,
     required bool isSupported,
+    required bool canSwitchToHost,
     required bool isInstalled,
     required bool isRunning,
     required bool isUpdating,
@@ -656,8 +778,21 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
     required PlatformRelease? platformRelease,
   }) {
     if (!isSupported) {
-      return const HakkinButton(
-        text: 'Plataforma No Soportada',
+      if (canSwitchToHost) {
+        return HakkinButton(
+          text: 'Cambiar a ${_getPlatformLabel(currentPlatform)}',
+          icon: _getPlatformIcon(currentPlatform),
+          variant: HakkinButtonVariant.primaryPlatinum,
+          onPressed: () {
+            setState(() {
+              _selectedPlatform = currentPlatform;
+              _selectedVersion = null;
+            });
+          },
+        );
+      }
+      return HakkinButton(
+        text: 'Disponible para ${_getPlatformLabel(activePlatformKey)}',
         variant: HakkinButtonVariant.secondary,
         onPressed: null,
       );

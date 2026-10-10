@@ -41,6 +41,18 @@ KNOWN_ASSET_CACHE = {
         "size_bytes": 798030827,
         "sha256": "86286cae84f07e0978bc32fb9597cc06bd795030e0c6d96c6fcf6ccd42801cbd"
     },
+    "https://github.com/Bonsanbec/fractochales/releases/download/v3.27/fractochales-win-x86_64-v3.27.zip": {
+        "size_bytes": 29001895,
+        "sha256": "5ca4e3ff3fae2eba0161a51b22e463c19d012a8cfe765e1e35e22d7fed8fffb4"
+    },
+    "https://github.com/Bonsanbec/fractochales/releases/download/v3.27/fractochales-mac-arm64-v3.27.app.zip": {
+        "size_bytes": 29737927,
+        "sha256": "8cac6560d462c0709d87c4dede8fadaf79e1b95d68b2fbad2516a94f570433c3"
+    },
+    "https://github.com/Bonsanbec/fractochales/releases/download/v3.27/fractochales-android-v3.27.apk": {
+        "size_bytes": 29535928,
+        "sha256": "ba1c10b162c071b56f3d2cd8ab5a995bb110718ecf3fa1d5ec7161c351e64e11"
+    },
     "https://github.com/Bonsanbec/fractochales/releases/download/v1.64-prod-2D/fractochales-win-x86_64-v1.64.zip": {
         "size_bytes": 23238440,
         "sha256": "ad9f2a2dff17726a5d516817059441bc181aee2666a3197118b3a9afa4127693"
@@ -550,7 +562,7 @@ def generate_catalog(
                                 else:
                                     size, sha256 = resolve_asset_metadata(url, direct_sha=None, direct_size=size)
 
-                                exe_rel = fn if fn.endswith(".jar") else plat_info.get("executable_relative_path", fn)
+                                exe_rel = fn if fn.endswith(".jar") else plat_info.get("executable_paths", {}).get(v_str, plat_info.get("executable_relative_path", fn))
                                 changelog = body if body else f"Lanzamiento de {meta['title']} v{v_str}."
 
                                 v_entry = {
@@ -581,7 +593,7 @@ def generate_catalog(
                             if v_str in seen_versions:
                                 continue
 
-                            exe_rel = fn if fn.endswith(".jar") else plat_info.get("executable_relative_path", fn)
+                            exe_rel = fn if fn.endswith(".jar") else plat_info.get("executable_paths", {}).get(v_str, plat_info.get("executable_relative_path", fn))
                             v_entry = {
                                 "version": v_str,
                                 "release_date": "2026-10-08T00:00:00Z",
