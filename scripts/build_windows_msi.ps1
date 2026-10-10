@@ -57,8 +57,6 @@ candle.exe -dProductVersion="$msiVersion" -dSourceDir="$SourceDir" $harvestedWxs
 light.exe -ext WixUIExtension -sval $mainObj $harvestedObj -out $outputMsi
 
 if (Test-Path $outputMsi) {
-    $size = (Get-Item $outputMsi).Length
-    Write-Host "MSIOK."
 } else {
     exit 1
 }
