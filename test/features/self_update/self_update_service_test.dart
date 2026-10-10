@@ -128,6 +128,8 @@ void main() {
       expect(script, contains(r'mv "$FOUND_APP" "$TARGET_APP"'));
       // Re-launch
       expect(script, contains(r'open -n "$TARGET_APP"'));
+      // Elevation fallback
+      expect(script, contains('osascript -e'));
     });
 
     test('generateWindowsUpdateScript contains staging, backup, and rollback', () {
@@ -166,6 +168,8 @@ void main() {
       expect(script, contains(r'cp -a "$BACKUP_DIR" "$APP_DIR"'));
       expect(script, contains(r'chmod +x "$CURRENT_EXE"'));
       expect(script, contains(r'"$CURRENT_EXE" &'));
+      // Elevation fallback
+      expect(script, contains('pkexec'));
     });
   });
 }

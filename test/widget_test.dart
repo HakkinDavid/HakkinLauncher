@@ -26,7 +26,7 @@ void main() {
         },
         "apps": [
           {
-            "id": "com.hakkin.testgame",
+            "id": "dev.bonsanbec.testgame",
             "slug": "test-game",
             "title": "Test Game",
             "category": "game",
@@ -90,7 +90,7 @@ void main() {
       expect(manifest.apps.length, 1);
 
       final app = manifest.apps.first;
-      expect(app.id, 'com.hakkin.testgame');
+      expect(app.id, 'dev.bonsanbec.testgame');
       expect(app.title, 'Test Game');
       expect(app.category, 'game');
       expect(app.assets.screenshots.length, 2);
@@ -131,7 +131,7 @@ void main() {
   group('InstalledApp Model & Launch Arguments Tests', () {
     test('Serializa y deserializa InstalledApp con argumentos de lanzamiento', () {
       final app = InstalledApp(
-        id: 'com.hakkin.game1',
+        id: 'dev.bonsanbec.game1',
         title: 'Eclipse',
         installedVersion: '1.0.0',
         executablePath: '/tmp/game',

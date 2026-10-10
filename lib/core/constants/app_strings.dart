@@ -461,4 +461,21 @@ class AppStrings {
       'Aviso: parche a nivel de directorio retornó $code, reintentando sobre ejecutable...';
   static String logHpatchzExecError(Object error) =>
       'Error al ejecutar hpatchz: $error.';
+
+  // ---------------------------------------------------------------------------
+  // macOS Relocation Service
+  // ---------------------------------------------------------------------------
+  static const macOsRelocationDialogTitle = 'Trasladar a Aplicaciones';
+  static const macOsRelocationDialogMessage =
+      'HakkinLauncher detectó que se está ejecutando fuera de la carpeta Aplicaciones. Para garantizar el correcto funcionamiento de las autoactualizaciones, se recomienda trasladar el lanzador a tu carpeta de Aplicaciones.';
+  static const macOsRelocationDialogConfirm = 'Mover a Aplicaciones';
+  static const macOsRelocationDialogCancel = 'Continuar aquí';
+  static const macOsRelocationSuccessToast =
+      'HakkinLauncher se trasladó exitosamente a Aplicaciones.';
+  static const macOsRelocationErrorToast =
+      'No se pudo trasladar automáticamente a Aplicaciones.';
+  static String logMacOsRelocationSuccess(String path) =>
+      'HakkinLauncher se trasladó con éxito a: $path.';
+  static String logMacOsRelocationError(Object error) =>
+      'Error al trasladar HakkinLauncher a Aplicaciones: $error.';
 }

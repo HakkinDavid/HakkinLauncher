@@ -5,10 +5,11 @@ import 'package:hakkin_launcher/core/constants/app_constants.dart';
 import 'package:hakkin_launcher/core/constants/app_strings.dart';
 import 'package:hakkin_launcher/core/constants/app_technical_strings.dart';
 import 'package:hakkin_launcher/core/theme/app_colors.dart';
+import 'package:hakkin_launcher/core/platform/macos_relocation_service.dart';
 import 'package:hakkin_launcher/features/catalog/presentation/controllers/catalog_controller.dart';
 import 'package:hakkin_launcher/features/self_update/services/self_update_service.dart';
 
-class ShellNavigationScaffold extends ConsumerWidget {
+class ShellNavigationScaffold extends ConsumerStatefulWidget {
   final Widget child;
 
   const ShellNavigationScaffold({
@@ -17,12 +18,30 @@ class ShellNavigationScaffold extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ShellNavigationScaffold> createState() =>
+      _ShellNavigationScaffoldState();
+}
+
+class _ShellNavigationScaffoldState
+    extends ConsumerState<ShellNavigationScaffold> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        MacOsRelocationService.checkAndRelocateIfNecessary(context);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final location = GoRouterState.of(context).uri.toString();
     final manifestAsync = ref.watch(catalogManifestProvider);
     final launcherMeta = manifestAsync.value?.launcherMeta;
     final hasLauncherUpdate = launcherMeta != null &&
-        SelfUpdateService.isNewerVersion(launcherMeta.latestVersion, AppConstants.appVersion);
+        SelfUpdateService.isNewerVersion(
+            launcherMeta.latestVersion, AppConstants.appVersion);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -129,7 +148,7 @@ class ShellNavigationScaffold extends ConsumerWidget {
           ),
 
           Expanded(
-            child: child,
+            child: widget.child,
           ),
         ],
       ),

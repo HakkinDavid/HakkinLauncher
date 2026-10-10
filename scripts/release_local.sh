@@ -149,6 +149,10 @@ for t in "${TARGETS_TO_PROCESS[@]}"; do
             fi
             python3 "$HASH_MGR" update-local-cache --target "macos-${arch}"
           done
+
+          # Generar imagen DMG nativa con /Applications
+          "$WORKSPACE_ROOT/scripts/build_macos_dmg.sh" "$APP_PATH" "build/release/HakkinLauncher-macos.dmg"
+
           echo "[$t] Empaquetado completado y registrado en caché local."
         else
           echo "[macos] La compilación nativa de macOS requiere un host macOS."
@@ -253,12 +257,15 @@ for t in "${TARGETS_TO_PROCESS[@]}"; do
     macos)
       [[ -f "build/release/HakkinLauncher-macos-arm64.zip" ]] && BINARY_FILES+=("build/release/HakkinLauncher-macos-arm64.zip")
       [[ -f "build/release/HakkinLauncher-macos-x64.zip" ]] && BINARY_FILES+=("build/release/HakkinLauncher-macos-x64.zip")
+      [[ -f "build/release/HakkinLauncher-macos.dmg" ]] && BINARY_FILES+=("build/release/HakkinLauncher-macos.dmg")
       ;;
     windows)
       [[ -f "build/release/HakkinLauncher-windows-x64.zip" ]] && BINARY_FILES+=("build/release/HakkinLauncher-windows-x64.zip")
+      [[ -f "build/release/HakkinLauncher-windows-x64.msi" ]] && BINARY_FILES+=("build/release/HakkinLauncher-windows-x64.msi")
       ;;
     linux)
       [[ -f "build/release/HakkinLauncher-linux-x64.zip" ]] && BINARY_FILES+=("build/release/HakkinLauncher-linux-x64.zip")
+      [[ -f "build/release/HakkinLauncher-linux-amd64.deb" ]] && BINARY_FILES+=("build/release/HakkinLauncher-linux-amd64.deb")
       ;;
     *)
       ZIP_CANDIDATE="build/release/HakkinLauncher-${t}.zip"

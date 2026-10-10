@@ -92,6 +92,10 @@ class AppTechnicalStrings {
   static const dirDesktop = 'Desktop';
   static const dirStartMenu = 'Microsoft/Windows/Start Menu/Programs/Hakkin';
   static const dirLinuxApps = '.local/share/applications';
+  static const dirApplicationsSystem = '/Applications';
+  static const dirApplicationsUser = 'Applications';
+  static const dirVolumes = '/Volumes';
+  static const dirDownloadsSystem = 'Downloads';
   static const parentDir = '..';
 
   static const extExe = '.exe';
@@ -101,6 +105,9 @@ class AppTechnicalStrings {
   static const extLnk = '.lnk';
   static const extDesktop = '.desktop';
   static const extPs1 = '.ps1';
+  static const extDmg = '.dmg';
+  static const extMsi = '.msi';
+  static const extDeb = '.deb';
 
   static const fileHpatchz = 'hpatchz';
   static const fileHpatchzExe = 'hpatchz.exe';
@@ -114,6 +121,9 @@ class AppTechnicalStrings {
   static const selfUpdateZipFileName = 'HakkinLauncher_update.zip';
   static const selfUpdateLogFileName = 'HakkinLauncher_self_update.log';
   static const appContentsMacOs = '.app/Contents/MacOS';
+  static const appleQuarantineAttr = 'com.apple.quarantine';
+  static const testHakkinWritePrefix = '.test_hakkin_write_';
+  static String testHakkinWriteFile(int pid) => '$testHakkinWritePrefix$pid';
 
   // ---------------------------------------------------------------------------
   // Shell Commands & Arguments
@@ -128,6 +138,11 @@ class AppTechnicalStrings {
   static const cmdTaskkill = 'taskkill';
   static const cmdPowershell = 'powershell';
   static const cmdCmd = 'cmd';
+  static const cmdOpen = 'open';
+  static const cmdHdiutil = 'hdiutil';
+  static const cmdDpkgDeb = 'dpkg-deb';
+  static const cmdPkexec = 'pkexec';
+  static const cmdOsascript = 'osascript';
   static const binBash = '/bin/bash';
   static const cmdWhere = 'where';
   static const cmdWhich = 'which';
@@ -135,6 +150,8 @@ class AppTechnicalStrings {
   static const argPlusX = '+x';
   static const argMinusCr = '-cr';
   static const argMinusR = '-R';
+  static const argMinusN = '-n';
+  static const argMinusDr = '-dr';
   static const argMinusXk = '-xk';
   static const argMinusQ = '-q';
   static const argMinusO = '-o';
@@ -432,13 +449,18 @@ if [ -d "\$TARGET_APP" ]; then
 fi
 
 echo "Sustituyendo aplicación en \$TARGET_APP..."
-rm -rf "\$TARGET_APP" 2>/dev/null || true
-if ! mv "\$FOUND_APP" "\$TARGET_APP"; then
-    echo "Error al mover nueva versión a destino."
-    rollback
+TARGET_PARENT="\$(dirname "\$TARGET_APP")"
+if ([ -e "\$TARGET_APP" ] && [ ! -w "\$TARGET_APP" ]) || [ ! -w "\$TARGET_PARENT" ]; then
+    echo "Permisos de escritura restringidos en \$TARGET_APP. Solicitando autorización administrativa en macOS..."
+    osascript -e "do shell script \\"rm -rf '\$TARGET_APP' && mv '\$FOUND_APP' '\$TARGET_APP' && xattr -dr com.apple.quarantine '\$TARGET_APP'\\" with administrator privileges" || rollback
+else
+    rm -rf "\$TARGET_APP" 2>/dev/null || true
+    if ! mv "\$FOUND_APP" "\$TARGET_APP"; then
+        echo "Error al mover nueva versión a destino."
+        rollback
+    fi
+    xattr -dr com.apple.quarantine "\$TARGET_APP" 2>/dev/null || true
 fi
-
-xattr -dr com.apple.quarantine "\$TARGET_APP" 2>/dev/null || true
 
 echo "Iniciando nueva versión..."
 if ! open -n "\$TARGET_APP"; then
@@ -600,8 +622,13 @@ rm -rf "\$BACKUP_DIR" 2>/dev/null || true
 cp -a "\$APP_DIR" "\$BACKUP_DIR" 2>/dev/null || rollback
 
 echo "Actualizando archivos en \$APP_DIR..."
-cp -a "\$STAGING_CONTENT/." "\$APP_DIR/" || rollback
-chmod +x "\$CURRENT_EXE" || true
+if [ ! -w "\$APP_DIR" ]; then
+    echo "Permisos insuficientes en \$APP_DIR. Solicitando autorización administrativa vía pkexec..."
+    pkexec env DISPLAY="\$DISPLAY" XAUTHORITY="\$XAUTHORITY" bash -c "cp -a '\$STAGING_CONTENT/.' '\$APP_DIR/' && chmod +x '\$CURRENT_EXE'" || rollback
+else
+    cp -a "\$STAGING_CONTENT/." "\$APP_DIR/" || rollback
+    chmod +x "\$CURRENT_EXE" || true
+fi
 
 echo "Iniciando nueva versión..."
 "\$CURRENT_EXE" &

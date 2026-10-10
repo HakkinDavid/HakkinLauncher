@@ -102,19 +102,19 @@ class TestCatalogGenerator(unittest.TestCase):
                 self.assertNotIn("64.0.0", versions)
 
                 # Si es firefighter-form, verificar que 26.06.02 está presente antes de 26.08.04
-                if app["id"] == "com.hakkin.firefighter-form":
+                if app["id"] == "dev.bonsanbec.firefighter-form":
                     self.assertIn("26.08.04", versions)
                     self.assertIn("26.06.02", versions)
                     self.assertNotIn("1.0.0", versions)
 
                 # Si es PWMS, verificar que 26.09.08 está presente antes de 26.09.11
-                if app["id"] == "com.hakkin.pwms":
+                if app["id"] == "dev.bonsanbec.pwms":
                     self.assertIn("26.09.11", versions)
                     self.assertIn("26.09.08", versions)
                     self.assertNotIn("1.0.0", versions)
 
                 # Si es Fractochales, verificar que soporta windows-x64, macos-arm64 y android
-                if app["id"] == "com.bonsanbec.fractochales":
+                if app["id"] == "dev.bonsanbec.fractochales":
                     self.assertIn("windows-x64", app["platforms"])
                     self.assertIn("macos-arm64", app["platforms"])
                     self.assertIn("android", app["platforms"])

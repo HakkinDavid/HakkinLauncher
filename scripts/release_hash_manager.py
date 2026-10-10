@@ -67,25 +67,52 @@ def update_catalog_launcher_meta(meta):
 
 
 TARGET_CONFIG = {
+    # Paquetes de Actualización y Portables (.zip)
     "macos-arm64": {
         "filename": "HakkinLauncher-macos-arm64.zip",
         "path": os.path.join(BUILD_DIR, "HakkinLauncher-macos-arm64.zip"),
-        "display_name": "macOS arm64",
+        "display_name": "macOS Apple Silicon (arm64)",
+        "type": "update",
     },
     "macos-x64": {
         "filename": "HakkinLauncher-macos-x64.zip",
         "path": os.path.join(BUILD_DIR, "HakkinLauncher-macos-x64.zip"),
-        "display_name": "macOS x64",
+        "display_name": "macOS Intel (x64)",
+        "type": "update",
     },
     "windows-x64": {
         "filename": "HakkinLauncher-windows-x64.zip",
         "path": os.path.join(BUILD_DIR, "HakkinLauncher-windows-x64.zip"),
         "display_name": "Windows x64",
+        "type": "update",
     },
     "linux-x64": {
         "filename": "HakkinLauncher-linux-x64.zip",
         "path": os.path.join(BUILD_DIR, "HakkinLauncher-linux-x64.zip"),
         "display_name": "Linux x64",
+        "type": "update",
+    },
+    # Instaladores Nativos para Nuevos Usuarios
+    "windows-msi": {
+        "filename": "HakkinLauncher-windows-x64.msi",
+        "path": os.path.join(BUILD_DIR, "HakkinLauncher-windows-x64.msi"),
+        "display_name": "Windows x64 (Instalador nativo .msi)",
+        "type": "installer",
+        "platform_key": "windows-x64",
+    },
+    "macos-dmg": {
+        "filename": "HakkinLauncher-macos.dmg",
+        "path": os.path.join(BUILD_DIR, "HakkinLauncher-macos.dmg"),
+        "display_name": "macOS Universal (Imagen .dmg con /Applications)",
+        "type": "installer",
+        "platform_key": "macos",
+    },
+    "linux-deb": {
+        "filename": "HakkinLauncher-linux-amd64.deb",
+        "path": os.path.join(BUILD_DIR, "HakkinLauncher-linux-amd64.deb"),
+        "display_name": "Linux Ubuntu / Debian (Paquete nativo .deb)",
+        "type": "installer",
+        "platform_key": "linux-x64",
     },
 }
 
@@ -393,32 +420,56 @@ def evaluate_release(local_files, remote_manifest_text, new_tag, force=False):
 
     existing_meta = read_catalog_launcher_meta()
 
+    installers_meta = {
+        TARGET_CONFIG[pid].get("platform_key", pid): {
+            "format": os.path.splitext(b["filename"])[1].lstrip("."),
+            "url": b["download_url"],
+            "sha256": b["sha256"],
+            "size_bytes": b.get("size_bytes", 0)
+        }
+        for pid, b in new_binaries.items()
+        if TARGET_CONFIG.get(pid, {}).get("type") == "installer" and b.get("download_url") and b.get("sha256") and b.get("size_bytes", 0) > 0
+    }
+
+    releases_meta = {
+        pid: {
+            "url": b["download_url"],
+            "sha256": b["sha256"],
+            "size_bytes": b.get("size_bytes", 0)
+        }
+        for pid, b in new_binaries.items()
+        if TARGET_CONFIG.get(pid, {}).get("type") != "installer" and b.get("download_url") and b.get("sha256") and b.get("size_bytes", 0) > 0
+    }
+
     launcher_meta_data = {
         "latest_version": clean_version_tag,
         "min_required_launcher_version": existing_meta.get("min_required_launcher_version", "1.0.0"),
-        "releases": {
-            pid: {
-                "url": b["download_url"],
-                "sha256": b["sha256"],
-                "size_bytes": b.get("size_bytes", 0)
-            }
-            for pid, b in new_binaries.items()
-            if b.get("download_url") and b.get("sha256") and b.get("size_bytes", 0) > 0
-        }
+        "installers": installers_meta,
+        "releases": releases_meta
     }
 
     update_catalog_launcher_meta(launcher_meta_data)
 
     update_app_constants_version(clean_version_tag)
 
-    # Generar Release Notes en Markdown con enlaces cruzados
-    notes_lines = [
+    # Generar Release Notes en Markdown con secciones separadas para instaladores y autoactualización
+    installer_lines = [
+        "### 🚀 Instaladores Nativos Recomendados (Nuevos Usuarios)",
+        "",
+        "| Plataforma | Formato | Archivo | Tamaño | SHA-256 | Descarga |",
+        "| :--- | :--- | :--- | :--- | :--- | :--- |"
+    ]
+    package_lines = [
+        "### 📦 Paquetes Portables y Autoactualización en Segundo Plano",
+        "",
         "| Plataforma | Archivo | Tamaño | SHA-256 | Descarga |",
         "| :--- | :--- | :--- | :--- | :--- |"
     ]
 
+    has_installers = False
     for pid in sorted(new_binaries.keys()):
         b = new_binaries[pid]
+        cfg = TARGET_CONFIG.get(pid, {})
         size_mb = f"{b['size_bytes'] / (1024 * 1024):.1f} MB" if b["size_bytes"] else "N/A"
         sha_short = b["sha256"][:12] + "..." if b["sha256"] else "N/A"
         
@@ -428,12 +479,25 @@ def evaluate_release(local_files, remote_manifest_text, new_tag, force=False):
             link_label = f"Descargar {b['origin_release']}"
 
         url = b.get("download_url", "#")
-        notes_lines.append(
-            f"| **{b.get('display_name', pid)}** | `{b['filename']}` | {size_mb} | `{sha_short}` | [{link_label}]({url}) |"
-        )
-    
+        if cfg.get("type") == "installer":
+            has_installers = True
+            fmt = os.path.splitext(b['filename'])[1].lstrip('.').upper()
+            installer_lines.append(
+                f"| **{cfg.get('display_name', pid)}** | `{fmt}` | `{b['filename']}` | {size_mb} | `{sha_short}` | [{link_label}]({url}) |"
+            )
+        else:
+            package_lines.append(
+                f"| **{cfg.get('display_name', pid)}** | `{b['filename']}` | {size_mb} | `{sha_short}` | [{link_label}]({url}) |"
+            )
+
+    all_notes = []
+    if has_installers:
+        all_notes.extend(installer_lines)
+        all_notes.append("")
+    all_notes.extend(package_lines)
+
     with open(RELEASE_NOTES_FILE, "w", encoding="utf-8") as f:
-        f.write("\n".join(notes_lines) + "\n")
+        f.write("\n".join(all_notes) + "\n")
 
     if action == "CREATE_RELEASE":
         files_to_upload.append(VERSION_MANIFEST_FILE)
@@ -553,40 +617,66 @@ def sync_launcher_meta_from_remote(repo=None):
     if manifest_data and isinstance(manifest_data, dict):
         clean_tag = re.sub(r'^v+', '', str(manifest_data.get("release_version", latest_tag or "1.0.0")))
         releases_dict = {}
+        installers_dict = {}
         for pid, b in manifest_data.get("binaries", {}).items():
             if isinstance(b, dict) and b.get("download_url") and b.get("sha256"):
-                releases_dict[pid] = {
-                    "url": b["download_url"],
-                    "sha256": b["sha256"],
-                    "size_bytes": b.get("size_bytes", 0)
-                }
+                cfg = TARGET_CONFIG.get(pid, {})
+                if cfg.get("type") == "installer":
+                    plat_key = cfg.get("platform_key", pid)
+                    fmt = os.path.splitext(b.get("filename", ""))[1].lstrip(".")
+                    installers_dict[plat_key] = {
+                        "format": fmt,
+                        "url": b["download_url"],
+                        "sha256": b["sha256"],
+                        "size_bytes": b.get("size_bytes", 0)
+                    }
+                else:
+                    releases_dict[pid] = {
+                        "url": b["download_url"],
+                        "sha256": b["sha256"],
+                        "size_bytes": b.get("size_bytes", 0)
+                    }
 
         meta = {
             "latest_version": clean_tag,
             "min_required_launcher_version": "1.0.0",
+            "installers": installers_dict,
             "releases": releases_dict
         }
-        print(f"✅ Se sincronizó launcher_meta con el release {clean_tag} ({len(releases_dict)} binarios)")
+        print(f"✅ Se sincronizó launcher_meta con el release {clean_tag} ({len(releases_dict)} paquetes, {len(installers_dict)} instaladores)")
     elif latest_tag:
         clean_tag = re.sub(r'^v+', '', str(latest_tag))
         releases_dict = {}
+        installers_dict = {}
         if assets:
             for asset in assets:
                 aname = asset.get("name", "")
                 pid = FILENAME_TO_TARGET.get(aname)
                 if pid:
+                    cfg = TARGET_CONFIG.get(pid, {})
                     digest = asset.get("digest", "")
                     sha = digest.split("sha256:")[-1] if "sha256:" in digest else ""
                     url = asset.get("url") or f"https://github.com/{repo}/releases/download/{latest_tag}/{aname}"
                     size = asset.get("size", 0)
-                    releases_dict[pid] = {
-                        "url": url,
-                        "sha256": sha,
-                        "size_bytes": size
-                    }
+                    if cfg.get("type") == "installer":
+                        plat_key = cfg.get("platform_key", pid)
+                        fmt = os.path.splitext(aname)[1].lstrip(".")
+                        installers_dict[plat_key] = {
+                            "format": fmt,
+                            "url": url,
+                            "sha256": sha,
+                            "size_bytes": size
+                        }
+                    else:
+                        releases_dict[pid] = {
+                            "url": url,
+                            "sha256": sha,
+                            "size_bytes": size
+                        }
         meta = {
             "latest_version": clean_tag,
             "min_required_launcher_version": "1.0.0",
+            "installers": installers_dict,
             "releases": releases_dict
         }
         if releases_dict:

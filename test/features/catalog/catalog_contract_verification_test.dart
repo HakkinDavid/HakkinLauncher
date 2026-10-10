@@ -17,16 +17,16 @@ void main() {
       expect(
         appIds,
         containsAll([
-          'com.bonsanbec.tecate-simulator',
-          'com.bonsanbec.fractochales',
-          'com.bonsanbec.migrant-aid-map',
-          'com.hakkin.firefighter-form',
-          'com.hakkin.pwms',
-          'com.hakkin.smart-scheduler',
-          'com.hakkin.wiimote-userland-driver',
-          'com.hakkin.languages-autohotkey',
-          'com.hakkin.cathelper',
-          'com.hakkin.catify-mod',
+          'dev.bonsanbec.tecate',
+          'dev.bonsanbec.fractochales',
+          'dev.bonsanbec.migrant-aid-map',
+          'dev.bonsanbec.firefighter-form',
+          'dev.bonsanbec.pwms',
+          'dev.bonsanbec.smart-scheduler',
+          'dev.bonsanbec.wiimote-userland-driver',
+          'dev.bonsanbec.languages-autohotkey',
+          'dev.bonsanbec.cathelper',
+          'dev.bonsanbec.catify-mod',
         ]),
         reason: '$sourceName: must contain all 10 expected app IDs',
       );
@@ -69,7 +69,7 @@ void main() {
       }
 
       // 1. Verificación de tecate-simulator
-      final tecate = manifest.apps.firstWhere((a) => a.id == 'com.bonsanbec.tecate-simulator');
+      final tecate = manifest.apps.firstWhere((a) => a.id == 'dev.bonsanbec.tecate');
       expect(tecate.title, 'Tecate Simulator');
       expect(tecate.category, 'game');
       expect(tecate.latestVersion, '26.10.08-13');
@@ -95,7 +95,7 @@ void main() {
       expect(tecateMac.getRelease('0.0.1')!.package.sizeBytes, 798030827);
 
       // 2. Verificación de fractochales
-      final fracto = manifest.apps.firstWhere((a) => a.id == 'com.bonsanbec.fractochales');
+      final fracto = manifest.apps.firstWhere((a) => a.id == 'dev.bonsanbec.fractochales');
       expect(fracto.title, 'Fractochales');
       expect(fracto.latestVersion, '3.27');
       expect(fracto.supportsPlatform('windows-x64'), isTrue);
@@ -121,11 +121,11 @@ void main() {
       expect(fractoAndroid.latestRelease.package.sizeBytes, 29535928);
 
       // 3. Verificación de firefighter-form
-      final bomberos = manifest.apps.firstWhere((a) => a.id == 'com.hakkin.firefighter-form');
+      final bomberos = manifest.apps.firstWhere((a) => a.id == 'dev.bonsanbec.firefighter-form');
       expect(bomberos.getPlatformRelease('windows-x64')!.latestRelease.entryPoint, 'bomberos.exe');
 
       // 4. Verificación de smart-scheduler
-      final scheduler = manifest.apps.firstWhere((a) => a.id == 'com.hakkin.smart-scheduler');
+      final scheduler = manifest.apps.firstWhere((a) => a.id == 'dev.bonsanbec.smart-scheduler');
       final schedulerMac = scheduler.getPlatformRelease('macos-arm64')!;
       expect(schedulerMac.versions.length, 2, reason: 'smart-scheduler must contain 2 versions');
       expect(schedulerMac.latestVersion, '2.5.0');
@@ -139,7 +139,7 @@ void main() {
       expect(schedulerDelta.sizeBytes, 1420500);
 
       // 5. Verificación de languages-autohotkey
-      final languages = manifest.apps.firstWhere((a) => a.id == 'com.hakkin.languages-autohotkey');
+      final languages = manifest.apps.firstWhere((a) => a.id == 'dev.bonsanbec.languages-autohotkey');
       final languagesWin = languages.getPlatformRelease('windows-x64')!;
       expect(languagesWin.versions.length, 2, reason: 'languages-autohotkey must have 2 versions');
       expect(languagesWin.getRelease('1.1.0')!.entryPoint, 'spanish-v1.0.exe');

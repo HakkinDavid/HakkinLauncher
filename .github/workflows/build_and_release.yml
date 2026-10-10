@@ -71,17 +71,20 @@ jobs:
       - name: Build Windows Release
         run: flutter build windows --release --dart-define=APP_VERSION=${{ needs.prepare-version.outputs.version_tag }} --build-name=${{ needs.prepare-version.outputs.version_tag }}
 
-      - name: Package Windows Binary
+      - name: Package Windows Binary (Zip & MSI)
         shell: pwsh
         run: |
           $releaseDir = "build\windows\x64\runner\Release"
           7z a -tzip HakkinLauncher-windows-x64.zip ".\$releaseDir\*" -mx=5
+          powershell -ExecutionPolicy Bypass -File scripts\build_windows_msi.ps1 -Version "${{ needs.prepare-version.outputs.version_tag }}" -SourceDir "$releaseDir" -OutputDir "."
 
-      - name: Upload Windows Artifact
+      - name: Upload Windows Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: windows-artifact
-          path: HakkinLauncher-windows-x64.zip
+          path: |
+            HakkinLauncher-windows-x64.zip
+            HakkinLauncher-windows-x64.msi
           retention-days: 1
           compression-level: 0
 
@@ -124,16 +127,20 @@ jobs:
       - name: Build Linux Release
         run: flutter build linux --release --dart-define=APP_VERSION=${{ needs.prepare-version.outputs.version_tag }} --build-name=${{ needs.prepare-version.outputs.version_tag }}
 
-      - name: Package Linux Binary
+      - name: Package Linux Binary (Zip & Deb)
         run: |
           cd build/linux/x64/release/bundle
           zip -r -q -5 ../../../../../HakkinLauncher-linux-x64.zip .
+          cd ../../../../..
+          ./scripts/build_linux_deb.sh "${{ needs.prepare-version.outputs.version_tag }}" "build/linux/x64/release/bundle" "HakkinLauncher-linux-amd64.deb"
 
-      - name: Upload Linux Artifact
+      - name: Upload Linux Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: linux-artifact
-          path: HakkinLauncher-linux-x64.zip
+          path: |
+            HakkinLauncher-linux-x64.zip
+            HakkinLauncher-linux-amd64.deb
           retention-days: 1
           compression-level: 0
 
@@ -169,11 +176,12 @@ jobs:
       - name: Build macOS Release
         run: flutter build macos --release --dart-define=APP_VERSION=${{ needs.prepare-version.outputs.version_tag }} --build-name=${{ needs.prepare-version.outputs.version_tag }}
 
-      - name: Package macOS Binaries
+      - name: Package macOS Binaries (Zip & DMG)
         run: |
           APP_PATH=$(find build/macos/Build/Products/Release -name "*.app" -maxdepth 1 | head -n 1)
           ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" HakkinLauncher-macos-arm64.zip
           ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" HakkinLauncher-macos-x64.zip
+          ./scripts/build_macos_dmg.sh "$APP_PATH" "HakkinLauncher-macos.dmg"
 
       - name: Upload macOS Artifacts
         uses: actions/upload-artifact@v4
@@ -182,6 +190,7 @@ jobs:
           path: |
             HakkinLauncher-macos-arm64.zip
             HakkinLauncher-macos-x64.zip
+            HakkinLauncher-macos.dmg
           retention-days: 1
           compression-level: 0
 
@@ -211,7 +220,7 @@ jobs:
       - name: Prepare Release Directory & Collect Binaries
         run: |
           mkdir -p build/release
-          find downloaded-artifacts -type f -name "*.zip" -exec mv {} build/release/ \;
+          find downloaded-artifacts -type f \( -name "*.zip" -o -name "*.msi" -o -name "*.dmg" -o -name "*.deb" \) -exec mv {} build/release/ \;
           echo "📦 Binarios recibidos de los jobs paralelos:"
           ls -lh build/release/
 
@@ -239,7 +248,9 @@ jobs:
           fi
 
           # Evaluar con gestor criptográfico
-          FILES=(build/release/*.zip)
+          shopt -s nullglob
+          FILES=(build/release/*.zip build/release/*.msi build/release/*.dmg build/release/*.deb)
+          shopt -u nullglob
           EVAL_JSON="$(python3 scripts/release_hash_manager.py eval-release "${EVAL_ARGS[@]}" "${FILES[@]}")"
           echo "Evaluación SSOT:"
           echo "$EVAL_JSON"

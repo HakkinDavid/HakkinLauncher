@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="*" 
+           Name="HakkinLauncher" 
+           Language="3082" 
+           Version="$(var.ProductVersion)" 
+           Manufacturer="Bonsanbec" 
+           UpgradeCode="B981C036-7A7C-4B11-86C4-47FE2A4750B9">
+
+    <Package InstallerVersion="301" 
+             Compressed="yes" 
+             InstallScope="perUser" 
+             InstallPrivileges="limited" 
+             Description="HakkinLauncher Setup" />
+
+    <MajorUpgrade DowngradeErrorMessage="Una versión posterior de HakkinLauncher ya está instalada." 
+                  AllowSameVersionUpgrades="yes" />
+
+    <MediaTemplate EmbedCab="yes" />
+
+    <Icon Id="AppIcon" SourceFile="$(var.IconPath)" />
+    <Property Id="ARPPRODUCTICON" Value="AppIcon" />
+    <Property Id="ALLUSERS" Value="2" />
+    <Property Id="MSIINSTALLPERUSER" Value="1" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="LocalAppDataFolder">
+        <Directory Id="ProgramsFolder" Name="Programs">
+          <Directory Id="INSTALLFOLDER" Name="HakkinLauncher" />
+        </Directory>
+      </Directory>
+
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ApplicationProgramsFolder" Name="HakkinLauncher" />
+      </Directory>
+
+      <Directory Id="DesktopFolder" Name="Desktop" />
+    </Directory>
+
+    <DirectoryRef Id="ApplicationProgramsFolder">
+      <Component Id="ApplicationShortcutStartMenu" Guid="98234B36-22B2-4E14-8B89-2BE9A73CA92E">
+        <Shortcut Id="StartMenuShortcut"
+                  Name="HakkinLauncher"
+                  Description="HakkinLauncher"
+                  Target="[INSTALLFOLDER]HakkinLauncher.exe"
+                  WorkingDirectory="INSTALLFOLDER"
+                  Icon="AppIcon" />
+        <RemoveFolder Id="RemoveApplicationProgramsFolder" On="uninstall" />
+        <RegistryValue Root="HKCU" Key="Software\HakkinLauncher" Name="InstalledStartMenu" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id="DesktopFolder">
+      <Component Id="ApplicationShortcutDesktop" Guid="C19F0D9E-C639-4467-AE86-8E3FE27AE9C1">
+        <Shortcut Id="DesktopShortcut"
+                  Name="HakkinLauncher"
+                  Description="HakkinLauncher"
+                  Target="[INSTALLFOLDER]HakkinLauncher.exe"
+                  WorkingDirectory="INSTALLFOLDER"
+                  Icon="AppIcon" />
+        <RegistryValue Root="HKCU" Key="Software\HakkinLauncher" Name="InstalledDesktop" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+
+    <Feature Id="ProductFeature" Title="HakkinLauncher" Level="1">
+      <ComponentGroupRef Id="AppFiles" />
+      <ComponentRef Id="ApplicationShortcutStartMenu" />
+      <ComponentRef Id="ApplicationShortcutDesktop" />
+    </Feature>
+  </Product>
+</Wix>
