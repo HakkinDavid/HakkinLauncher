@@ -185,7 +185,11 @@ class DeltaGenerator:
                         patch_sha = digest[7:]
                     target_sha = to_release.get("executable_sha256", "")
                     if not target_sha:
-                        target_sha = to_release.get("package", {}).get("sha256", "")
+                        is_to_pkg_zip = to_release.get("package", {}).get("url", "").lower().endswith(".zip")
+                        if not is_to_pkg_zip:
+                            target_sha = to_release.get("package", {}).get("sha256", "")
+                        else:
+                            target_sha = ""
                     return {
                         "from_version": from_release["version"],
                         "to_version": to_release["version"],
@@ -241,7 +245,15 @@ class DeltaGenerator:
                 if os.path.isfile(target_exe_path):
                     target_binary_sha256 = compute_sha256(target_exe_path)
                 else:
-                    target_binary_sha256 = to_pkg.get("sha256", "")
+                    resolved_target = None
+                    for root, dirs, files in os.walk(to_dir):
+                        if root.endswith(".app/Contents/MacOS") and files:
+                            resolved_target = os.path.join(root, files[0])
+                            break
+                    if resolved_target and os.path.isfile(resolved_target):
+                        target_binary_sha256 = compute_sha256(resolved_target)
+                    else:
+                        target_binary_sha256 = ""
 
                 # Ejecutar hdiffz a nivel de directorio (-s-16k compresión estándar)
                 print(f"  [Delta] Ejecutando hdiffz en directorios...")

@@ -51,7 +51,8 @@ class ProcessLauncher {
     final appIdx = targetPath.indexOf(AppTechnicalStrings.extApp);
     if (appIdx != -1) {
       appBundlePath = targetPath.substring(0, appIdx + AppTechnicalStrings.extApp.length);
-    } else if (installDir != null) {
+    }
+    if ((appBundlePath == null || !Directory(appBundlePath).existsSync()) && installDir != null) {
       final dir = Directory(installDir);
       if (dir.existsSync()) {
         try {

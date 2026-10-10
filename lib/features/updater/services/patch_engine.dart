@@ -363,15 +363,40 @@ class PatchEngine {
           );
 
           if (deltaSuccess && matchedDelta.targetSha256.isNotEmpty) {
-            final exeFile = File(p.join(targetInstallDir.path, targetRelease.executableRelativePath));
-            if (await exeFile.exists()) {
-              final hashMatch = await HashValidator.verifySha256(exeFile, matchedDelta.targetSha256);
-              if (!hashMatch) {
-                debugPrint(AppStrings.logPatchHashMismatch());
+            var targetExePath = p.join(targetInstallDir.path, targetRelease.executableRelativePath);
+            if (Platform.isMacOS) {
+              final autoResolved = ProcessLauncher.resolveExecutablePath(targetExePath, targetInstallDir.path);
+              if (autoResolved != null) {
+                targetExePath = autoResolved;
+              }
+            }
+
+            final exeFile = File(targetExePath);
+            final isZipPackage = targetRelease.package.url.toLowerCase().endsWith(AppTechnicalStrings.extZip);
+
+            // Si targetSha256 coincide con el hash del paquete ZIP, se trata del checksum del contenedor
+            // comprimido (fallback del catálogo), no del binario desempaquetado. En parches de directorio/ZIP,
+            // la integridad ya ha sido garantizada criptográficamente por hpatchz (-C-new-copy) y patchSha256.
+            final isContainerPackageHash = isZipPackage &&
+                matchedDelta.targetSha256.toLowerCase() == targetRelease.package.sha256.toLowerCase();
+
+            if (!isContainerPackageHash) {
+              if (await exeFile.exists()) {
+                final hashMatch = await HashValidator.verifySha256(exeFile, matchedDelta.targetSha256);
+                if (!hashMatch) {
+                  debugPrint(AppStrings.logPatchHashMismatch());
+                  deltaSuccess = false;
+                }
+              } else {
+                debugPrint(AppStrings.logExecutableNotFound(targetExePath));
                 deltaSuccess = false;
               }
             } else {
-              deltaSuccess = false;
+              // Validar que el ejecutable objetivo exista tras la aplicación del parche
+              if (!await exeFile.exists()) {
+                debugPrint(AppStrings.logExecutableNotFound(targetExePath));
+                deltaSuccess = false;
+              }
             }
           }
         }
@@ -573,8 +598,7 @@ class PatchEngine {
     required String executableRelativePath,
   }) async {
     try {
-      final exeFile = File(p.join(targetDirectory.path, executableRelativePath));
-      if (!await exeFile.exists()) return false;
+      if (!await targetDirectory.exists()) return false;
 
       // Obtener la ruta resuelta o descargar hpatchz si no está presente
       final hpatchzCmd = await ComponentManager.instance.getHpatchzPath();
@@ -597,9 +621,16 @@ class PatchEngine {
           return true;
         }
         debugPrint(AppStrings.logHpatchzDirExitCode(dirResult.exitCode));
+        return false;
       }
 
       // Fallback o modo binario único: parche directo sobre el ejecutable
+      final exeFile = File(p.join(targetDirectory.path, executableRelativePath));
+      if (!await exeFile.exists()) {
+        debugPrint(AppStrings.logExecutableNotFound(exeFile.path));
+        return false;
+      }
+
       final result = await Process.run(
         hpatchzCmd,
         [AppTechnicalStrings.argMinusF, exeFile.path, patchFile.path, exeFile.path],
