@@ -527,25 +527,28 @@ def evaluate_release(local_files, remote_manifest_text, new_tag, force=False):
 
 
 def update_app_constants_version(version_tag):
-    """Actualiza defaultAppVersion en lib/core/constants/app_constants.dart."""
+    """Actualiza defaultAppVersion en lib/core/constants/app_technical_strings.dart (o app_constants.dart)."""
     clean_tag = re.sub(r'^v+', '', version_tag)
+    tech_file = os.path.join(WORKSPACE_ROOT, "lib", "core", "constants", "app_technical_strings.dart")
     constants_file = os.path.join(WORKSPACE_ROOT, "lib", "core", "constants", "app_constants.dart")
-    if not os.path.isfile(constants_file):
+    target_file = tech_file if os.path.isfile(tech_file) else constants_file
+    if not os.path.isfile(target_file):
         return False
-    with open(constants_file, "r", encoding="utf-8") as f:
+    with open(target_file, "r", encoding="utf-8") as f:
         content = f.read()
-    new_content = re.sub(
-        r"static const String defaultAppVersion = '[^']*';",
-        f"static const String defaultAppVersion = '{clean_tag}';",
-        content
-    )
-    if new_content != content:
-        with open(constants_file, "w", encoding="utf-8") as f:
-            f.write(new_content)
-        print(f"Versión base en app_constants.dart sincronizada con: {clean_tag}", file=sys.stderr)
-    else:
-        print(f"Versión base en app_constants.dart ya está al día ({clean_tag}).", file=sys.stderr)
-    return True
+
+    pattern = r"(static const (?:String )?defaultAppVersion = )'[^']*';"
+    if re.search(pattern, content):
+        new_content = re.sub(pattern, rf"\g<1>'{clean_tag}';", content)
+        if new_content != content:
+            with open(target_file, "w", encoding="utf-8") as f:
+                f.write(new_content)
+            print(f"Versión base en {os.path.basename(target_file)} sincronizada con: {clean_tag}", file=sys.stderr)
+            return True
+        else:
+            print(f"Versión base en {os.path.basename(target_file)} ya está al día ({clean_tag}).", file=sys.stderr)
+            return True
+    return False
 
 
 def sync_launcher_meta_from_remote(repo=None):

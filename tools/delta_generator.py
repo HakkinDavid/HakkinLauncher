@@ -183,13 +183,9 @@ class DeltaGenerator:
                     digest = asset.get("digest", "")
                     if digest and digest.startswith("sha256:"):
                         patch_sha = digest[7:]
-                    target_sha = to_release.get("executable_sha256", "")
+                    target_sha = to_release.get("executable_sha256") or to_release.get("target_sha256", "")
                     if not target_sha:
-                        is_to_pkg_zip = to_release.get("package", {}).get("url", "").lower().endswith(".zip")
-                        if not is_to_pkg_zip:
-                            target_sha = to_release.get("package", {}).get("sha256", "")
-                        else:
-                            target_sha = ""
+                        target_sha = to_release.get("package", {}).get("sha256", "")
                     return {
                         "from_version": from_release["version"],
                         "to_version": to_release["version"],
@@ -240,7 +236,7 @@ class DeltaGenerator:
                     zf.extractall(to_dir)
 
                 # Calcular hash del ejecutable objetivo en la versión nueva
-                exe_rel = to_release.get("entry_point", "")
+                exe_rel = to_release.get("entry_point") or to_release.get("executable_relative_path", "")
                 target_exe_path = os.path.join(to_dir, exe_rel)
                 if os.path.isfile(target_exe_path):
                     target_binary_sha256 = compute_sha256(target_exe_path)
@@ -253,7 +249,7 @@ class DeltaGenerator:
                     if resolved_target and os.path.isfile(resolved_target):
                         target_binary_sha256 = compute_sha256(resolved_target)
                     else:
-                        target_binary_sha256 = ""
+                        target_binary_sha256 = to_pkg.get("sha256", "")
 
                 # Ejecutar hdiffz a nivel de directorio (-s-16k compresión estándar)
                 print(f"  [Delta] Ejecutando hdiffz en directorios...")

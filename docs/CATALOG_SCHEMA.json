@@ -79,13 +79,15 @@
                     "type": "object",
                     "required": ["version", "package"],
                     "anyOf": [
-                      { "required": ["entry_point"] }
+                      { "required": ["entry_point"] },
+                      { "required": ["executable_relative_path"] }
                     ],
                     "properties": {
                       "version": { "type": "string" },
                       "release_date": { "type": ["string", "null"] },
                       "changelog": { "type": "string" },
                       "entry_point": { "type": "string" },
+                      "executable_relative_path": { "type": "string" },
                       "package": {
                         "type": "object",
                         "required": ["url", "sha256", "size_bytes"],

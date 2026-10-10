@@ -310,6 +310,38 @@ def format_changelog(changelog_text, title, version):
 
     return cl
 
+DEFAULT_ASSET_PATTERNS = {
+    ("tecate-simulator", "windows-x64"): r"tecate-windows.*\.zip",
+    ("tecate-simulator", "macos-arm64"): r"tecate-macos.*\.zip",
+    ("fractochales", "windows-x64"): r"fractochales-win.*\.zip",
+    ("fractochales", "macos-arm64"): r"fractochales-mac.*\.zip",
+    ("fractochales", "android"): r"fractochales-android.*\.apk",
+    ("migrant-aid-map", "android"): r".*\.apk",
+    ("firefighter-form", "windows-x64"): r"bomberos-windows.*\.zip",
+    ("firefighter-form", "android"): r"bomberos-android.*\.apk",
+    ("PWMS", "android"): r"pwms-android.*\.apk",
+    ("smart-scheduler", "macos-arm64"): r"smart-scheduler-macos.*\.zip",
+    ("WiimoteUserlandDriver", "macos-arm64"): r"WiimoteUserlandDriver.*",
+    ("languages-autohotkey", "windows-x64"): r"(spanish|pinyin).*\.exe",
+    ("cathelper", "android"): r"CATHelper.*\.apk",
+    ("CatifyMod-Forge", "windows-x64"): r"catify.*\.jar",
+}
+
+def get_platform_asset_pattern(slug, plat_key):
+    """Retorna un patrón regex preciso para vincular assets con su plataforma correspondiente."""
+    for (s, pk), pat in DEFAULT_ASSET_PATTERNS.items():
+        if (s.lower() == slug.lower() or s.lower() in slug.lower()) and pk == plat_key:
+            return pat
+    if "win" in plat_key:
+        return r".*(win|windows|\.exe|\.msi).*"
+    if "mac" in plat_key:
+        return r".*(mac|macos|darwin|\.dmg).*"
+    if "linux" in plat_key:
+        return r".*(linux|\.deb|\.appimage|\.tar\.gz).*"
+    if "android" in plat_key:
+        return r".*\.apk$"
+    return ".*"
+
 def parse_version_tuple(v):
     """Convert version string to comparable tuple (e.g. '2.5.0' -> (2, 5, 0), '26.10.08-13' -> (26, 10, 8, 13))"""
     parts = re.findall(r'\d+', str(v))
@@ -506,7 +538,8 @@ def generate_catalog(
                 platforms[pkey] = {
                     "entry_point": entry_exe,
                     "protected_user_paths": pdata.get("protected_user_paths", []),
-                    "asset_pattern": ".*"
+                    "asset_pattern": get_platform_asset_pattern(app.get("slug", ""), pkey),
+                    "versions": pdata.get("versions", [])
                 }
 
             overrides[repo] = {
@@ -599,63 +632,63 @@ def generate_catalog(
                     seen_urls.add(pkg["url"])
 
             # Strategy 2: Dynamic Multi-Release Discovery from GitHub Releases & Pre-resolved Cache
-            else:
-                pattern = plat_info.get("asset_pattern", ".*")
+            pattern = plat_info.get("asset_pattern") or get_platform_asset_pattern(meta.get("slug", ""), plat_key)
 
-                # Ingest releases discovered via GitHub API
-                if remote_releases:
-                    for r in remote_releases:
-                        if r.get("draft", False):
-                            continue
-                        tag = r.get("tag_name", "")
-                        r_name = r.get("name", "")
-                        pub_date = r.get("published_at", "2026-10-08T00:00:00Z")
-                        body = (r.get("body") or "").strip()
+            # Ingest releases discovered via GitHub API
+            if remote_releases:
+                for r in remote_releases:
+                    if r.get("draft", False):
+                        continue
+                    tag = r.get("tag_name", "")
+                    r_name = r.get("name", "")
+                    pub_date = r.get("published_at", "2026-10-08T00:00:00Z")
+                    body = (r.get("body") or "").strip()
 
-                        for asset in r.get("assets", []):
-                            fn = asset.get("name", "")
-                            if re.search(pattern, fn):
-                                url = asset.get("browser_download_url", "")
-                                if url in seen_urls:
-                                    continue
-                                v_str = clean_version(tag=tag, release_name=r_name, filename=fn, url=url)
-                                if v_str in seen_versions:
-                                    continue
+                    for asset in r.get("assets", []):
+                        fn = asset.get("name", "")
+                        if re.search(pattern, fn):
+                            url = asset.get("browser_download_url", "")
+                            if url in seen_urls:
+                                continue
+                            v_str = clean_version(tag=tag, release_name=r_name, filename=fn, url=url)
+                            if v_str in seen_versions:
+                                continue
 
-                                # Resolve exact size and sha256 digest
-                                size = asset.get("size", 0)
-                                digest = asset.get("digest")
-                                sha256 = ""
-                                if digest and digest.startswith("sha256:"):
-                                    sha256 = digest[7:]
-                                elif url in KNOWN_ASSET_CACHE:
-                                    sha256 = KNOWN_ASSET_CACHE[url]["sha256"]
-                                    if size <= 0:
-                                        size = KNOWN_ASSET_CACHE[url]["size_bytes"]
-                                else:
-                                    size, sha256 = resolve_asset_metadata(url, direct_sha=None, direct_size=size)
+                            # Resolve exact size and sha256 digest
+                            size = asset.get("size", 0)
+                            digest = asset.get("digest")
+                            sha256 = ""
+                            if digest and digest.startswith("sha256:"):
+                                sha256 = digest[7:]
+                            elif url in KNOWN_ASSET_CACHE:
+                                sha256 = KNOWN_ASSET_CACHE[url]["sha256"]
+                                if size <= 0:
+                                    size = KNOWN_ASSET_CACHE[url]["size_bytes"]
+                            else:
+                                size, sha256 = resolve_asset_metadata(url, direct_sha=None, direct_size=size)
 
-                                exe_rel = fn if fn.endswith(".jar") else plat_info.get("executable_paths", {}).get(v_str, plat_info.get("entry_point") or plat_info.get("executable_relative_path", fn))
-                                changelog = format_changelog(body if body else f"Lanzamiento de {meta['title']} versión {v_str}.", meta['title'], v_str)
+                            exe_rel = fn if fn.endswith(".jar") else plat_info.get("executable_paths", {}).get(v_str, plat_info.get("entry_point") or plat_info.get("executable_relative_path", fn))
+                            changelog = format_changelog(body if body else f"Lanzamiento de {meta['title']} versión {v_str}.", meta['title'], v_str)
 
-                                v_entry = {
-                                    "version": v_str,
-                                    "release_date": pub_date,
-                                    "changelog": changelog,
-                                    "entry_point": exe_rel,
-                                    "package": {
-                                        "url": url,
-                                        "size_bytes": size,
-                                        "sha256": sha256
-                                    },
-                                    "delta_patches": [],
-                                    "scripts": {"pre_install": None, "post_install": None}
-                                }
-                                versions_list.append(v_entry)
-                                seen_versions.add(v_str)
-                                seen_urls.add(url)
+                            v_entry = {
+                                "version": v_str,
+                                "release_date": pub_date,
+                                "changelog": changelog,
+                                "entry_point": exe_rel,
+                                "package": {
+                                    "url": url,
+                                    "size_bytes": size,
+                                    "sha256": sha256
+                                },
+                                "delta_patches": [],
+                                "scripts": {"pre_install": None, "post_install": None}
+                            }
+                            versions_list.append(v_entry)
+                            seen_versions.add(v_str)
+                            seen_urls.add(url)
 
-                # Fallback to KNOWN_ASSET_CACHE (for offline builds or un-indexed assets)
+            # Fallback to KNOWN_ASSET_CACHE (for offline builds or un-indexed assets)
+            if not versions_list:
                 for cached_url, cached_info in KNOWN_ASSET_CACHE.items():
                     if f"github.com/{repo}/releases/download/" in cached_url:
                         fn = cached_url.split('/')[-1]
@@ -684,36 +717,32 @@ def generate_catalog(
                             seen_versions.add(v_str)
                             seen_urls.add(cached_url)
 
-                if not versions_list and plat_key not in remote_manifest_versions:
-                    print(f"  Warning: no asset found for {plat_key} matching {pattern}", file=sys.stderr)
+            if not versions_list and plat_key not in remote_manifest_versions:
+                print(f"  Warning: no asset found for {plat_key} matching {pattern}", file=sys.stderr)
 
             # Strategy 3: Merge previously recorded versions for this platform (filtering corrupted ghosts)
             if existing_app and "platforms" in existing_app and plat_key in existing_app["platforms"]:
-                has_explicit_versions = "versions" in plat_info and isinstance(plat_info["versions"], list)
-                if not has_explicit_versions:
-                    existing_plat = existing_app["platforms"][plat_key]
-                    for old_v in existing_plat.get("versions", []):
-                        old_ver = old_v.get("version")
-                        old_pkg = old_v.get("package", {})
-                        old_url = old_pkg.get("url", "") if isinstance(old_pkg, dict) else ""
-                        # Filter out ghost 64.0.0 and duplicate 1.0.0 pointing to 26.xx packages
-                        if old_ver == "64.0.0":
-                            continue
-                        if old_ver == "1.0.0" and any(x in old_url for x in ["26.", "v26."]):
-                            continue
-                        if not isinstance(old_pkg, dict) or not old_url.startswith("https://"):
-                            continue
-                        if old_pkg.get("size_bytes", 0) <= 0 or len(old_pkg.get("sha256", "")) != 64:
-                            continue
-                        if old_ver and old_ver not in seen_versions and old_url not in seen_urls:
-                            if "entry_point" not in old_v and "executable_relative_path" in old_v:
-                                old_v["entry_point"] = old_v["executable_relative_path"]
-                            if "executable_relative_path" not in old_v and "entry_point" in old_v:
-                                old_v["executable_relative_path"] = old_v["entry_point"]
-                            old_v["changelog"] = format_changelog(old_v.get("changelog"), meta['title'], old_ver)
-                            versions_list.append(old_v)
-                            seen_versions.add(old_ver)
-                            seen_urls.add(old_url)
+                existing_plat = existing_app["platforms"][plat_key]
+                for old_v in existing_plat.get("versions", []):
+                    old_ver = old_v.get("version")
+                    old_pkg = old_v.get("package", {})
+                    old_url = old_pkg.get("url", "") if isinstance(old_pkg, dict) else ""
+                    # Filter out ghost 64.0.0 and duplicate 1.0.0 pointing to 26.xx packages
+                    if old_ver == "64.0.0":
+                        continue
+                    if old_ver == "1.0.0" and any(x in old_url for x in ["26.", "v26."]):
+                        continue
+                    if not isinstance(old_pkg, dict) or not old_url.startswith("https://"):
+                        continue
+                    if old_pkg.get("size_bytes", 0) <= 0 or len(old_pkg.get("sha256", "")) != 64:
+                        continue
+                    if old_ver and old_ver not in seen_versions and old_url not in seen_urls:
+                        entry_point = old_v.get("entry_point") or old_v.get("executable_relative_path")
+                        old_v["entry_point"] = entry_point
+                        old_v["changelog"] = format_changelog(old_v.get("changelog"), meta['title'], old_ver)
+                        versions_list.append(old_v)
+                        seen_versions.add(old_ver)
+                        seen_urls.add(old_url)
 
             if not versions_list:
                 continue
@@ -948,7 +977,9 @@ def validate_manifest(manifest, schema_path):
             for v_obj in pval["versions"]:
                 assert "version" in v_obj and v_obj["version"], f"Platform {pkey} missing version string"
                 assert v_obj["version"] != "64.0.0", f"Corrupt phantom version 64.0.0 found in {app['id']} {pkey}"
-                assert ("entry_point" in v_obj and v_obj["entry_point"]), f"Platform {pkey} missing entry_point / executable_relative_path"
+                entry_point = v_obj.get("entry_point") or v_obj.get("executable_relative_path")
+                assert entry_point, f"Platform {pkey} missing entry_point / executable_relative_path"
+                v_obj["entry_point"] = entry_point
                 assert "package" in v_obj, f"Platform {pkey} missing package"
                 pkg = v_obj["package"]
                 assert "url" in pkg and pkg["url"].startswith("https://"), f"Invalid package url in {pkey}"

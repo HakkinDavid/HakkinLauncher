@@ -6,9 +6,12 @@ Pruebas unitarias para el generador centralizado de deltas y repositorio satéli
 """
 
 import os
+import sys
 import tempfile
 import unittest
 import zipfile
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from delta_generator import (
     format_delta_tag,

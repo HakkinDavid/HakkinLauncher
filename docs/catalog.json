@@ -1,8 +1,8 @@
 {
   "version": "2.0.0",
-  "catalog_timestamp": "2026-10-10T10:06:35.305103+00:00",
+  "catalog_timestamp": "2026-10-10T10:32:21.854802+00:00",
   "launcher_meta": {
-    "latest_version": "26.10.10-01",
+    "latest_version": "26.10.10-09",
     "min_required_launcher_version": "1.0.0",
     "installers": {
       "windows-x64": {
@@ -82,6 +82,7 @@
               "version": "26.10.08-13",
               "release_date": "2026-10-08T20:27:07Z",
               "changelog": "Lanzamiento de Tecate Simulator versión 26.10.08-13 con soporte optimizado para Windows y macOS.",
+              "entry_point": "tecate.exe",
               "package": {
                 "url": "https://github.com/Bonsanbec/tecate-simulator/releases/download/26.10.08-13/tecate-windows.zip",
                 "size_bytes": 1084841300,
@@ -101,13 +102,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "tecate.exe"
+              }
             },
             {
               "version": "0.0.1",
               "release_date": "2026-09-28T06:01:26Z",
               "changelog": "Lanzamiento inicial de Tecate Simulator versión 0.0.1.",
+              "entry_point": "tecate.exe",
               "package": {
                 "url": "https://github.com/Bonsanbec/tecate-simulator/releases/download/latest/tecate-windows-v0.0.1-release.zip",
                 "size_bytes": 771167643,
@@ -117,8 +118,7 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "tecate.exe"
+              }
             }
           ]
         },
@@ -130,6 +130,7 @@
               "version": "26.10.08-13",
               "release_date": "2026-10-08T20:27:07Z",
               "changelog": "Lanzamiento de Tecate Simulator versión 26.10.08-13 con soporte optimizado para Windows y macOS.",
+              "entry_point": "tecate.app",
               "package": {
                 "url": "https://github.com/Bonsanbec/tecate-simulator/releases/download/26.10.08-13/tecate-macos.zip",
                 "size_bytes": 1111734578,
@@ -149,13 +150,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "tecate.app"
+              }
             },
             {
               "version": "0.0.1",
               "release_date": "2026-09-28T06:01:26Z",
               "changelog": "Lanzamiento inicial de Tecate Simulator versión 0.0.1.",
+              "entry_point": "Tecate Simulator Facade MVP.app",
               "package": {
                 "url": "https://github.com/Bonsanbec/tecate-simulator/releases/download/latest/tecate-macos-v0.0.1-release.zip",
                 "size_bytes": 798030827,
@@ -165,8 +166,7 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "Tecate Simulator Facade MVP.app"
+              }
             }
           ]
         }
@@ -209,6 +209,7 @@
               "version": "3.27",
               "release_date": "2026-10-09T22:08:47Z",
               "changelog": "Lanzamiento de Fractochales versión 3.27 con mejoras en el motor de renderizado fractal y optimizaciones de rendimiento.",
+              "entry_point": "Fractochales v3.27/main.exe",
               "package": {
                 "url": "https://github.com/Bonsanbec/fractochales/releases/download/v3.27/fractochales-win-x86_64-v3.27.zip",
                 "size_bytes": 29001895,
@@ -228,13 +229,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "Fractochales v3.27/main.exe"
+              }
             },
             {
               "version": "1.64",
               "release_date": "2023-11-30T12:08:45Z",
               "changelog": "Lanzamiento inicial de Fractochales versión 1.64 con renderizado bidimensional.",
+              "entry_point": "main.exe",
               "package": {
                 "url": "https://github.com/Bonsanbec/fractochales/releases/download/v1.64-prod-2D/fractochales-win-x86_64-v1.64.zip",
                 "size_bytes": 23238440,
@@ -244,8 +245,7 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "main.exe"
+              }
             }
           ]
         },
@@ -257,6 +257,7 @@
               "version": "3.27",
               "release_date": "2026-10-09T22:08:47Z",
               "changelog": "Lanzamiento de Fractochales versión 3.27 con paquete nativo para macOS Apple Silicon.",
+              "entry_point": "fractochales-mac-arm64-v3.27.app",
               "package": {
                 "url": "https://github.com/Bonsanbec/fractochales/releases/download/v3.27/fractochales-mac-arm64-v3.27.app.zip",
                 "size_bytes": 29737927,
@@ -266,8 +267,7 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "fractochales-mac-arm64-v3.27.app"
+              }
             }
           ]
         },
@@ -279,6 +279,7 @@
               "version": "3.27",
               "release_date": "2026-10-09T22:08:47Z",
               "changelog": "Lanzamiento de Fractochales versión 3.27 con soporte táctil y optimización móvil para Android.",
+              "entry_point": "fractochales-android-v3.27.apk",
               "package": {
                 "url": "https://github.com/Bonsanbec/fractochales/releases/download/v3.27/fractochales-android-v3.27.apk",
                 "size_bytes": 29535928,
@@ -288,8 +289,7 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "fractochales-android-v3.27.apk"
+              }
             }
           ]
         }
@@ -330,6 +330,7 @@
               "version": "3.0",
               "release_date": "2025-05-28T08:17:27Z",
               "changelog": "Lanzamiento de Sistema de Apoyo Migrante versión 3.0 con actualización de directorios y mapas interactivos.",
+              "entry_point": "migrant-aid-map-android.apk",
               "package": {
                 "url": "https://github.com/Bonsanbec/migrant-aid-map/releases/download/latest/migrant-aid-map-android.apk",
                 "size_bytes": 54644848,
@@ -349,13 +350,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "migrant-aid-map-android.apk"
+              }
             },
             {
               "version": "2.2",
               "release_date": "2025-04-20T20:23:00Z",
               "changelog": "Lanzamiento de Sistema de Apoyo Migrante versión 2.2 con mejoras en la navegación y servicios comunitarios.",
+              "entry_point": "migrant-aid-map-android.apk",
               "package": {
                 "url": "https://github.com/Bonsanbec/migrant-aid-map/releases/download/2.2/migrant-aid-map-android.apk",
                 "size_bytes": 54639495,
@@ -365,8 +366,7 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "migrant-aid-map-android.apk"
+              }
             }
           ]
         }
@@ -410,6 +410,7 @@
               "version": "26.08.04",
               "release_date": "2026-08-04T22:04:20Z",
               "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 26.08.04 con sincronización remota y optimización de formularios.",
+              "entry_point": "bomberos.exe",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.08.04/bomberos-windows-release.zip",
                 "size_bytes": 17286178,
@@ -429,13 +430,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "bomberos.exe"
+              }
             },
             {
               "version": "26.06.02",
               "release_date": "2026-06-02T02:04:58Z",
               "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 26.06.02 con validación digital de firmas.",
+              "entry_point": "bomberos.exe",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.06.02/bomberos-windows-release.zip",
                 "size_bytes": 16025163,
@@ -445,13 +446,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "bomberos.exe"
+              }
             },
             {
               "version": "26.05.21",
               "release_date": "2026-05-21T10:28:31Z",
               "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 26.05.21 con exportación a PDF.",
+              "entry_point": "bomberos.exe",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.05.21/bomberos-windows-release.zip",
                 "size_bytes": 15966209,
@@ -461,13 +462,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "bomberos.exe"
+              }
             },
             {
               "version": "26.04.02",
               "release_date": "2026-04-02T22:15:03Z",
               "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 26.04.02 con folios únicos de atención.",
+              "entry_point": "bomberos.exe",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.04.02/bomberos-windows-release.zip",
                 "size_bytes": 15862010,
@@ -477,13 +478,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "bomberos.exe"
+              }
             },
             {
               "version": "26.03.17",
               "release_date": "2026-03-18T00:02:20Z",
               "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 26.03.17 con correcciones en el registro de incidentes.",
+              "entry_point": "bomberos.exe",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.03.17/bomberos-windows-release.zip",
                 "size_bytes": 15861517,
@@ -493,13 +494,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "bomberos.exe"
+              }
             },
             {
               "version": "26.03.11",
               "release_date": "2026-03-11T09:41:33Z",
               "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 26.03.11 con soporte de incidentes vehiculares.",
+              "entry_point": "bomberos.exe",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.03.11/bomberos-windows-release.zip",
                 "size_bytes": 15861469,
@@ -509,13 +510,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "bomberos.exe"
+              }
             },
             {
               "version": "26.02.27",
               "release_date": "2026-02-27T10:57:46Z",
               "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 26.02.27 con registro prehospitalario base.",
+              "entry_point": "bomberos.exe",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.02.27/bomberos-windows-release.zip",
                 "size_bytes": 15848916,
@@ -525,8 +526,7 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "bomberos.exe"
+              }
             }
           ]
         },
@@ -538,6 +538,7 @@
               "version": "26.08.04",
               "release_date": "2026-08-04T22:04:20Z",
               "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 26.08.04 con sincronización remota y optimización de formularios.",
+              "entry_point": "bomberos-android-release.apk",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.08.04/bomberos-android-release.apk",
                 "size_bytes": 65859605,
@@ -557,13 +558,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "bomberos-android-release.apk"
+              }
             },
             {
               "version": "26.06.02",
               "release_date": "2026-06-02T02:04:58Z",
               "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 26.06.02 con validación digital de firmas.",
+              "entry_point": "bomberos-android-release.apk",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.06.02/bomberos-android-release.apk",
                 "size_bytes": 60871555,
@@ -573,13 +574,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "bomberos-android-release.apk"
+              }
             },
             {
               "version": "26.05.21",
               "release_date": "2026-05-21T10:28:31Z",
               "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 26.05.21 con exportación a PDF.",
+              "entry_point": "bomberos-android-release.apk",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.05.21/bomberos-android-release.apk",
                 "size_bytes": 60871559,
@@ -589,13 +590,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "bomberos-android-release.apk"
+              }
             },
             {
               "version": "26.04.02",
               "release_date": "2026-04-02T22:15:03Z",
               "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 26.04.02 con folios únicos de atención.",
+              "entry_point": "bomberos-android-release.apk",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.04.02/bomberos-android-release.apk",
                 "size_bytes": 60017095,
@@ -605,13 +606,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "bomberos-android-release.apk"
+              }
             },
             {
               "version": "26.03.17",
               "release_date": "2026-03-18T00:02:20Z",
               "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 26.03.17 con correcciones en el registro de incidentes.",
+              "entry_point": "bomberos-android-release.apk",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.03.17/bomberos-android-release.apk",
                 "size_bytes": 60016843,
@@ -621,13 +622,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "bomberos-android-release.apk"
+              }
             },
             {
               "version": "26.03.11",
               "release_date": "2026-03-11T09:41:33Z",
               "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 26.03.11 con soporte de incidentes vehiculares.",
+              "entry_point": "bomberos-android-release.apk",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.03.11/bomberos-android-release.apk",
                 "size_bytes": 60016843,
@@ -637,13 +638,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "bomberos-android-release.apk"
+              }
             },
             {
               "version": "26.02.27",
               "release_date": "2026-02-27T10:57:46Z",
               "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 26.02.27 con registro prehospitalario base.",
+              "entry_point": "bomberos-android-release.apk",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.02.27/bomberos-android-release.apk",
                 "size_bytes": 59918307,
@@ -653,13 +654,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "bomberos-android-release.apk"
+              }
             },
             {
               "version": "26.01.28",
               "release_date": "2026-01-28T00:58:14Z",
               "changelog": "Visualización del identificador de versión y mejoras de estabilidad general.",
+              "entry_point": "bomberos-android-release.apk",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v26.01.28/bomberos-android-release.apk",
                 "size_bytes": 59179483,
@@ -669,13 +670,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "bomberos-android-release.apk"
+              }
             },
             {
               "version": "25.11.12",
               "release_date": "2025-11-12T04:21:37Z",
               "changelog": "Corrección de errores en el despliegue condicional de formularios.",
+              "entry_point": "bomberos-android-release.apk",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v25.11.12/bomberos-android-release.apk",
                 "size_bytes": 59176700,
@@ -685,13 +686,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "bomberos-android-release.apk"
+              }
             },
             {
               "version": "25.11.11",
               "release_date": "2025-11-11T02:34:27Z",
               "changelog": "Corrección en el controlador durante la recuperación de datos médicos.",
+              "entry_point": "bomberos-android-release.apk",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v25.11.11/bomberos-android-release.apk",
                 "size_bytes": 59094780,
@@ -701,13 +702,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "bomberos-android-release.apk"
+              }
             },
             {
               "version": "25.11.07",
               "release_date": "2025-11-07T12:51:29Z",
               "changelog": "Optimizaciones continuas en la rutina de actualización, validación de certificados y renderizado.",
+              "entry_point": "bomberos-android-release.apk",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v25.11.07/bomberos-android-release.apk",
                 "size_bytes": 59094784,
@@ -717,13 +718,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "bomberos-android-release.apk"
+              }
             },
             {
               "version": "25.11.06",
               "release_date": "2025-11-07T00:43:05Z",
               "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 25.11.06 con ajustes de rendimiento.",
+              "entry_point": "bomberos-android-release.apk",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v25.11.06/bomberos-android-release.apk",
                 "size_bytes": 58244837,
@@ -733,13 +734,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "bomberos-android-release.apk"
+              }
             },
             {
               "version": "25.11.05",
               "release_date": "2025-11-05T11:34:20Z",
               "changelog": "Lanzamiento de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 25.11.05 con mejoras en la interfaz de captura.",
+              "entry_point": "bomberos-android-release.apk",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v25.11.05/bomberos-android-release.apk",
                 "size_bytes": 58244821,
@@ -749,13 +750,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "bomberos-android-release.apk"
+              }
             },
             {
               "version": "25.11.02",
               "release_date": "2025-11-02T10:38:19Z",
               "changelog": "Lanzamiento inicial de Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos versión 25.11.02.",
+              "entry_point": "bomberos-android-release.apk",
               "package": {
                 "url": "https://github.com/HakkinDavid/firefighter-form/releases/download/v25.11.02/bomberos-android-release.apk",
                 "size_bytes": 58260277,
@@ -765,8 +766,7 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "bomberos-android-release.apk"
+              }
             }
           ]
         }
@@ -807,6 +807,7 @@
               "version": "26.09.11",
               "release_date": "2026-09-11T03:01:32Z",
               "changelog": "Lanzamiento de Platinum World Management System versión 26.09.11 con mejoras en auditoría e inventario.",
+              "entry_point": "pwms-android-release.apk",
               "package": {
                 "url": "https://github.com/HakkinDavid/PWMS/releases/download/v26.09.11/pwms-android-release.apk",
                 "size_bytes": 90255671,
@@ -826,13 +827,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "pwms-android-release.apk"
+              }
             },
             {
               "version": "26.09.08",
               "release_date": "2026-09-08T07:53:36Z",
               "changelog": "Lanzamiento de Platinum World Management System versión 26.09.08 con optimización en consultas relacionales.",
+              "entry_point": "pwms-android-release.apk",
               "package": {
                 "url": "https://github.com/HakkinDavid/PWMS/releases/download/v26.09.08/pwms-android-release.apk",
                 "size_bytes": 90288515,
@@ -842,13 +843,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "pwms-android-release.apk"
+              }
             },
             {
               "version": "26.09.01",
               "release_date": "2026-09-01T04:02:04Z",
               "changelog": "Lanzamiento de Platinum World Management System versión 26.09.01 con ajustes en el motor Drift.",
+              "entry_point": "pwms-android-release.apk",
               "package": {
                 "url": "https://github.com/HakkinDavid/PWMS/releases/download/v26.09.01/pwms-android-release.apk",
                 "size_bytes": 89059111,
@@ -858,13 +859,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "pwms-android-release.apk"
+              }
             },
             {
               "version": "26.08.31",
               "release_date": "2026-08-31T07:22:30Z",
               "changelog": "Lanzamiento de Platinum World Management System versión 26.08.31 con trazabilidad de eventos históricos.",
+              "entry_point": "pwms-android-release.apk",
               "package": {
                 "url": "https://github.com/HakkinDavid/PWMS/releases/download/v26.08.31/pwms-android-release.apk",
                 "size_bytes": 89124687,
@@ -874,13 +875,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "pwms-android-release.apk"
+              }
             },
             {
               "version": "26.08.28",
               "release_date": "2026-08-28T08:22:54Z",
               "changelog": "Lanzamiento de Platinum World Management System versión 26.08.28 con soporte extendido de entidades.",
+              "entry_point": "pwms-android-release.apk",
               "package": {
                 "url": "https://github.com/HakkinDavid/PWMS/releases/download/v26.08.28/pwms-android-release.apk",
                 "size_bytes": 88534355,
@@ -890,13 +891,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "pwms-android-release.apk"
+              }
             },
             {
               "version": "26.08.16",
               "release_date": "2026-08-16T00:03:03Z",
               "changelog": "Lanzamiento inicial de Platinum World Management System versión 26.08.16 con base relacional en cuarta forma normal.",
+              "entry_point": "pwms-android-release.apk",
               "package": {
                 "url": "https://github.com/HakkinDavid/PWMS/releases/download/v26.08.16/pwms-android-release.apk",
                 "size_bytes": 86466275,
@@ -906,8 +907,7 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "pwms-android-release.apk"
+              }
             }
           ]
         }
@@ -946,6 +946,7 @@
               "version": "2.5.0",
               "release_date": "2026-10-01T14:30:00Z",
               "changelog": "Lanzamiento de Smart Scheduler versión 2.5.0 con optimización en la clasificación de horarios y nuevo paquete de aplicación para macOS Apple Silicon.",
+              "entry_point": "Smart Scheduler.app",
               "package": {
                 "url": "https://github.com/HakkinDavid/smart-scheduler/releases/download/v2.5/smart-scheduler-macos-arm64.zip",
                 "size_bytes": 32060507,
@@ -964,13 +965,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "Smart Scheduler.app"
+              }
             },
             {
               "version": "2.0.0",
               "release_date": "2026-08-15T10:00:00Z",
               "changelog": "Lanzamiento inicial de Smart Scheduler versión 2.0.0 con interfaz visual y soporte de restricciones.",
+              "entry_point": "Smart Scheduler.app",
               "package": {
                 "url": "https://github.com/HakkinDavid/smart-scheduler/releases/download/v2.0/smart-scheduler-macos-arm64.zip",
                 "size_bytes": 32063818,
@@ -980,8 +981,7 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "Smart Scheduler.app"
+              }
             }
           ]
         }
@@ -1019,6 +1019,7 @@
               "version": "1.0",
               "release_date": "2026-01-11T09:48:58Z",
               "changelog": "Lanzamiento inicial de Wiimote Userland Driver versión 1.0 con soporte para IOHIDManager en macOS.",
+              "entry_point": "WiimoteUserlandDriver-mac-arm64",
               "package": {
                 "url": "https://github.com/HakkinDavid/WiimoteUserlandDriver/releases/download/v1.0/WiimoteUserlandDriver-mac-arm64",
                 "size_bytes": 51776,
@@ -1028,8 +1029,7 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "WiimoteUserlandDriver-mac-arm64"
+              }
             }
           ]
         }
@@ -1070,6 +1070,7 @@
               "version": "1.1.0",
               "release_date": "2026-09-20T12:00:00Z",
               "changelog": "Lanzamiento de Language Input Hotkey versión 1.1.0 con soporte completo de acentos en español mediante accesos rápidos estilo Microsoft Word.",
+              "entry_point": "spanish-v1.0.exe",
               "package": {
                 "url": "https://github.com/HakkinDavid/languages-autohotkey/releases/download/latest/spanish-v1.0.exe",
                 "size_bytes": 1262592,
@@ -1089,13 +1090,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "spanish-v1.0.exe"
+              }
             },
             {
               "version": "1.0.0",
               "release_date": "2026-07-10T11:00:00Z",
               "changelog": "Lanzamiento inicial de Language Input Hotkey versión 1.0.0 con módulo pinyin y mapeo tonal para caracteres en mandarín.",
+              "entry_point": "pinyin-v1.0.exe",
               "package": {
                 "url": "https://github.com/HakkinDavid/languages-autohotkey/releases/download/latest/pinyin-v1.0.exe",
                 "size_bytes": 1298432,
@@ -1105,8 +1106,7 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "pinyin-v1.0.exe"
+              }
             }
           ]
         }
@@ -1148,6 +1148,7 @@
               "version": "1.2",
               "release_date": "2023-05-24T16:07:21Z",
               "changelog": "Lanzamiento de CAT Helper versión 1.2 con mejoras en las funciones de cálculo y optimización de interfaz.",
+              "entry_point": "CATHelper.apk",
               "package": {
                 "url": "https://github.com/HakkinDavid/cathelper/releases/download/latest/CATHelper.apk",
                 "size_bytes": 6176525,
@@ -1167,13 +1168,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "CATHelper.apk"
+              }
             },
             {
               "version": "1.1",
               "release_date": "2023-05-24T02:20:39Z",
               "changelog": "Lanzamiento de CAT Helper versión 1.1 con incorporación de fórmulas estadísticas adicionales.",
+              "entry_point": "CATHelper.apk",
               "package": {
                 "url": "https://github.com/HakkinDavid/cathelper/releases/download/1.1/CATHelper.apk",
                 "size_bytes": 6228749,
@@ -1183,13 +1184,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "CATHelper.apk"
+              }
             },
             {
               "version": "1.0",
               "release_date": "2023-05-12T20:28:14Z",
               "changelog": "Lanzamiento inicial de CAT Helper versión 1.0 con calculadoras de física y probabilidad.",
+              "entry_point": "CATHelper.apk",
               "package": {
                 "url": "https://github.com/HakkinDavid/cathelper/releases/download/1.0/CATHelper.apk",
                 "size_bytes": 6126949,
@@ -1199,8 +1200,7 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "CATHelper.apk"
+              }
             }
           ]
         }
@@ -1243,6 +1243,7 @@
               "version": "1.1.1",
               "release_date": "2026-06-13T05:23:05Z",
               "changelog": "Lanzamiento de CatifyMod Forge versión 1.1.1 con optimizaciones de compatibilidad en Forge.",
+              "entry_point": "catify-1.1.1.jar",
               "package": {
                 "url": "https://github.com/HakkinDavid/CatifyMod-Forge/releases/download/26.1/catify-1.1.1.jar",
                 "size_bytes": 149086,
@@ -1262,13 +1263,13 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "catify-1.1.1.jar"
+              }
             },
             {
               "version": "1.0.2",
               "release_date": "2026-05-26T09:19:07Z",
               "changelog": "Lanzamiento inicial de CatifyMod Forge versión 1.0.2 con transformación visual de jugador a modelo felino.",
+              "entry_point": "catify-1.0.2.jar",
               "package": {
                 "url": "https://github.com/HakkinDavid/CatifyMod-Forge/releases/download/latest/catify-1.0.2.jar",
                 "size_bytes": 150902,
@@ -1278,8 +1279,7 @@
               "scripts": {
                 "pre_install": null,
                 "post_install": null
-              },
-              "entry_point": "catify-1.0.2.jar"
+              }
             }
           ]
         }

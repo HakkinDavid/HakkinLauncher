@@ -20,7 +20,7 @@ class AppTechnicalStrings {
   // ---------------------------------------------------------------------------
   // Versioning & Official URLs
   // ---------------------------------------------------------------------------
-  static const defaultAppVersion = '26.10.10-00';
+  static const defaultAppVersion = '26.10.10-09';
   static const envAppVersionKey = 'APP_VERSION';
   static const appVersion = String.fromEnvironment(
     'APP_VERSION',
