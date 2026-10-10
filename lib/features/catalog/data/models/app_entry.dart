@@ -31,6 +31,20 @@ class CatalogManifest {
         if (launcherMeta != null) 'launcher_meta': launcherMeta!.toJson(),
         'apps': apps.map((e) => e.toJson()).toList(),
       };
+
+  CatalogManifest copyWith({
+    String? version,
+    String? catalogTimestamp,
+    LauncherMeta? launcherMeta,
+    List<AppEntry>? apps,
+  }) {
+    return CatalogManifest(
+      version: version ?? this.version,
+      catalogTimestamp: catalogTimestamp ?? this.catalogTimestamp,
+      launcherMeta: launcherMeta ?? this.launcherMeta,
+      apps: apps ?? this.apps,
+    );
+  }
 }
 
 class LauncherMeta {

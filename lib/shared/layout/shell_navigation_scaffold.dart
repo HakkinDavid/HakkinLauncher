@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/platform/os_paths.dart';
 import '../../core/theme/app_colors.dart';
+import '../../features/catalog/presentation/controllers/catalog_controller.dart';
+import '../../features/self_update/services/self_update_service.dart';
 
-class ShellNavigationScaffold extends StatelessWidget {
+class ShellNavigationScaffold extends ConsumerWidget {
   final Widget child;
 
   const ShellNavigationScaffold({
@@ -13,8 +16,12 @@ class ShellNavigationScaffold extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final location = GoRouterState.of(context).uri.toString();
+    final manifestAsync = ref.watch(catalogManifestProvider);
+    final launcherMeta = manifestAsync.value?.launcherMeta;
+    final hasLauncherUpdate = launcherMeta != null &&
+        SelfUpdateService.isNewerVersion(launcherMeta.latestVersion, AppConstants.appVersion);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -112,6 +119,7 @@ class ShellNavigationScaffold extends StatelessWidget {
                   label: 'Ajustes',
                   route: '/settings',
                   isActive: location.startsWith('/settings'),
+                  hasBadge: hasLauncherUpdate,
                 ),
 
                 const Spacer(),
@@ -180,6 +188,7 @@ class ShellNavigationScaffold extends StatelessWidget {
     required String label,
     required String route,
     required bool isActive,
+    bool hasBadge = false,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
@@ -206,14 +215,33 @@ class ShellNavigationScaffold extends StatelessWidget {
                   color: isActive ? AppColors.celestialBlue : AppColors.platinumMuted,
                 ),
                 const SizedBox(width: 14),
-                Text(
-                  label,
-                  style: TextStyle(
-                    color: isActive ? AppColors.platinum : AppColors.platinumMuted,
-                    fontSize: 14,
-                    fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+                Expanded(
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      color: isActive ? AppColors.platinum : AppColors.platinumMuted,
+                      fontSize: 14,
+                      fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+                    ),
                   ),
                 ),
+                if (hasBadge)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: AppColors.celestialBlue,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Text(
+                      'NEW',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),

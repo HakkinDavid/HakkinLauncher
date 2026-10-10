@@ -11,15 +11,11 @@ void main() {
       expect(SelfUpdateService.isNewerVersion('2.0.0', '1.0.0'), isTrue);
       expect(SelfUpdateService.isNewerVersion('1.0.0.1', '1.0.0'), isTrue);
       expect(SelfUpdateService.isNewerVersion('v1.0.1', '1.0.0'), isTrue);
-      expect(SelfUpdateService.isNewerVersion('26.10.08', '1.0.0'), isTrue);
-
-      // Igualdad
-      expect(SelfUpdateService.isNewerVersion('1.0.0', '1.0.0'), isFalse);
-      expect(SelfUpdateService.isNewerVersion('v1.0.0', '1.0.0'), isFalse);
-
-      // Versión anterior
-      expect(SelfUpdateService.isNewerVersion('0.9.9', '1.0.0'), isFalse);
-      expect(SelfUpdateService.isNewerVersion('0.1.0', '1.0.0'), isFalse);
+      // Formato YY.MM.DD-HH
+      expect(SelfUpdateService.isNewerVersion('26.10.10-00', '26.10.09-20'), isTrue);
+      expect(SelfUpdateService.isNewerVersion('26.10.09-20', '26.10.10-00'), isFalse);
+      expect(SelfUpdateService.isNewerVersion('26.10.09-21', '26.10.09-20'), isTrue);
+      expect(SelfUpdateService.isNewerVersion('26.10.10-00', '26.10.10-00'), isFalse);
     });
 
     test('isUpdateAvailable evaluates against AppConstants.appVersion correctly', () {

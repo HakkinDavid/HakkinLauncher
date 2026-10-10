@@ -280,5 +280,5 @@ jobs:
             git commit -m "chore(release): sincronizar catálogo y versión de lanzador [skip ci]"
             git push origin HEAD:${{ github.ref_name }}
           else
-            echo "No hay cambios en el catálogo para commitear."
+            echo "No hay cambios en el catálogo para commitear en ${{ github.ref_name }}."
           fi

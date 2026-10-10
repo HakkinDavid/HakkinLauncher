@@ -17,9 +17,13 @@ class BackgroundCheckService {
   final CatalogRepository _catalogRepository = CatalogRepository();
   final LibraryRepository _libraryRepository = LibraryRepository();
 
-  /// Inicia el temporizador de sondeo periódico en segundo plano.
+  /// Inicia el temporizador de sondeo periódico en segundo plano con comprobación automática inicial.
   void startPeriodicChecks({Duration interval = AppConstants.backgroundCheckInterval}) {
     _timer?.cancel();
+    // Comprobación automática inmediata tras el arranque de la aplicación (3s de gracia)
+    Timer(const Duration(seconds: 3), () {
+      checkForUpdates(silent: true);
+    });
     _timer = Timer.periodic(interval, (_) {
       checkForUpdates(silent: true);
     });

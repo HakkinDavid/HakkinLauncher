@@ -548,12 +548,30 @@ def sync_launcher_meta_from_remote(repo=None):
         print(f"✅ Se sincronizó launcher_meta con el release {clean_tag} ({len(releases_dict)} binarios)")
     elif latest_tag:
         clean_tag = re.sub(r'^v+', '', str(latest_tag))
+        releases_dict = {}
+        if assets:
+            for asset in assets:
+                aname = asset.get("name", "")
+                pid = FILENAME_TO_TARGET.get(aname)
+                if pid:
+                    digest = asset.get("digest", "")
+                    sha = digest.split("sha256:")[-1] if "sha256:" in digest else ""
+                    url = asset.get("url") or f"https://github.com/{repo}/releases/download/{latest_tag}/{aname}"
+                    size = asset.get("size", 0)
+                    releases_dict[pid] = {
+                        "url": url,
+                        "sha256": sha,
+                        "size_bytes": size
+                    }
         meta = {
             "latest_version": clean_tag,
             "min_required_launcher_version": "1.0.0",
-            "releases": {}
+            "releases": releases_dict
         }
-        print(f"⚠️ Tag {latest_tag} localizado sin version_manifest.json; releases inicializado vacío.")
+        if releases_dict:
+            print(f"✅ Se sincronizó launcher_meta directamente desde los activos del release {clean_tag} ({len(releases_dict)} binarios)")
+        else:
+            print(f"⚠️ Tag {latest_tag} localizado sin activos descargables; releases inicializado vacío.")
     else:
         # No hay ningún release en GitHub (todas las versiones fueron borradas)
         meta = {

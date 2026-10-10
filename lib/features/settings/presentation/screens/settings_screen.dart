@@ -108,9 +108,48 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   Future<void> _checkForUpdatesNow() async {
     setState(() => _isCheckingUpdates = true);
-    await BackgroundCheckService.instance.checkForUpdates(silent: false);
-    if (mounted) {
-      setState(() => _isCheckingUpdates = false);
+    try {
+      // 1. Refrescar el provider del catálogo para actualizar el estado reactivo de Riverpod
+      final manifest = await ref.refresh(catalogManifestProvider.future);
+      // 2. Ejecutar la comprobación completa de actualizaciones de aplicaciones y del lanzador
+      final updates = await BackgroundCheckService.instance.checkForUpdates(silent: false);
+
+      if (mounted) {
+        setState(() => _isCheckingUpdates = false);
+        final hasLauncherUpdate = manifest.launcherMeta != null &&
+            SelfUpdateService.isNewerVersion(manifest.launcherMeta!.latestVersion, AppConstants.appVersion);
+
+        if (hasLauncherUpdate || updates.isNotEmpty) {
+          final summaryMsg = hasLauncherUpdate
+              ? '¡Nueva versión de ${AppConstants.appName} v${manifest.launcherMeta!.latestVersion} disponible!'
+              : 'Se encontraron ${updates.length} actualización(es) disponible(s).';
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(summaryMsg),
+              backgroundColor: AppColors.celestialBlue,
+              duration: const Duration(seconds: 4),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Todo al día. Todas tus aplicaciones y el lanzador están en la versión más reciente.'),
+              backgroundColor: AppColors.surfaceElevated,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isCheckingUpdates = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al comprobar actualizaciones: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
     }
   }
 
