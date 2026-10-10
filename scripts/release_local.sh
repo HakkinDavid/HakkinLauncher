@@ -170,7 +170,6 @@ for t in "${TARGETS_TO_PROCESS[@]}"; do
           # Host no Windows
           if [[ "$TARGET" != "all" ]]; then
             echo "❌ Error: La compilación de Windows requiere un host Windows o GitHub Actions CI."
-            echo "   💡 Para compilar en la nube automáticamente, haz push a la rama 'stable'."
             exit 1
           fi
 
@@ -196,7 +195,6 @@ for t in "${TARGETS_TO_PROCESS[@]}"; do
             echo "[$t] Binario legítimo previo preservado y registrado en caché local."
           else
             echo "ℹ️ [$t] Host macOS ($HOST_OS) detectado. Flutter no soporta compilar Windows en Mac."
-            echo "   💡 No se creará ningún archivo dummy. Los binarios de Windows se compilarán en GitHub Actions al hacer push a 'stable'."
           fi
         fi
         ;;
@@ -215,7 +213,6 @@ for t in "${TARGETS_TO_PROCESS[@]}"; do
           # Host no Linux
           if [[ "$TARGET" != "all" ]]; then
             echo "❌ Error: La compilación de Linux requiere un host Linux o GitHub Actions CI."
-            echo "   💡 Para compilar en la nube automáticamente, haz push a la rama 'stable'."
             exit 1
           fi
 
@@ -241,7 +238,6 @@ for t in "${TARGETS_TO_PROCESS[@]}"; do
             echo "[$t] Binario legítimo previo preservado y registrado en caché local."
           else
             echo "ℹ️ [$t] Host macOS ($HOST_OS) detectado. Flutter no soporta compilar Linux en Mac."
-            echo "   💡 No se creará ningún archivo dummy. Los binarios de Linux se compilarán en GitHub Actions al hacer push a 'stable'."
           fi
         fi
         ;;

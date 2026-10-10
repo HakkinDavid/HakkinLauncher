@@ -1,9 +1,6 @@
 name: Multi-Platform Cloud Build & Release
 
 on:
-  push:
-    branches:
-      - stable
   workflow_dispatch:
     inputs:
       version_tag:
