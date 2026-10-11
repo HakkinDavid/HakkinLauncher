@@ -67,5 +67,15 @@
       <ComponentRef Id="ApplicationShortcutStartMenu" />
       <ComponentRef Id="ApplicationShortcutDesktop" />
     </Feature>
+
+    <CustomAction Id="LaunchApplication"
+                  Directory="INSTALLFOLDER"
+                  ExeCommand='"[INSTALLFOLDER]HakkinLauncher.exe"'
+                  Execute="immediate"
+                  Return="asyncNoWait" />
+
+    <InstallExecuteSequence>
+      <Custom Action="LaunchApplication" After="InstallFinalize">NOT REMOVE~="ALL"</Custom>
+    </InstallExecuteSequence>
   </Product>
 </Wix>
