@@ -1,49 +1,49 @@
 {
   "version": "2.0.0",
-  "catalog_timestamp": "2026-10-10T23:22:30.863459+00:00",
+  "catalog_timestamp": "2026-10-11T09:42:51.203871+00:00",
   "launcher_meta": {
-    "latest_version": "26.10.10-23",
+    "latest_version": "26.10.11-09",
     "min_required_launcher_version": "1.0.0",
     "installers": {
       "windows-x64": {
         "format": "msi",
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.10-23/HakkinLauncher-windows-x64.msi",
-        "sha256": "902c1c36d729666ce500112ba1911001aa806fd54430820b2aa01a72c9927382",
-        "size_bytes": 13246464
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.11-09/HakkinLauncher-windows-x64.msi",
+        "sha256": "a8489da2d7f49ba839bf5b925df2d87182e80b4040c495e36acd9e5565ad18dc",
+        "size_bytes": 13258752
       },
       "macos": {
         "format": "dmg",
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.10-23/HakkinLauncher-macos.dmg",
-        "sha256": "cd32792026729568494a868a3c9d3760d457303a66d520166887869a8dcf64db",
-        "size_bytes": 12752080
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.11-09/HakkinLauncher-macos.dmg",
+        "sha256": "1f4343aa5bc096cb9d20598e4124d5011caab6fb5d521bd04653cf16e337b7d8",
+        "size_bytes": 12763607
       },
       "linux-x64": {
         "format": "deb",
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.10-23/HakkinLauncher-linux-amd64.deb",
-        "sha256": "561bce38631da0533814209084a8b76fca25901820fdbae5ac842a5c8a647df1",
-        "size_bytes": 8790472
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.11-09/HakkinLauncher-linux-amd64.deb",
+        "sha256": "fd70a40a9b727752e0e23bfb76725809ab697769cda2158acfc879a1a0e059c6",
+        "size_bytes": 8795922
       }
     },
     "releases": {
       "linux-x64": {
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.10-23/HakkinLauncher-linux-x64.zip",
-        "sha256": "4ac076d37efa277b882110d61ebb062f1f031fc5564a76cd6245a843476ed84e",
-        "size_bytes": 10898064
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.11-09/HakkinLauncher-linux-x64.zip",
+        "sha256": "5d261d976b008c9d0823f5a268dc52cbe8e364db456f472f3c1a3797dae72f17",
+        "size_bytes": 10905500
       },
       "macos-arm64": {
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.10-23/HakkinLauncher-macos-arm64.zip",
-        "sha256": "fb6909c81f2c9c52d253fafec116e1afeca2568b7d931c3d0c5f54c3ed1d3b2d",
-        "size_bytes": 11610645
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.11-09/HakkinLauncher-macos-arm64.zip",
+        "sha256": "440ea00c126310e1ddd2296434df8eb9949443fd32d47ffb4df4beeb1546bf36",
+        "size_bytes": 11619047
       },
       "macos-x64": {
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.10-23/HakkinLauncher-macos-x64.zip",
-        "sha256": "f2fd46e9bfa028b931351d535abe2db733bbe7eebf16c43bbfc1679a87d8b4e1",
-        "size_bytes": 11610645
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.11-09/HakkinLauncher-macos-x64.zip",
+        "sha256": "91902e928e1df6f174ca118e67cdb000da99f4348a4863c60295c5fc55a56d54",
+        "size_bytes": 11619047
       },
       "windows-x64": {
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.10-23/HakkinLauncher-windows-x64.zip",
-        "sha256": "467091faea450b8f948f51d0f327c95f01f03e4f70b6da301d28f2868cc485c2",
-        "size_bytes": 12729805
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.11-09/HakkinLauncher-windows-x64.zip",
+        "sha256": "cb3f435b44747e0256d217efb38ec9173f222826d6723b7188ffa26c27fc47df",
+        "size_bytes": 12738195
       }
     }
   },
@@ -1041,7 +1041,7 @@
       "category": "tool",
       "developer": "HakkinDavid",
       "summary": "Herramienta de acceso rápido para escribir caracteres especiales en español y tonos pinyin sin cambiar la distribución del teclado.",
-      "description_markdown": "# Language Input Hotkey\n\nHerramienta de escritura rápida en segundo plano para ingresar caracteres especiales en español y tonos pinyin mediante atajos de teclado estilo Microsoft Word.\n\n### Módulos disponibles\n- **Módulo de español**: Escritura rápida de vocales acentuadas, diéresis y signos de apertura de interrogación y exclamación.\n- **Módulo de pinyin**: Asignación tonal directa para caracteres fonéticos en mandarín.",
+      "description_markdown": "# Language Input Hotkey\n\nHerramienta de escritura rápida en segundo plano para ingresar caracteres especiales en español y tonos pinyin mediante atajos de teclado estilo Microsoft Word.\n\n### Módulos disponibles\n- **Módulo de español**: Escritura rápida de vocales acentuadas, diéresis y signos de apertura de interrogación y exclamación.\n- **Módulo de Pinyin**: Asignación tonal directa para caracteres fonéticos en mandarín.",
       "tags": [
         "Utilidad",
         "Escritura",
