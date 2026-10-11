@@ -447,6 +447,8 @@ class AppStrings {
       'Error al crear acceso directo en el escritorio: $error.';
   static String logStartMenuError(Object error) =>
       'Error al registrar en el menú de aplicaciones: $error.';
+  static String logRemoveShortcutsError(Object error) =>
+      'Aviso al eliminar accesos directos de la aplicación: $error.';
   static String logTrayInitError(Object error) =>
       'Error al inicializar la bandeja del sistema: $error.';
   static String logCloseToTrayPrefError(Object error) =>

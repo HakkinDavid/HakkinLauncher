@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:local_notifier/local_notifier.dart';
 import '../constants/app_strings.dart';
+import 'shortcut_service.dart';
 
 /// Servicio centralizado de notificaciones nativas de escritorio.
 class NotificationService {
@@ -19,6 +20,7 @@ class NotificationService {
         appName: AppStrings.appName,
         shortcutPolicy: ShortcutPolicy.requireCreate,
       );
+      await ShortcutService.cleanupRedundantLauncherShortcuts();
       _initialized = true;
     } catch (e) {
       debugPrint(AppStrings.logCouldNotInitLocalNotifier(e));

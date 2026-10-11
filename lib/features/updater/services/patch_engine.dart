@@ -829,14 +829,22 @@ class PatchEngine {
 
     await _libraryRepository.saveInstalledApp(installedApp);
 
-    // 4. Gestión automática de accesos directos
+    // 4. Gestión automática de accesos directos (Escritorio y Aplicaciones/Launchpad/Menú de inicio)
     if (isInitialInstall) {
       await ShortcutService.createDesktopShortcut(
         appTitle: app.title,
         executablePath: exePath,
       );
+      await ShortcutService.createStartMenuEntry(
+        appTitle: app.title,
+        executablePath: exePath,
+      );
     } else {
       await ShortcutService.updateDesktopShortcutIfExists(
+        appTitle: app.title,
+        executablePath: exePath,
+      );
+      await ShortcutService.updateStartMenuEntryIfExists(
         appTitle: app.title,
         executablePath: exePath,
       );

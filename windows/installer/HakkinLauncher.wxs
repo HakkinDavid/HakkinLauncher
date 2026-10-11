@@ -37,7 +37,7 @@
       <Directory Id="DesktopFolder" Name="Desktop" />
     </Directory>
 
-    <DirectoryRef Id="ApplicationProgramsFolder">
+    <DirectoryRef Id="ProgramMenuFolder">
       <Component Id="ApplicationShortcutStartMenu" Guid="98234B36-22B2-4E14-8B89-2BE9A73CA92E">
         <Shortcut Id="StartMenuShortcut"
                   Name="HakkinLauncher"
@@ -45,7 +45,7 @@
                   Target="[INSTALLFOLDER]HakkinLauncher.exe"
                   WorkingDirectory="INSTALLFOLDER"
                   Icon="AppIcon" />
-        <RemoveFolder Id="RemoveApplicationProgramsFolder" On="uninstall" />
+        <RemoveFolder Id="RemoveApplicationProgramsFolder" Directory="ApplicationProgramsFolder" On="both" />
         <RegistryValue Root="HKCU" Key="Software\HakkinLauncher" Name="InstalledStartMenu" Type="integer" Value="1" KeyPath="yes" />
       </Component>
     </DirectoryRef>

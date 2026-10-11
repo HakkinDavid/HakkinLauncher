@@ -58,10 +58,27 @@ class WindowService with WindowListener {
     }
   }
 
+  /// Oculta la ventana en la bandeja del sistema y en macOS retira el icono del Dock.
+  Future<void> hideToTray() async {
+    await windowManager.hide();
+    if (Platform.isMacOS) {
+      await windowManager.setSkipTaskbar(true);
+    }
+  }
+
+  /// Restaura la ventana desde la bandeja del sistema y devuelve el icono al Dock en macOS.
+  Future<void> restoreWindow() async {
+    if (Platform.isMacOS) {
+      await windowManager.setSkipTaskbar(false);
+    }
+    await windowManager.show();
+    await windowManager.focus();
+  }
+
   @override
   void onWindowClose() async {
     if (_closeToTray && (Platform.isWindows || Platform.isMacOS || Platform.isLinux)) {
-      await windowManager.hide();
+      await hideToTray();
     } else {
       await windowManager.destroy();
     }

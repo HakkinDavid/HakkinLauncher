@@ -13,9 +13,11 @@ class AppDelegate: FlutterAppDelegate {
 
   override func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
     if !flag {
+      sender.setActivationPolicy(.regular)
       for window in sender.windows {
         window.makeKeyAndOrderFront(self)
       }
+      sender.activate(ignoringOtherApps: true)
     }
     return true
   }

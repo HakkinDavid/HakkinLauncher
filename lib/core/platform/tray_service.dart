@@ -5,6 +5,7 @@ import 'package:window_manager/window_manager.dart';
 import '../constants/app_constants.dart';
 import '../constants/app_strings.dart';
 import '../constants/app_technical_strings.dart';
+import 'window_service.dart';
 
 /// Servicio para la bandeja del sistema.
 class TrayService with TrayListener {
@@ -58,8 +59,7 @@ class TrayService with TrayListener {
 
   @override
   void onTrayIconMouseDown() {
-    windowManager.show();
-    windowManager.focus();
+    WindowService.instance.restoreWindow();
   }
 
   @override
@@ -70,8 +70,7 @@ class TrayService with TrayListener {
   @override
   void onTrayMenuItemClick(MenuItem menuItem) {
     if (menuItem.key == AppTechnicalStrings.trayKeyShowWindow) {
-      windowManager.show();
-      windowManager.focus();
+      WindowService.instance.restoreWindow();
     } else if (menuItem.key == AppTechnicalStrings.trayKeyCheckUpdates) {
       onCheckUpdatesRequested?.call();
     } else if (menuItem.key == AppTechnicalStrings.trayKeyExitApp) {

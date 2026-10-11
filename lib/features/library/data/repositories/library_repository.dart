@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hakkin_launcher/core/constants/app_constants.dart';
+import 'package:hakkin_launcher/core/platform/shortcut_service.dart';
 import 'package:hakkin_launcher/features/library/data/models/installed_app.dart';
 
 /// Repositorio para la persistencia del estado de las aplicaciones instaladas.
@@ -55,13 +56,19 @@ class LibraryRepository {
     }
   }
 
-  /// Desinstala una aplicación eliminando sus archivos y removiéndola del registro.
+  /// Desinstala una aplicación eliminando sus archivos, accesos directos y removiéndola del registro.
   /// Respeta las rutas definidas por el usuario si se especifican.
   Future<bool> uninstallApp(String id, {bool deleteUserData = false}) async {
     final app = await getInstalledApp(id);
     if (app == null) return false;
 
     try {
+      await ShortcutService.removeShortcutsForApp(
+        appTitle: app.title,
+        executablePath: app.executablePath,
+        installDirectory: app.installDirectory,
+      );
+
       final dir = Directory(app.installDirectory);
       if (await dir.exists()) {
         await dir.delete(recursive: true);

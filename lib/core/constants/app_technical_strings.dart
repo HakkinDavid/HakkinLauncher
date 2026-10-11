@@ -91,6 +91,7 @@ class AppTechnicalStrings {
   static const dirToolsBin = 'tools/bin';
   static const dirDesktop = 'Desktop';
   static const dirStartMenu = 'Microsoft/Windows/Start Menu/Programs/Hakkin';
+  static const dirStartMenuPrograms = 'Microsoft/Windows/Start Menu/Programs';
   static const dirLinuxApps = '.local/share/applications';
   static const dirApplicationsSystem = '/Applications';
   static const dirApplicationsUser = 'Applications';
@@ -133,6 +134,8 @@ class AppTechnicalStrings {
   static const cmdDitto = 'ditto';
   static const cmdUnzip = 'unzip';
   static const cmdCodesign = 'codesign';
+  static const cmdLsregister =
+      '/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister';
   static const cmdTasklist = 'tasklist';
   static const cmdKill = 'kill';
   static const cmdTaskkill = 'taskkill';
@@ -303,6 +306,7 @@ class AppTechnicalStrings {
   static const envHome = 'HOME';
   static const envUserProfile = 'USERPROFILE';
   static const envAppData = 'APPDATA';
+  static const envOneDrive = 'OneDrive';
 
   // ---------------------------------------------------------------------------
   // Categories
