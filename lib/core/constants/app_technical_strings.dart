@@ -90,7 +90,10 @@ class AppTechnicalStrings {
   static const dirCodeSignature = '_CodeSignature';
   static const dirToolsBin = 'tools/bin';
   static const dirDesktop = 'Desktop';
-  static const dirStartMenu = 'Microsoft/Windows/Start Menu/Programs/Hakkin';
+  static const dirStartMenu =
+      'Microsoft/Windows/Start Menu/Programs/HakkinLauncher';
+  static const dirStartMenuLegacyHakkin =
+      'Microsoft/Windows/Start Menu/Programs/Hakkin';
   static const dirStartMenuPrograms = 'Microsoft/Windows/Start Menu/Programs';
   static const dirLinuxApps = '.local/share/applications';
   static const dirApplicationsSystem = '/Applications';

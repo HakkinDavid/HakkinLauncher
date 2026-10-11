@@ -37,7 +37,7 @@
       <Directory Id="DesktopFolder" Name="Desktop" />
     </Directory>
 
-    <DirectoryRef Id="ProgramMenuFolder">
+    <DirectoryRef Id="ApplicationProgramsFolder">
       <Component Id="ApplicationShortcutStartMenu" Guid="98234B36-22B2-4E14-8B89-2BE9A73CA92E">
         <Shortcut Id="StartMenuShortcut"
                   Name="HakkinLauncher"

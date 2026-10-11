@@ -67,13 +67,13 @@ cat <<EOF > "$STAGING_DIR/usr/share/applications/hakkin-launcher.desktop"
 [Desktop Entry]
 Type=Application
 Name=HakkinLauncher
-GenericName=Lanzador de Software y Videojuegos
-Comment=Cliente universal de distribución, actualización diferencial y ejecución de software y videojuegos
+GenericName=Lanzador de aplicaciones
+Comment=Lanzador de aplicaciones para descubrir, instalar y abrir tu biblioteca
 Exec=/opt/HakkinLauncher/$EXE_NAME %u
 Icon=hakkin-launcher
 Terminal=false
 Categories=Game;Utility;
-Keywords=Games;Launcher;Hakkin;Updates;
+Keywords=Games;Launcher;HakkinLauncher;Updates;
 StartupWMClass=$EXE_NAME
 EOF
 chmod 644 "$STAGING_DIR/usr/share/applications/hakkin-launcher.desktop"
@@ -88,7 +88,7 @@ Architecture: amd64
 Maintainer: HakkinDavid <dev@hakkin.org>
 Depends: libgtk-3-0, libayatana-appindicator3-1, liblzma5, libnotify4
 Description: HakkinLauncher
- Cliente universal de distribución, actualización diferencial y ejecución de software y videojuegos.
+ Lanzador de aplicaciones para descubrir, instalar y abrir tu biblioteca.
 EOF
 
 echo "🔨 Compilando paquete .deb con dpkg-deb..."

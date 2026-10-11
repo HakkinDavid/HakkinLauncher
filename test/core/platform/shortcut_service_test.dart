@@ -1,10 +1,29 @@
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hakkin_launcher/core/constants/app_strings.dart';
+import 'package:hakkin_launcher/core/constants/app_technical_strings.dart';
 import 'package:hakkin_launcher/core/platform/shortcut_service.dart';
 import 'package:path/path.dart' as p;
 
 void main() {
   group('ShortcutService Tests', () {
+    test('Windows Start Menu directory uses HakkinLauncher subfolder instead of Hakkin', () {
+      expect(
+        AppTechnicalStrings.dirStartMenu,
+        equals('Microsoft/Windows/Start Menu/Programs/HakkinLauncher'),
+      );
+      expect(
+        AppTechnicalStrings.dirStartMenuLegacyHakkin,
+        equals('Microsoft/Windows/Start Menu/Programs/Hakkin'),
+      );
+    });
+
+    test('AppStrings.categoryLabel localizes catalog categories to Spanish sentence case', () {
+      expect(AppStrings.categoryLabel('game'), equals('Juego'));
+      expect(AppStrings.categoryLabel('app'), equals('App'));
+      expect(AppStrings.categoryLabel('tool'), equals('Herramienta'));
+    });
+
     test('removeShortcutsForApp cleans up symlinks and shortcuts for uninstalled apps', () async {
       // Limpieza de eventual acceso directo residual de pruebas previas
       await ShortcutService.removeShortcutsForApp(

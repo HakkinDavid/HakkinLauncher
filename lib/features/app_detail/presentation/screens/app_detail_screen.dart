@@ -720,7 +720,7 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
                               ),
                               const Divider(height: 24),
                               _buildMetaRow(AppStrings.fieldDeveloper, app.developer),
-                              _buildMetaRow(AppStrings.fieldCategory, app.category.toUpperCase()),
+                              _buildMetaRow(AppStrings.fieldCategory, AppStrings.categoryLabel(app.category)),
                               _buildMetaRow(AppStrings.fieldActivePlatform, _getPlatformLabel(activePlatformKey)),
                               _buildMetaRow(AppStrings.fieldAvailablePlatforms, availablePlatformKeys.map(_getPlatformLabel).join(AppTechnicalStrings.commaSpace)),
                               _buildMetaRow(AppStrings.fieldSelectedVersion, AppTechnicalStrings.versionWithV(selectedRelease.version)),
@@ -729,26 +729,10 @@ class _AppDetailScreenState extends ConsumerState<AppDetailScreen> {
                                   AppStrings.fieldReleaseDate,
                                   AppStrings.formatDate(selectedRelease.releaseDate!),
                                 ),
-                              if (selectedRelease.entryPoint.isNotEmpty)
-                                _buildMetaRow(
-                                  AppStrings.fieldEntryPoint,
-                                  selectedRelease.entryPoint,
-                                ),
                               if (selectedRelease.package.sizeBytes > 0)
                                 _buildMetaRow(
                                   AppStrings.fieldDownloadSize,
                                   AppStrings.megabytes((selectedRelease.package.sizeBytes / 1048576).toStringAsFixed(1)),
-                                ),
-                              _buildMetaRow(
-                                AppStrings.fieldDeltaSupport,
-                                selectedRelease.deltaPatches.isNotEmpty
-                                    ? AppStrings.deltaPatchesAvailable(selectedRelease.deltaPatches.length)
-                                    : AppStrings.deltaFullDownloadOnly,
-                              ),
-                              if (platformRelease != null && platformRelease.protectedUserPaths.isNotEmpty)
-                                _buildMetaRow(
-                                  AppStrings.fieldUserPaths,
-                                  AppStrings.userPathsProtected(platformRelease.protectedUserPaths.length),
                                 ),
                             ],
                           ),

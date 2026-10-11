@@ -138,14 +138,16 @@ class ShortcutService {
           startMenuDir,
           appTitle + AppTechnicalStrings.extLnk,
         );
-        // Limpiar entrada previa en subcarpeta heredada si existiera
+        // Limpiar entrada previa en subcarpeta heredada Hakkin si existiera
         final legacyPath = p.join(
           appData,
-          AppTechnicalStrings.dirStartMenu,
+          AppTechnicalStrings.dirStartMenuLegacyHakkin,
           appTitle + AppTechnicalStrings.extLnk,
         );
         await _deleteShortcutEntityIfExists(legacyPath);
-        await _cleanupEmptyDirectory(p.join(appData, AppTechnicalStrings.dirStartMenu));
+        await _cleanupEmptyDirectory(
+          p.join(appData, AppTechnicalStrings.dirStartMenuLegacyHakkin),
+        );
 
         return await _createWindowsShortcut(
           targetPath: executablePath,
@@ -245,11 +247,17 @@ class ShortcutService {
         );
         final legacyPath = p.join(
           appData,
-          AppTechnicalStrings.dirStartMenu,
+          AppTechnicalStrings.dirStartMenuLegacyHakkin,
+          appTitle + AppTechnicalStrings.extLnk,
+        );
+        final rootProgramsPath = p.join(
+          appData,
+          AppTechnicalStrings.dirStartMenuPrograms,
           appTitle + AppTechnicalStrings.extLnk,
         );
         if (await _shortcutEntityExists(directPath) ||
-            await _shortcutEntityExists(legacyPath)) {
+            await _shortcutEntityExists(legacyPath) ||
+            await _shortcutEntityExists(rootProgramsPath)) {
           return await createStartMenuEntry(
             appTitle: appTitle,
             executablePath: executablePath,
@@ -334,7 +342,8 @@ class ShortcutService {
             p.join(oneDrive, AppTechnicalStrings.dirDesktop, lnkFileName),
           if (appData.isNotEmpty) ...[
             p.join(userHomeStartMenuBase(appData), lnkFileName),
-            p.join(appData, AppTechnicalStrings.dirStartMenu, lnkFileName),
+            p.join(appData, AppTechnicalStrings.dirStartMenuLegacyHakkin, lnkFileName),
+            p.join(appData, AppTechnicalStrings.dirStartMenuPrograms, lnkFileName),
           ],
         ];
 
@@ -344,6 +353,9 @@ class ShortcutService {
 
         if (appData.isNotEmpty) {
           await _cleanupEmptyDirectory(p.join(appData, AppTechnicalStrings.dirStartMenu));
+          await _cleanupEmptyDirectory(
+            p.join(appData, AppTechnicalStrings.dirStartMenuLegacyHakkin),
+          );
         }
       } else if (Platform.isLinux) {
         if (userHome.isEmpty) return;
@@ -367,8 +379,8 @@ class ShortcutService {
     }
   }
 
-  /// Limpia accesos directos redundantes del propio lanzador en Windows Start Menu
-  /// cuando coexisten el acceso directo en la raíz de Programs y la subcarpeta heredada.
+  /// Migra accesos directos de la subcarpeta heredada `Hakkin` hacia `HakkinLauncher`
+  /// en Windows Start Menu y elimina la carpeta heredada.
   static Future<void> cleanupRedundantLauncherShortcuts() async {
     if (!Platform.isWindows) return;
     try {
@@ -376,33 +388,30 @@ class ShortcutService {
           AppTechnicalStrings.empty;
       if (appData.isEmpty) return;
 
-      final programsDir = p.join(appData, AppTechnicalStrings.dirStartMenuPrograms);
-      final rootShortcut = File(
-        p.join(programsDir, AppTechnicalStrings.dirHakkinLauncher + AppTechnicalStrings.extLnk),
+      final legacyHakkinDir = Directory(
+        p.join(appData, AppTechnicalStrings.dirStartMenuLegacyHakkin),
       );
-      final redundantSubfolder = Directory(
-        p.join(programsDir, AppTechnicalStrings.dirHakkinLauncher),
-      );
+      if (await legacyHakkinDir.exists()) {
+        final targetHakkinLauncherDir = Directory(
+          p.join(appData, AppTechnicalStrings.dirStartMenu),
+        );
+        await targetHakkinLauncherDir.create(recursive: true);
 
-      if (await redundantSubfolder.exists()) {
-        if (!await rootShortcut.exists()) {
-          final subfolderShortcut = File(
-            p.join(
-              redundantSubfolder.path,
-              AppTechnicalStrings.dirHakkinLauncher + AppTechnicalStrings.extLnk,
-            ),
-          );
-          if (await subfolderShortcut.exists()) {
-            await subfolderShortcut.copy(rootShortcut.path);
+        await for (final entity in legacyHakkinDir.list(followLinks: false)) {
+          if (entity is File && entity.path.endsWith(AppTechnicalStrings.extLnk)) {
+            final destPath = p.join(targetHakkinLauncherDir.path, p.basename(entity.path));
+            if (!await File(destPath).exists()) {
+              await entity.copy(destPath);
+            }
           }
         }
-        await redundantSubfolder.delete(recursive: true);
+        await legacyHakkinDir.delete(recursive: true);
       }
     } catch (_) {}
   }
 
   static String userHomeStartMenuBase(String appData) =>
-      p.join(appData, AppTechnicalStrings.dirStartMenuPrograms);
+      p.join(appData, AppTechnicalStrings.dirStartMenu);
 
   static String _getUserHome() {
     return Platform.environment[AppTechnicalStrings.envHome] ??

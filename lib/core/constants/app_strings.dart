@@ -1,3 +1,5 @@
+import 'app_technical_strings.dart';
+
 /// Centralized user-facing strings for HakkinLauncher.
 ///
 /// Contains UI text, button labels, screen titles, dialogs, status badges,
@@ -15,7 +17,7 @@ class AppStrings {
   static const navLibrary = 'Biblioteca';
   static const navSettings = 'Ajustes';
   static const statusOnline = 'En línea';
-  static const badgeNew = 'NUEVO';
+  static const badgeNew = 'Nuevo';
   static String statusOs(String os) => 'Plataforma: $os';
 
   // ---------------------------------------------------------------------------
@@ -34,8 +36,8 @@ class AppStrings {
   static const updateFull = 'Actualizar completa';
   static const updateLauncher = 'Actualizar lanzador';
   static const updating = 'Actualizando...';
-  static const goToStore = 'Ir a la Tienda';
-  static const viewInStore = 'Ver en la Tienda';
+  static const goToStore = 'Ir a la tienda';
+  static const viewInStore = 'Ver en la tienda';
   static const savePath = 'Guardar ruta';
   static const selectInstallDirectory = 'Seleccionar carpeta';
   static const openInstallDirectory = 'Abrir carpeta';
@@ -43,8 +45,6 @@ class AppStrings {
   static const checkUpdatesNow = 'Buscar actualizaciones ahora';
   static const checkingUpdates = 'Buscando actualizaciones...';
   static const cleanTemporaryFiles = 'Limpiar archivos temporales';
-  static const verifyPatchEngine = 'Verificar o descargar motor de parches';
-  static const verifyingComponents = 'Verificando componentes...';
 
   static String playOrOpenVersion(String version) => 'Jugar v$version';
   static String installVersion(String version) => 'Instalar v$version';
@@ -62,11 +62,15 @@ class AppStrings {
   // ---------------------------------------------------------------------------
   // Store & Catalog
   // ---------------------------------------------------------------------------
-  static const searchCatalogHint = 'Buscar videojuegos o herramientas...';
+  static const searchCatalogHint = 'Buscar en el catálogo...';
   static const categoryAll = 'Todos';
   static const categoryGames = 'Juegos';
+  static const categoryApps = 'Apps';
   static const categoryTools = 'Herramientas';
-  static const featured = 'DESTACADO';
+  static const categoryGameSingular = 'Juego';
+  static const categoryAppSingular = 'App';
+  static const categoryToolSingular = 'Herramienta';
+  static const featured = 'Destacado';
   static const exploreCatalog = 'Explorar catálogo';
   static const notFound = 'No encontrado';
   static const appNotFoundInCatalog =
@@ -75,20 +79,31 @@ class AppStrings {
   static String errorLoadingCatalog(Object error) =>
       'Error al cargar el catálogo: $error.';
 
+  static String categoryLabel(String category) {
+    switch (category.toLowerCase()) {
+      case AppTechnicalStrings.categoryGame:
+        return categoryGameSingular;
+      case AppTechnicalStrings.categoryApp:
+        return categoryAppSingular;
+      case AppTechnicalStrings.categoryTool:
+        return categoryToolSingular;
+      default:
+        return category;
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // Library Screen & Item Actions
   // ---------------------------------------------------------------------------
-  static const myLibraryTitle = 'Mi Biblioteca';
-  static const myLibrarySubtitle =
-      'Programas y videojuegos instalados localmente en este equipo.';
+  static const myLibraryTitle = 'Mi biblioteca';
+  static const myLibrarySubtitle = 'Tus aplicaciones listas para abrir.';
   static const emptyLibraryTitle = 'Tu biblioteca está vacía';
   static const emptyLibrarySubtitle =
-      'Explora la tienda e instala tus primeros programas.';
-  static const manageVersions = 'Gestionar versiones';
-  static const launchArguments = 'Argumentos de lanzamiento';
-  static const createDesktopShortcut = 'Crear acceso directo en el Escritorio';
+      'Explora la tienda para instalar aplicaciones.';
+  static const manageVersions = 'Ir a la página de la tienda';
+  static const launchArguments = 'Argumentos de inicio';
+  static const createDesktopShortcut = 'Crear acceso directo en el escritorio';
   static const addToStartMenu = 'Añadir al menú de aplicaciones';
-  static const verifyFileIntegrity = 'Verificar integridad de archivos';
   static const desktopShortcutCreated =
       'Acceso directo creado en el escritorio.';
   static const couldNotCreateShortcut =
@@ -96,19 +111,17 @@ class AppStrings {
   static const startMenuEntryCreated =
       'Acceso añadido al menú de aplicaciones.';
   static const couldNotCreateStartMenuEntry =
-      'No se pudo registrar en el menú de aplicaciones.';
-  static const integrityVerifiedTitle = 'Integridad verificada';
-  static const integrityFailureTitle = 'Fallo de integridad';
+      'No se pudo añadir al menú de aplicaciones.';
   static const confirmUninstallTitle = '¿Desinstalar aplicación?';
   static const launchArgumentsParamDescription =
-      'Parámetros de línea de comandos al iniciar la aplicación:';
+      'Parámetros al iniciar la aplicación.';
   static const launchArgumentsHint = 'ej. -windowed -novsync -fps 60';
 
   static String errorLoadingLibrary(Object error) =>
       'Error al cargar la biblioteca: $error.';
   static String argumentsFor(String title) => 'Argumentos para $title';
   static String confirmUninstallContent(String title) =>
-      'Se eliminarán los archivos de $title. Tus datos de partidas guardadas permanecerán protegidos.';
+      'Se eliminarán los archivos de $title. Tus partidas guardadas permanecerán protegidas.';
   static String installedVersionLabel(String version) =>
       'Versión instalada: v$version';
   static String installedVersionWithUpdateLabel(
@@ -122,42 +135,33 @@ class AppStrings {
   // ---------------------------------------------------------------------------
   // Badges
   // ---------------------------------------------------------------------------
-  static const badgeInstalled = 'INSTALADO';
-  static const badgeUpdateAvailable = 'ACTUALIZAR';
-  static const badgeRunning = 'EN EJECUCIÓN';
-  static const badgeAnomaly = 'ANOMALÍA';
+  static const badgeInstalled = 'Instalado';
+  static const badgeUpdateAvailable = 'Actualizar';
+  static const badgeRunning = 'En ejecución';
+  static const badgeAnomaly = 'Anomalía';
 
   // ---------------------------------------------------------------------------
   // App Detail Screen
   // ---------------------------------------------------------------------------
-  static const technicalDetails = 'Detalles Técnicos';
+  static const technicalDetails = 'Detalles de la aplicación';
   static const fieldCategory = 'Categoría';
   static const fieldDeveloper = 'Desarrollador';
-  static const fieldActivePlatform = 'Plataforma Activa';
-  static const fieldAvailablePlatforms = 'Plataformas Disponibles';
-  static const fieldSelectedVersion = 'Versión Seleccionada';
-  static const fieldReleaseDate = 'Fecha de Versión';
-  static const fieldEntryPoint = 'Punto de Entrada';
-  static const fieldRelativeExecutable = 'Ejecutable Relativo';
-  static const fieldDownloadSize = 'Tamaño de Descarga';
-  static const fieldDeltaSupport = 'Soporte Diferencial';
-  static const deltaFullDownloadOnly = 'Solo descarga completa';
-  static const fieldUserPaths = 'Rutas de Usuario';
-  static const downloadOrInstallErrorTitle =
-      'Error en la descarga o instalación';
+  static const fieldActivePlatform = 'Plataforma activa';
+  static const fieldAvailablePlatforms = 'Plataformas disponibles';
+  static const fieldSelectedVersion = 'Versión seleccionada';
+  static const fieldReleaseDate = 'Fecha de versión';
+  static const fieldDownloadSize = 'Tamaño de descarga';
+  static const downloadOrInstallErrorTitle = 'Error de instalación';
   static const versionAnomalyDetectedTitle = 'Anomalía de versión detectada';
-  static const screenshotsTitle = 'Capturas de Pantalla';
-  static const cleanInstallRequiredTitle = 'Instalación Limpia Requerida';
-  static const proceedWithCleanInstall = 'Proceder con Instalación Limpia';
+  static const screenshotsTitle = 'Capturas de pantalla';
+  static const cleanInstallRequiredTitle = 'Instalación limpia requerida';
+  static const proceedWithCleanInstall = 'Proceder con instalación limpia';
 
-  static String versionNotes(String version) => 'Notas de la Versión v$version';
+  static String versionNotes(String version) => 'Notas de la versión v$version';
   static String versionTagRecent(String version) => 'v$version reciente';
   static String versionTag(String version) => 'v$version';
-  static String deltaPatchesAvailable(int count) =>
-      'Disponible: $count parches';
-  static String userPathsProtected(int count) => '$count protegidas';
   static String anomalyExplanation(String installed) =>
-      'La versión instalada v$installed es huérfana o inexistente en el catálogo actual. Debe ser actualizada de manera completa.';
+      'La versión instalada v$installed ya no está disponible en el catálogo. Debe actualizarse de manera completa.';
   static String cleanInstallWarningMessage(
           String currentVersion, String targetVersion) =>
       'Tienes instalada la versión v$currentVersion.\n\n'
@@ -178,38 +182,29 @@ class AppStrings {
   // Settings Screen
   // ---------------------------------------------------------------------------
   static const settingsTitle = 'Configuración';
-  static const settingsSubtitle =
-      'Ajustes del lanzador, repositorio remoto y mantenimiento.';
-  static const installPathSectionTitle =
-      'Ruta de Instalación de Juegos y Software';
-  static const installPathSectionDescription =
-      'Carpeta del sistema operativo donde se descargarán y extraerán los paquetes y binarios.';
-  static const installDirectoryLabel = 'Directorio de Instalación';
+  static const settingsSubtitle = 'Preferencias generales del lanzador.';
+  static const installPathSectionTitle = 'Ruta de instalación';
+  static const installPathSectionDescription = 'Carpeta para las aplicaciones.';
+  static const installDirectoryLabel = 'Carpeta de instalación';
   static const selectInstallDirectoryPrompt =
       'Selecciona la carpeta de instalación';
   static const installPathSavedSuccess =
       'Ruta de instalación guardada con éxito.';
   static const couldNotOpenDirectory =
       'No se pudo abrir la carpeta en el explorador del sistema.';
-  static const backgroundAndUpdatesTitle =
-      'Segundo Plano y Actualizaciones';
+  static const backgroundAndUpdatesTitle = 'Sistema';
   static const backgroundAndUpdatesDescription =
-      'Opciones de bandeja del sistema y sondeo automático.';
+      'Comportamiento de la ventana y actualizaciones.';
   static const minimizeToTrayTitle =
-      'Minimizar a la bandeja al cerrar la ventana';
+      'Mantener activo al cerrar la ventana';
   static const minimizeToTraySubtitle =
-      'El lanzador permanecerá activo en la bandeja del sistema o barra de menú para verificar actualizaciones.';
+      'Permite recibir avisos cuando haya nuevas versiones disponibles.';
   static const maintenanceTitle = 'Mantenimiento';
   static const maintenanceDescription =
-      'Limpieza de archivos residuales de descargas y rotación de registros.';
-  static const noticeCouldNotVerifyPatchEngine =
-      'Aviso: No se pudo verificar o descargar el motor de parches.';
-  static const systemInfoTitle = 'Información del Sistema';
-  static const systemInfoDescription =
-      'Rutas locales utilizadas por HakkinLauncher.';
-  static const labelBaseDir = 'Directorio base';
-  static const labelToolsDir = 'Herramientas';
-  static const labelHpatchzEngine = 'Motor hpatchz';
+      'Libera espacio eliminando archivos temporales.';
+  static const systemInfoTitle = 'Información del sistema';
+  static const systemInfoDescription = 'Detalles generales de HakkinLauncher.';
+  static const labelBaseDir = 'Carpeta de datos';
   static const labelPlatform = 'Plataforma';
   static const labelLauncherVersion = 'Versión del lanzador';
 
@@ -230,16 +225,12 @@ class AppStrings {
       'Error al comprobar actualizaciones: $error.';
   static String filesDeletedCount(int count) =>
       'Se eliminaron $count archivos temporales.';
-  static String componentsVerifiedSuccess(String status) =>
-      'Componentes verificados exitosamente: $status.';
-  static String errorVerifyingComponents(Object error) =>
-      'Error al verificar componentes: $error.';
 
   // ---------------------------------------------------------------------------
   // Tray Menu
   // ---------------------------------------------------------------------------
   static const trayOpenLauncher = 'Abrir HakkinLauncher';
-  static const trayCheckUpdates = 'Buscar Actualizaciones';
+  static const trayCheckUpdates = 'Buscar actualizaciones';
   static const trayExit = 'Salir';
 
   // ---------------------------------------------------------------------------
@@ -260,7 +251,7 @@ class AppStrings {
       'Todas tus aplicaciones y el lanzador están en la versión más reciente.';
 
   static String appReadyToRun(String title) =>
-      '$title está listo para ejecutarse.';
+      '$title está listo para abrirse.';
   static String updateCompletedBody(String title, String version) =>
       '$title se ha actualizado con éxito a la versión v$version.';
   static String updateAvailableBody(String title, String version) =>
@@ -292,30 +283,22 @@ class AppStrings {
   // ---------------------------------------------------------------------------
   // PatchEngine & Lifecycle
   // ---------------------------------------------------------------------------
-  static const checkingAppStateAndVersion =
-      'Comprobando estado y versión de la aplicación...';
+  static const checkingAppStateAndVersion = 'Preparando instalación...';
   static const appHasNoVersionForPlatform =
-      'Esta aplicación no tiene versión para tu plataforma actual.';
-  static const verifyingPackageChecksum =
-      'Verificando integridad criptográfica del paquete...';
+      'Esta aplicación no está disponible para tu plataforma actual.';
+  static const verifyingPackageChecksum = 'Finalizando descarga...';
   static const checksumMismatchError =
-      'Error de integridad: el hash SHA-256 no coincide.';
-  static const cleaningDirAndExtracting =
-      'Limpiando directorio y extrayendo paquete...';
-  static const verifyingPatchSecurity =
-      'Verificando firma de seguridad del parche...';
-  static const runningPreScripts =
-      'Ejecutando script previo a la actualización...';
-  static const applyingDeltaPatch = 'Aplicando parche diferencial...';
+      'El archivo descargado está incompleto o dañado.';
+  static const cleaningDirAndExtracting = 'Instalando aplicación...';
+  static const verifyingPatchSecurity = 'Preparando actualización...';
+  static const runningPreScripts = 'Preparando archivos...';
+  static const applyingDeltaPatch = 'Actualizando aplicación...';
   static const deltaUpdateCompletedSuccess =
-      'Actualización diferencial completada con éxito.';
-  static const protectingUserData =
-      'Protegiendo partidas y configuraciones de usuario...';
-  static const runningPreInstallScript =
-      'Ejecutando script pre-instalación...';
-  static const extractingAppFiles = 'Extrayendo archivos de la aplicación...';
-  static const runningPostInstallScript =
-      'Ejecutando script post-instalación...';
+      'Actualización completada con éxito.';
+  static const protectingUserData = 'Resguardando tus datos...';
+  static const runningPreInstallScript = 'Preparando instalación...';
+  static const extractingAppFiles = 'Instalando archivos...';
+  static const runningPostInstallScript = 'Finalizando instalación...';
   static const installationCompletedSuccess =
       'Instalación completada correctamente.';
 
@@ -340,9 +323,9 @@ class AppStrings {
   static String cleanInstallErrorMessage(Object error) =>
       'Error en instalación limpia: $error.';
   static String startingDeltaDownloadMessage(String mb) =>
-      'Iniciando descarga de parche diferencial de $mb MB...';
+      'Iniciando descarga de actualización de $mb MB...';
   static String downloadingPatchMessage(String status, String speed) =>
-      'Descargando parche: $status$speed';
+      'Descargando actualización: $status$speed';
   static String installationErrorMessage(Object error) =>
       'Ocurrió un error durante la instalación: $error.';
 
@@ -351,12 +334,12 @@ class AppStrings {
   // ---------------------------------------------------------------------------
   static const fileDoesNotExist = 'El archivo no existe.';
   static const appNotRegisteredLocally =
-      'Aplicación no registrada localmente.';
-  static const executableFileEmpty = 'El archivo ejecutable está vacío.';
+      'Aplicación no registrada.';
+  static const executableFileEmpty = 'El archivo de la aplicación está vacío.';
   static const allFilesVerifiedSuccessfully =
       'Todos los archivos verificados correctamente.';
   static String executableNotFoundOnDisk(String path) =>
-      'El archivo ejecutable no existe en disco: $path.';
+      'El archivo de la aplicación no existe en disco: $path.';
   static String anomalyOrphanVersionDetected(
           String installed, String latest) =>
       'Anomalía detectada: la versión v$installed es huérfana o inexistente en el catálogo. Requiere actualización completa a v$latest.';
@@ -364,17 +347,17 @@ class AppStrings {
   // ---------------------------------------------------------------------------
   // Self Update
   // ---------------------------------------------------------------------------
-  static const selfUpdateChecking = 'Comprobando paquetes del lanzador...';
+  static const selfUpdateChecking = 'Preparando actualización del lanzador...';
   static const selfUpdateNoPlatformPackage =
-      'No hay paquete del lanzador para tu plataforma actual.';
+      'No hay actualización disponible para tu plataforma actual.';
   static const selfUpdateUnsupportedPlatform = 'Plataforma no soportada.';
   static const selfUpdateInvalidDownloadUrl =
-      'URL de descarga de la actualización no válida.';
-  static const selfUpdateEmptyUrl = 'URL vacía.';
+      'Dirección de descarga no válida.';
+  static const selfUpdateEmptyUrl = 'Dirección vacía.';
   static const selfUpdateVerifyingChecksum =
-      'Verificando integridad del nuevo lanzador...';
+      'Preparando instalación...';
   static const selfUpdateHashMismatchMessage =
-      'Error de integridad: el hash SHA-256 no coincide.';
+      'El archivo descargado está incompleto o dañado.';
   static const selfUpdatePreparingRestart =
       'Preparando reinicio del lanzador...';
   static const selfUpdateReadyTitle = 'Actualización lista';
@@ -384,17 +367,17 @@ class AppStrings {
   static const selfUpdateStarting =
       'Iniciando actualización del lanzador...';
   static const selfUpdateHttp404 =
-      'No se encontró el paquete de actualización en el servidor. Verifica que la entrega de la versión esté disponible en GitHub.';
+      'No se encontró la actualización disponible en este momento.';
   static const selfUpdateTimeout =
       'Tiempo de espera agotado al descargar la actualización. Comprueba tu conexión a internet.';
   static const selfUpdateConnectionError =
-      'Error de red o sin conexión al servidor de descargas.';
+      'Error de red o sin conexión a internet.';
   static String selfUpdateStartingDownload(String version) =>
       'Iniciando descarga de actualización v$version...';
   static String selfUpdateDownloading(String status, String speed) =>
       'Descargando actualización: $status$speed';
   static String selfUpdateErrorGeneric(Object error) =>
-      'Error durante la autoactualización: $error.';
+      'Error al actualizar el lanzador: $error.';
   static String selfUpdateNetworkError(String message) =>
       'Error de red durante la descarga: $message.';
 
@@ -477,17 +460,17 @@ class AppStrings {
   // ---------------------------------------------------------------------------
   // macOS Relocation Service
   // ---------------------------------------------------------------------------
-  static const macOsRelocationDialogTitle = 'Trasladar a Aplicaciones';
+  static const macOsRelocationDialogTitle = 'Mover a la carpeta de aplicaciones';
   static const macOsRelocationDialogMessage =
-      'HakkinLauncher detectó que se está ejecutando fuera de la carpeta Aplicaciones. Para garantizar el correcto funcionamiento de las autoactualizaciones, se recomienda trasladar el lanzador a tu carpeta de Aplicaciones.';
-  static const macOsRelocationDialogConfirm = 'Mover a Aplicaciones';
+      'Para recibir actualizaciones correctamente, se recomienda mover HakkinLauncher a la carpeta de aplicaciones.';
+  static const macOsRelocationDialogConfirm = 'Mover a la carpeta de aplicaciones';
   static const macOsRelocationDialogCancel = 'Continuar aquí';
   static const macOsRelocationSuccessToast =
-      'HakkinLauncher se trasladó exitosamente a Aplicaciones.';
+      'HakkinLauncher se trasladó exitosamente a la carpeta de aplicaciones.';
   static const macOsRelocationErrorToast =
-      'No se pudo trasladar automáticamente a Aplicaciones.';
+      'No se pudo trasladar automáticamente a la carpeta de aplicaciones.';
   static String logMacOsRelocationSuccess(String path) =>
       'HakkinLauncher se trasladó con éxito a: $path.';
   static String logMacOsRelocationError(Object error) =>
-      'Error al trasladar HakkinLauncher a Aplicaciones: $error.';
+      'Error al trasladar HakkinLauncher a la carpeta de aplicaciones: $error.';
 }

@@ -54,7 +54,7 @@ class StatusBadge extends StatelessWidget {
 
   factory StatusBadge.tag(String tag) {
     return StatusBadge(
-      label: tag.toUpperCase(),
+      label: AppStrings.categoryLabel(tag),
       backgroundColor: AppColors.surfaceElevated,
       textColor: AppColors.platinumMuted,
     );

@@ -5,7 +5,6 @@ import 'package:hakkin_launcher/core/constants/app_strings.dart';
 import 'package:hakkin_launcher/core/constants/app_technical_strings.dart';
 import 'package:hakkin_launcher/core/housekeeping/cleaner_service.dart';
 import 'package:hakkin_launcher/core/platform/background_check_service.dart';
-import 'package:hakkin_launcher/core/platform/component_manager.dart';
 import 'package:hakkin_launcher/core/platform/os_paths.dart';
 import 'package:hakkin_launcher/core/platform/window_service.dart';
 import 'package:hakkin_launcher/core/theme/app_colors.dart';
@@ -26,9 +25,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   String _installPath = AppTechnicalStrings.empty;
   bool _closeToTray = true;
   String _baseDir = AppTechnicalStrings.empty;
-  String _toolsDir = AppTechnicalStrings.empty;
-  String _hpatchzStatus = AppTechnicalStrings.empty;
-  bool _isVerifyingComponents = false;
   int _deletedFiles = -1;
   bool _isCheckingUpdates = false;
   String? _selfUpdateStatusMessage;
@@ -46,8 +42,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final closeToTray = prefs.getBool(AppConstants.prefCloseToTrayKey) ?? true;
     final baseDir = await OsPaths.getAppBaseDirectory();
     final defaultAppsDir = await OsPaths.getDefaultAppsInstallDirectory();
-    final toolsDir = await OsPaths.getToolsDirectory();
-    final hpatchzStatus = await ComponentManager.instance.getComponentStatus();
 
     // Limpiar ruta por defecto heredada si apuntaba a la subcarpeta anidada redundante
     final legacyNestedDefault = p.join(
@@ -65,39 +59,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         _installPath = customPath.isNotEmpty ? customPath : defaultAppsDir.path;
         _closeToTray = closeToTray;
         _baseDir = baseDir.path;
-        _toolsDir = toolsDir.path;
-        _hpatchzStatus = hpatchzStatus;
       });
-    }
-  }
-
-  Future<void> _verifyOrDownloadComponents() async {
-    setState(() => _isVerifyingComponents = true);
-    try {
-      final success = await ComponentManager.instance.downloadAndInstallHpatchz();
-      final newStatus = await ComponentManager.instance.getComponentStatus();
-      if (mounted) {
-        setState(() {
-          _isVerifyingComponents = false;
-          _hpatchzStatus = newStatus;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              success
-                  ? AppStrings.componentsVerifiedSuccess(newStatus)
-                  : AppStrings.noticeCouldNotVerifyPatchEngine,
-            ),
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() => _isVerifyingComponents = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppStrings.errorVerifyingComponents(e))),
-        );
-      }
     }
   }
 
@@ -464,16 +426,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       style: const TextStyle(color: AppColors.success, fontSize: 13),
                     ),
                   ],
-                  const SizedBox(height: 12),
-                  HakkinButton(
-                    text: _isVerifyingComponents
-                        ? AppStrings.verifyingComponents
-                        : AppStrings.verifyPatchEngine,
-                    isLoading: _isVerifyingComponents,
-                    icon: Icons.build_circle_outlined,
-                    variant: HakkinButtonVariant.secondary,
-                    onPressed: _isVerifyingComponents ? null : _verifyOrDownloadComponents,
-                  ),
                 ],
               ),
             ),
@@ -513,10 +465,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildPathRow(AppStrings.labelBaseDir, _baseDir),
-                        if (_toolsDir.isNotEmpty)
-                          _buildPathRow(AppStrings.labelToolsDir, _toolsDir),
-                        if (_hpatchzStatus.isNotEmpty)
-                          _buildPathRow(AppStrings.labelHpatchzEngine, _hpatchzStatus),
                         _buildPathRow(AppStrings.labelPlatform, OsPaths.getCurrentPlatformKey()),
                         _buildPathRow(AppStrings.labelLauncherVersion, AppConstants.appVersion),
                       ],

@@ -259,8 +259,6 @@ class LibraryScreen extends ConsumerWidget {
                                       ),
                                     );
                                   }
-                                } else if (val == AppTechnicalStrings.menuValueVerify) {
-                                  _runIntegrityVerification(context, ref, installedApp);
                                 } else if (val == AppTechnicalStrings.menuValueUninstall) {
                                   _confirmUninstall(context, ref, installedApp);
                                 }
@@ -270,7 +268,7 @@ class LibraryScreen extends ConsumerWidget {
                                   value: AppTechnicalStrings.menuValueVersions,
                                   child: Row(
                                     children: [
-                                      Icon(Icons.history, size: 18, color: AppColors.platinum),
+                                      Icon(Icons.storefront_outlined, size: 18, color: AppColors.platinum),
                                       SizedBox(width: 8),
                                       Text(AppStrings.manageVersions),
                                     ],
@@ -303,16 +301,6 @@ class LibraryScreen extends ConsumerWidget {
                                       Icon(Icons.apps, size: 18, color: AppColors.platinum),
                                       SizedBox(width: 8),
                                       Text(AppStrings.addToStartMenu),
-                                    ],
-                                  ),
-                                ),
-                                const PopupMenuItem(
-                                  value: AppTechnicalStrings.menuValueVerify,
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.verified_outlined, size: 18, color: AppColors.platinum),
-                                      SizedBox(width: 8),
-                                      Text(AppStrings.verifyFileIntegrity),
                                     ],
                                   ),
                                 ),
@@ -384,48 +372,6 @@ class LibraryScreen extends ConsumerWidget {
         ],
       ),
     );
-  }
-
-  void _runIntegrityVerification(BuildContext context, WidgetRef ref, InstalledApp app) async {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => const Center(
-        child: CircularProgressIndicator(color: AppColors.platinum),
-      ),
-    );
-
-    final result = await ref.read(installedAppsProvider.notifier).verifyAppIntegrity(app.id);
-    if (context.mounted) {
-      Navigator.pop(context); // cerrar loader
-      final isValid = result[AppTechnicalStrings.keyIsValid] == true;
-      showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          backgroundColor: AppColors.surface,
-          title: Row(
-            children: [
-              Icon(
-                isValid ? Icons.check_circle : Icons.warning_amber,
-                color: isValid ? AppColors.success : AppColors.error,
-              ),
-              const SizedBox(width: 8),
-              Text(isValid ? AppStrings.integrityVerifiedTitle : AppStrings.integrityFailureTitle),
-            ],
-          ),
-          content: Text(
-            result[AppTechnicalStrings.keyMessage].toString(),
-            style: const TextStyle(color: AppColors.platinumMuted),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text(AppStrings.understood),
-            ),
-          ],
-        ),
-      );
-    }
   }
 
   void _confirmUninstall(BuildContext context, WidgetRef ref, InstalledApp app) async {

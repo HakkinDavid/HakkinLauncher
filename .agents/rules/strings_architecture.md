@@ -22,28 +22,29 @@ Si se necesita un nuevo texto o constante técnica, **primero debe agregarse a `
 
 ---
 
-## 2. Reglas Normativas de Formato y Puntuación
+## 2. Reglas Normativas de Formato, Puntuación y Experiencia de Usuario
 
-### 2.1 Puntuación y Capitalización
-1. **Oraciones, Notificaciones, Descripciones y Mensajes**:
-   - Deben comenzar siempre con mayúscula y **finalizar obligatoriamente con punto (`.`)**.
+### 2.1 Puntuación y Capitalización de Oración
+1. **Capitalización de Oración Obligatoria (Prohibido *Title Case*)**:
+   - En español estándar solo se escribe con mayúscula inicial la primera palabra de la cadena y los nombres propios o siglas reales (`HakkinLauncher`, `Windows`, `macOS`, `Linux`, `Android`, `iOS`, `3D`).
+   - Está **terminantemente prohibido** capitalizar sustantivos o palabras principales intermedias (*Title Case*) en títulos, botones, etiquetas o encabezados.
+   - Los sustantivos comunes de vistas, secciones o carpetas (*tienda*, *biblioteca*, *escritorio*, *aplicaciones*, *sistema*) van **siempre en minúscula** cuando están embebidos en una frase (ej. `"Ir a la tienda"`, `"Ver en la tienda"`, `"Ir a la página de la tienda"`, `"Crear acceso directo en el escritorio"`).
+2. **Oraciones, Notificaciones, Descripciones y Mensajes**:
+   - Deben comenzar siempre con mayúscula, respetar capitalización de oración y **finalizar obligatoriamente con punto (`.`)**.
    - Ejemplo: `"Todas tus aplicaciones y el lanzador están en la versión más reciente."`
-2. **Botones, Etiquetas, Títulos y Distintivos**:
-   - Deben usar mayúscula inicial (o *Title Case*) y **nunca llevar punto final**.
-   - Ejemplo: `"Instalar versión"`, `"En ejecución"`, `"Buscar actualizaciones"`
+3. **Botones, Etiquetas, Títulos y Distintivos**:
+   - Deben usar **exclusivamente capitalización de oración** y **nunca llevar punto final**.
+   - Ejemplo: `"Instalar versión"`, `"En ejecución"`, `"Buscar actualizaciones"`, `"Mi biblioteca"`, `"Sistema"`
 
 ### 2.2 Español Profesional y Cero Anglicismos en la Interfaz
-Se prohíbe el uso de anglicismos crudos en la interfaz de usuario. Utilizar exclusivamente la terminología estandarizada:
+Se prohíbe el uso de anglicismos crudos en la interfaz de usuario, incluyendo categorías:
 - *Store* $\rightarrow$ **Tienda**
 - *Library* $\rightarrow$ **Biblioteca**
 - *Launcher* (en UI/prosa genérica) $\rightarrow$ **Lanzador** (*HakkinLauncher* solo como marca)
-- *Downgrade* $\rightarrow$ **Degradación / Instalación de versión anterior**
-- *Delta / Patch* $\rightarrow$ **Parche diferencial / Parche**
-- *Full download* $\rightarrow$ **Descarga completa**
+- *game / app / tool* (categorías) $\rightarrow$ **Juego / App / Herramienta**
+- *Downgrade* $\rightarrow$ **Instalación de versión anterior**
 - *Clean install* $\rightarrow$ **Instalación limpia**
-- *Self-update* $\rightarrow$ **Autoactualización**
-- *Background* $\rightarrow$ **Segundo plano**
-- *Tray / System tray* $\rightarrow$ **Bandeja del sistema**
+- *Self-update* $\rightarrow$ **Actualización del lanzador**
 - *Shortcut* $\rightarrow$ **Acceso directo**
 - *Badge* $\rightarrow$ **Distintivo**
 - *Settings* $\rightarrow$ **Configuración / Ajustes**
@@ -51,27 +52,31 @@ Se prohíbe el uso de anglicismos crudos en la interfaz de usuario. Utilizar exc
 - *Savegames / Saves* $\rightarrow$ **Partidas guardadas**
 - *User data* $\rightarrow$ **Datos de usuario**
 - *Screenshot* $\rightarrow$ **Captura de pantalla**
-- *Fallback* $\rightarrow$ **Alternativa de respaldo**
 - *Running* $\rightarrow$ **En ejecución**
 
-### 2.3 Prohibición de Símbolos Visuales Embebidos
+### 2.3 Prohibición de Desdoblamientos, Redundancias y Exposición Técnica
+1. **Cero Desdoblamientos**: Prohibido duplicar términos equivalentes (*"juegos y software"*, *"programas y videojuegos"*, *"videojuegos o herramientas"*, *"verificar o descargar"*, *"descargar y extraer"*, *"paquetes y binarios"*). Usar siempre el término general directo (*aplicaciones*, *catálogo*, etc.).
+2. **Cero Pleonasmos Contextuales**: Prohibidas las redundancias obvias como *"instalados localmente en este equipo"* dentro de la Biblioteca.
+3. **Opacidad Técnica (Caja Negra)**: Ninguna cadena visible para el usuario debe describir ni desnudar los procesos internos del lanzador (*repositorio remoto*, *motor de parches*, *sondeo automático*, *paquetes y binarios*, *rotación de registros*, *integridad de archivos*, *suma de verificación*, *scripts*, etc.). Los textos deben reflejar únicamente el significado funcional para el usuario.
+
+### 2.4 Prohibición de Símbolos Visuales Embebidos
 No incrustar viñetas, flechas, numerales ni caracteres decorativos (`+`, `-`, `#`, `➔`, `•`, etc.) en las cadenas. Los indicadores visuales pertenecen a los widgets de Flutter (`Icon`, `StatusBadge`, `Row`), no al texto.
 - Incorrecto: `'+ Instalar'`, `'• Descargando'`
 - Correcto: `'Instalar'`, `'Descargando...'`
 
-### 2.4 Concisión y Eliminación de Paréntesis
+### 2.5 Concisión y Eliminación de Paréntesis
 Evitar paréntesis explicativos innecesarios y textos redundantes. Las cadenas deben ser directas y precisas.
 - Incorrecto: `'Limpiar archivos temporales (caché)'`
 - Correcto: `'Limpiar archivos temporales'`
 
-### 2.5 Extensión Normativa de Formato para el Catálogo (`catalog.json`)
+### 2.6 Extensión Normativa de Formato para el Catálogo (`catalog.json`)
 El catálogo es una fuente de datos dinámica externa; por tanto:
 - **No aplica la regla de *zero hardcoded strings* del código Dart**: Sus cadenas no se trasladan a `AppStrings`.
 - **Aplica estrictamente toda la normativa de formato**:
-  1. `title`: Title Case, **sin punto final**, sin emojis ni símbolos decorativos.
-  2. `summary`: Una o dos oraciones en español técnico con **punto final obligatorio (`.`)**, sin anglicismos.
-  3. `description_markdown`: Markdown semántico 100% en español (prohibido inglés residual). Encabezados sin punto final. Párrafos y viñetas (`- **Nombre**: Descripción.`) con **punto final obligatorio (`.`)**.
+  1. `title`: Nombre propio de la aplicación, **sin punto final**, sin emojis ni símbolos decorativos.
+  2. `summary`: Una o dos oraciones en español profesional con **punto final obligatorio (`.`)**, sin anglicismos.
+  3. `description_markdown`: Markdown semántico 100% en español (prohibido inglés residual). Encabezados y títulos de características (`- **Nombre de característica**:`) con **capitalización de oración** (sin *Title Case*) y sin punto final. Párrafos y descripciones de viñetas con **punto final obligatorio (`.`)**.
   4. `changelog`: Resumen legible y formal en español con **punto final (`.`)**. Prohibidos volcados de Git (`Merge branch`, `Update release.yaml`), enlaces (`**Full Changelog**`), tablas Markdown con hashes truncados y notas informales (`meow`).
-  5. `tags`: Title Case, **sin punto final**, en español técnico o siglas universales (*3D*, *macOS*, etc.).
+  5. `tags`: Capitalización de oración, **sin punto final**, en español o siglas universales (*3D*, *macOS*, etc.).
   6. `developer`: Nombre institucional o de autor, **sin punto final**.
 

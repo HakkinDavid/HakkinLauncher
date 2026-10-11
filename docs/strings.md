@@ -56,158 +56,164 @@ Esta norma aplica **sin excepción alguna**, incluyendo:
 
 ## 2. Reglas Normativas para las Cadenas de Texto
 
-### 2.1. Puntuación y Capitalización Uniforme
+### 2.1. Puntuación y Capitalización de Oración en Español Estándar
 
-1. **Mensajes, Descripciones, Avisos y Notificaciones**:
-   Toda oración completa, descripción de sección, cuerpo de cuadro de diálogo, mensaje explicativo, notificación nativa o registro de aviso debe comenzar con mayúscula y finalizar obligatoriamente con un punto (`.`).
+1. **Prohibición Absoluta de *Title Case* Anglosajón**:
+   En español estándar únicamente se escribe con mayúscula inicial la primera palabra de un texto, título, subtítulo, etiqueta o botón, además de los nombres propios y siglas reales (`HakkinLauncher`, `Windows`, `macOS`, `Linux`, `Android`, `iOS`, `3D`).
+   - Está **estrictamente prohibido** capitalizar sustantivos y adjetivos intermedios como si fueran siglas (*Title Case*).
+   - Los sustantivos comunes que designan vistas, secciones o carpetas del sistema (*tienda*, *biblioteca*, *configuración*, *escritorio*, *aplicaciones*, *sistema*) deben escribirse **siempre con minúscula inicial** cuando forman parte de una frase u oración.
+   - *Correcto*: `"Mi biblioteca"`, `"Detalles de la aplicación"`, `"Ruta de instalación"`, `"Ir a la tienda"`, `"Ir a la página de la tienda"`, `"Crear acceso directo en el escritorio"`, `"Buscar actualizaciones"`
+   - *Incorrecto*: `"Mi Biblioteca"`, `"Detalles Técnicos"`, `"Ruta de Instalación de Juegos y Software"`, `"Ir a la Tienda"`, `"Crear acceso directo en el Escritorio"`, `"Buscar Actualizaciones"`
+
+2. **Mensajes, Descripciones, Avisos y Notificaciones**:
+   Toda oración completa, descripción de sección, cuerpo de cuadro de diálogo, mensaje explicativo, notificación nativa o registro de aviso debe comenzar con mayúscula inicial, mantener capitalización normal de oración y finalizar obligatoriamente con un punto (`.`).
    - *Correcto*: `"Todas tus aplicaciones y el lanzador están en la versión más reciente."`
    - *Incorrecto*: `"Todas tus aplicaciones y el lanzador están en la versión más reciente"`
-   - *Correcto*: `"Se eliminaron los archivos temporales de instalación."`
-   - *Incorrecto*: `"se eliminaron los archivos temporales de instalación"`
-   - *Correcto*: `"No se pudo verificar o descargar el motor de parches."`
-   - *Incorrecto*: `"No se pudo verificar o descargar el motor de parches"`
+   - *Correcto*: `"Se eliminaron los archivos temporales."`
+   - *Incorrecto*: `"se eliminaron los archivos temporales"`
+   - *Correcto*: `"Carpeta para las aplicaciones."`
+   - *Incorrecto*: `"Carpeta para las aplicaciones"`
 
-2. **Etiquetas, Botones, Títulos y Distintivos**:
-   Los títulos de sección, nombres de pantallas, etiquetas de botones, elementos de menú, nombres de columnas técnicas y distintivos de estado utilizan mayúscula inicial (o *Title Case* según jerarquía) y **nunca** llevan punto final.
-   - *Correcto*: `"Guardar cambios"`, `"Buscar actualizaciones"`, `"Instalación limpia"`, `"Biblioteca"`, `"En ejecución"`
-   - *Incorrecto*: `"Guardar cambios."`, `"buscar actualizaciones"`, `"Instalación limpia."`
+3. **Etiquetas, Botones, Títulos y Distintivos**:
+   Los títulos de sección, nombres de pantallas, etiquetas de botones, elementos de menú, nombres de campos y distintivos de estado utilizan **exclusivamente capitalización de oración** (mayúscula solo en la primera letra y nombres propios) y **nunca** llevan punto final.
+   - *Correcto*: `"Guardar cambios"`, `"Buscar actualizaciones"`, `"Instalación limpia"`, `"Biblioteca"`, `"En ejecución"`, `"Sistema"`
+   - *Incorrecto*: `"Guardar cambios."`, `"buscar actualizaciones"`, `"Instalación Limpia"`, `"Segundo Plano y Actualizaciones"`
 
 ---
 
 ### 2.2. Español Profesional y Eliminación de Anglicismos
-Todas las cadenas visibles del sistema se expresan en un español técnico, profesional, neutro y depurado. Se prohíbe el uso de anglicismos crudos o no adaptados en la interfaz de usuario:
+Todas las cadenas visibles del sistema se expresan en un español claro, natural y depurado. Se prohíbe el uso de anglicismos crudos o no adaptados en la interfaz de usuario, incluyendo las categorías del catálogo:
 
 | Anglicismo no permitido | Término estandarizado en HakkinLauncher | Justificación y Ámbito |
 | :--- | :--- | :--- |
-| *Store* | **Tienda** | Vista de descubrimiento y catálogo público. |
-| *Library* | **Biblioteca** | Módulo de programas y juegos instalados localmente. |
+| *Store* | **Tienda** | Vista de descubrimiento y catálogo. |
+| *Library* | **Biblioteca** | Módulo de aplicaciones instaladas. |
 | *Launcher* (en UI/prosa) | **Lanzador** | Se reserva la palabra *HakkinLauncher* únicamente como nombre propio de marca. En explicaciones o etiquetas genéricas se usa *lanzador*. |
-| *Downgrade* | **Degradación / Instalación de versión anterior** | Reemplazo deliberado de una versión superior por una inferior. |
-| *Delta / Patch* | **Parche diferencial / Parche** | Archivo `.hdiff` con las diferencias binarias entre dos versiones. |
-| *Full download* | **Descarga completa** | Paquete comprimido `.zip` íntegro sin parche diferencial. |
-| *Clean install* | **Instalación limpia** | Proceso de despliegue desde cero preservando datos de usuario. |
-| *Self-update* | **Autoactualización / Actualización del lanzador** | Mecanismo de actualización autónoma del cliente. |
-| *Background (task/polling)* | **Segundo plano** | Procesos y comprobaciones periódicas no bloqueantes. |
-| *Tray / System Tray* | **Bandeja del sistema** | Menú residente en el área de notificaciones del sistema operativo. |
-| *Shortcut* | **Acceso directo** | Enlace en el Escritorio o Menú de Aplicaciones del SO. |
+| *game / app / tool* (categorías) | **Juego / App / Herramienta** | Categorías visibles en tarjetas, filtros y fichas de la tienda. |
+| *Downgrade* | **Instalación de versión anterior** | Reemplazo deliberado de una versión superior por una inferior. |
+| *Clean install* | **Instalación limpia** | Proceso de instalación desde cero preservando datos de usuario. |
+| *Self-update* | **Actualización del lanzador** | Mecanismo de actualización autónoma del cliente. |
+| *Tray / System Tray* | **Bandeja del sistema** | Área de notificaciones del sistema operativo. |
+| *Shortcut* | **Acceso directo** | Enlace en el escritorio o menú de aplicaciones del sistema. |
 | *Badge* | **Distintivo** | Indicador visual de estado (`INSTALADO`, `ACTUALIZAR`, etc.). |
-| *Header* | **Encabezado** | Componente visual superior o cabecera de sección. |
-| *Settings* | **Configuración / Ajustes** | Panel de personalización y preferencias del usuario. |
-| *Changelog / Release notes* | **Notas de la versión** | Lista de cambios y correcciones de una entrega histórica. |
-| *Savegame / Saves* | **Partidas guardadas / Datos de guardado** | Archivos de progreso del usuario en videojuegos. |
-| *User data* | **Datos de usuario** | Configuraciones y archivos preservados en `protected_user_paths`. |
-| *Checksum / Hash* | **Suma de verificación / Hash criptográfico** | Código de integridad SHA-256 para validación de paquetes y deltas. |
-| *Screenshot* | **Captura de pantalla** | Imágenes ilustrativas en la galería de ficha de producto. |
-| *Fallback* | **Alternativa de respaldo** | Mecanismo que activa la descarga completa ante un fallo diferencial. |
-| *Staging* | **Área temporal / Directorio de preparación** | Carpeta intermedia antes de la extracción definitiva. |
-| *Orphan* | **Huérfana** | Versión local instalada que ha dejado de existir en el catálogo remoto. |
-| *Running* | **En ejecución** | Estado de un proceso de juego o aplicación activo. |
+| *Settings* | **Configuración / Ajustes** | Panel de preferencias del usuario. |
+| *Changelog / Release notes* | **Notas de la versión** | Lista de cambios de una versión. |
+| *Savegame / Saves* | **Partidas guardadas** | Archivos de progreso del usuario. |
+| *User data* | **Datos de usuario** | Configuraciones y archivos del usuario preservados entre versiones. |
+| *Screenshot* | **Captura de pantalla** | Imágenes ilustrativas en la galería de la ficha. |
+| *Running* | **En ejecución** | Estado de una aplicación activa. |
 
 ---
 
-### 2.3. Estandarización Terminológica
-Para garantizar absoluta coherencia semántica en todo el código, mensajes y documentación de HakkinLauncher, los siguientes conceptos institucionales están normados:
+### 2.3. Prohibición de Desdoblamientos y Redundancias Léxicas
+El lenguaje de la interfaz debe ser directo, económico y libre de desdoblamientos artificiales o pleonasmos:
 
-- **Lanzador**: La aplicación cliente universal responsable de la gestión del ciclo de vida (distribución, instalación, ejecución y actualización) de aplicaciones y videojuegos.
-- **Catálogo**: El manifiesto centralizado (`catalog.json`) distribuido remotamente que actúa como fuente de verdad sobre todas las aplicaciones, plataformas y versiones disponibles.
-- **Tienda**: Espacio interactivo dentro del lanzador enfocado en la exploración, filtrado y descubrimiento de títulos del catálogo.
-- **Biblioteca**: Espacio dedicado a los programas instalados en la máquina local, con herramientas de gestión de versiones, accesos directos e integridad.
-- **Aplicación / Juego**: Entidad lógica del catálogo que posee metadatos descriptivos, soporte multiplataforma e histórico de entregas.
-- **Versión / Entrega (`Release`)**: Hito numerado bajo versionado semántico formal (`vX.Y.Z`) que incluye paquetes binarios, notas de versión y deltas opcionales.
-- **Parche diferencial (`Delta`)**: Paquete binario generado mediante HDiffPatch que contiene exclusivamente la diferencia entre una versión base previa y la versión objetivo actual.
-- **Descarga completa**: Paquete `.zip` integral requerido en la primera instalación, en instalaciones limpias o ante indisponibilidad de deltas válidos.
-- **Instalación limpia**: Procedimiento de borrado y despliegue íntegro del paquete que se ejecuta obligatoriamente al retroceder a una versión anterior o ante versiones huérfanas, asegurando el aislamiento y restauración de los datos de usuario.
-- **Degradación (`Downgrade`)**: Proceso de instalar una versión histórica anterior a la que está actualmente instalada. Está terminantemente prohibido aplicarlo sobre la instalación activa mediante deltas; requiere siempre una instalación limpia.
-- **Anomalía de versión**: Condición anómala detectada cuando la versión registrada localmente no existe en el catálogo activo (versión huérfana).
-- **Rutas protegidas / Datos de usuario**: Patrones de archivos y carpetas (`saves/**`, `config.ini`) definidos en `protected_user_paths` que deben ser resguardados y reincorporados sin alteración durante cualquier reemplazo de archivos.
-- **Motor de parches (`hpatchz`)**: Componente binario externo desacoplado que HakkinLauncher descarga y aprovisiona autónomamente para procesar parches diferenciales.
-- **Bandeja del sistema**: Servicio de integración de sistema operativo que mantiene la aplicación minimizada y activa para el sondeo en segundo plano sin estorbar al usuario.
-- **Autoactualización**: Proceso de sustitución del propio ejecutable de HakkinLauncher gestionado mediante scripts desacoplados (`update_helper.sh` / `update_helper.bat`).
+1. **Cero Desdoblamientos**:
+   Está prohibido duplicar sustantivos o verbos equivalentes cuando un único concepto general abarca la acción o entidad:
+   - *Incorrecto*: `"Ruta de instalación de juegos y software"` $\rightarrow$ *Correcto*: `"Ruta de instalación"`
+   - *Incorrecto*: `"Programas y videojuegos"` $\rightarrow$ *Correcto*: `"Aplicaciones"`
+   - *Incorrecto*: `"Buscar videojuegos o herramientas..."` $\rightarrow$ *Correcto*: `"Buscar en el catálogo..."`
+   - *Incorrecto*: `"Carpeta del sistema operativo donde se descargarán y extraerán los paquetes y binarios."` $\rightarrow$ *Correcto*: `"Carpeta para las aplicaciones."`
+   - *Incorrecto*: `"Error en la descarga o instalación"` $\rightarrow$ *Correcto*: `"Error de instalación"`
+
+2. **Cero Redundancias y Pleonasmos Contextuales**:
+   No se deben repetir condiciones implícitas en el contexto de la pantalla ni pleonasmos espaciales:
+   - *Incorrecto*: `"Programas y videojuegos instalados localmente en este equipo."` (en la Biblioteca ya todo está instalado, y *"este equipo"* siempre es local).
+   - *Correcto*: `"Tus aplicaciones listas para abrir."`
 
 ---
 
-### 2.4. Prohibición de Símbolos Embebidos en Cadenas
+### 2.4. Opacidad Técnica (Principio de Caja Negra hacia el Usuario)
+La interfaz de usuario **jamás debe desnudar el proceso interno de la aplicación**. El usuario no tiene por qué enterarse de la arquitectura interna, protocolos, herramientas auxiliares ni operaciones de bajo nivel del lanzador:
+
+1. **Ocultación de Infraestructura y Procesos Internos**:
+   - Está **prohibido** mencionar en textos visibles para el usuario conceptos internos como: *repositorio remoto*, *motor de parches*, *hpatchz*, *sondeo automático*, *paquetes y binarios*, *extracción de paquetes*, *rotación de registros*, *suma de verificación*, *hash SHA-256*, *scripts pre/post-instalación*, *ejecutable relativo*, *punto de entrada* o *soporte diferencial*.
+2. **Orientación Funcional en Configuración y Acciones**:
+   - Las secciones y descripciones deben nombrarse por su propósito funcional para el usuario, no por su mecanismo técnico:
+     - Usar **`"Sistema"`** en lugar de `"Segundo plano y actualizaciones"`.
+     - Explicar qué sucede funcionalmente para el usuario (ej. `"Mantener activo al cerrar la ventana"` / `"Permite recibir avisos de nuevas versiones disponibles."`) en lugar de hablar de *"bandeja del sistema y sondeo automático"*.
+   - Las acciones deben reflejar con honestidad lo que hacen para el usuario:
+     - En la Biblioteca, usar **`"Ir a la página de la tienda"`** en lugar de `"Gestionar versiones"`.
+   - No exponer botones ni opciones de diagnóstico interno que no competen al usuario (como *"Verificar o descargar motor de parches"* o *"Verificar integridad de archivos"*).
+
+---
+
+### 2.5. Prohibición de Símbolos Embebidos en Cadenas
 Está **estrictamente prohibido** incrustar caracteres de formateo visual, viñetas, flechas, numerales decorativos o símbolos (`+`, `-`, `#`, `➔`, `•`, etc.) directamente dentro de las constantes de texto.
 
 - **Justificación**: Las señales visuales, iconos de acción y separadores son responsabilidad exclusiva de los componentes gráficos de Flutter (`Icon`, `Chip`, `StatusBadge`, `Row`, `ListTile`). Incrustar glifos en las cadenas rompe la accesibilidad, arruina la estandarización y dificulta la localización.
 - **Ejemplos de corrección**:
-  - *Antes*: `'+ Instalar'` $\rightarrow$ *Ahora*: `'Instalar'`
-  - *Antes*: `'Juego #1'` $\rightarrow$ *Ahora*: `'Juego 1'`
-  - *Antes*: `'(v1.0 ➔ v1.2)'` $\rightarrow$ *Ahora*: `'de versión 1.0 a versión 1.2'`
-  - *Antes*: `'• Comprobando estado...'` $\rightarrow$ *Ahora*: `'Comprobando estado...'`
-  - *Antes*: `'[ACTUALIZAR]'` $\rightarrow$ *Ahora*: `'ACTUALIZAR'` *(el contenedor visual provee el marco y borde)*
+   - *Antes*: `'+ Instalar'` $\rightarrow$ *Ahora*: `'Instalar'`
+   - *Antes*: `'Juego #1'` $\rightarrow$ *Ahora*: `'Juego 1'`
+   - *Antes*: `'(v1.0 ➔ v1.2)'` $\rightarrow$ *Ahora*: `'de versión 1.0 a versión 1.2'`
+   - *Antes*: `'• Comprobando estado...'` $\rightarrow$ *Ahora*: `'Preparando...'`
+   - *Antes*: `'[ACTUALIZAR]'` $\rightarrow$ *Ahora*: `'ACTUALIZAR'` *(el contenedor visual provee el marco y borde)*
 
 ---
 
-### 2.5. Concisión y Eliminación de Paréntesis y Explicaciones Embebidas
+### 2.6. Concisión y Eliminación de Paréntesis y Explicaciones Embebidas
 Todas las cadenas de la aplicación deben ser concisas, precisas, elegantes y directas. Se prohíbe el uso de paréntesis explicativos innecesarios `(...)` y de instrucciones sobre-específicas o redundantes embebidas en los textos.
 
 - **Eliminación de Paréntesis Innecesarios**:
   - *Antes*: `'Actualizar (completa)'` $\rightarrow$ *Ahora*: `'Actualizar completa'`
-  - *Antes*: `'Directorio de instalación (ruta local)'` $\rightarrow$ *Ahora*: `'Directorio de instalación'`
+  - *Antes*: `'Directorio de instalación (ruta local)'` $\rightarrow$ *Ahora*: `'Carpeta de instalación'`
   - *Antes*: `'Limpiar archivos temporales (caché)'` $\rightarrow$ *Ahora*: `'Limpiar archivos temporales'`
-  - *Antes*: `'Parche diferencial (HDiffPatch)'` $\rightarrow$ *Ahora*: `'Parche diferencial'`
-  - *Antes*: `'Verificar integridad (SHA-256)'` $\rightarrow$ *Ahora*: `'Verificar integridad'`
 
 - **Eliminación de Redundancias y Explicaciones Verbosas**:
-  - *Antes*: `'Descarga y descomprime el paquete completo de la aplicación desde el servidor remoto sin usar parches.'` $\rightarrow$ *Ahora*: `'Descarga el paquete completo de la aplicación.'`
+  - *Antes*: `'Carpeta del sistema operativo donde se descargarán y extraerán los paquetes y binarios.'` $\rightarrow$ *Ahora*: `'Carpeta para las aplicaciones.'`
   - *Antes*: `'La versión actualmente instalada en tu equipo es v1.0.0 pero existe una más nueva disponible.'` $\rightarrow$ *Ahora*: `'Actualización v1.1.0 disponible.'`
   - *Antes*: `'Pulsa este botón para iniciar el juego en una ventana separada desacoplada del lanzador.'` $\rightarrow$ *Ahora*: `'Jugar'`
 
 ---
 
-### 2.6. Extensión Normativa de Formato para el Catálogo (`catalog.json`)
+### 2.7. Extensión Normativa de Formato para el Catálogo (`catalog.json`)
 
-#### 2.6.1. Ámbito de Aplicación: Formato vs. Cero Cadenas Literales (*Hardcoding*)
+#### 2.7.1. Ámbito de Aplicación: Formato vs. Cero Cadenas Literales (*Hardcoding*)
 El catálogo (`docs/catalog.json`) y sus manifiestos remotos constituyen fuentes de datos dinámicas externas consumidas por el cliente en tiempo de ejecución. Por su naturaleza desacoplada del código fuente del lanzador:
 - **No aplica la regla de *zero hardcoded strings* del código Dart**: Las cadenas textuales de los títulos, descripciones y notas de versión no se trasladan a constantes dentro de `lib/core/constants/app_strings.dart` (hacerlo acoplaría datos dinámicos como código estático compilado).
-- **Aplica estrictamente toda la normativa de formato y estilo**: Todas las cadenas legibles por el usuario dentro del catálogo (`title`, `summary`, `description_markdown`, `changelog`, `tags`, `developer`) deben cumplir rigurosamente las reglas de puntuación, capitalización, español profesional técnico, concisión y prohibición de símbolos visuales embebidos.
+- **Aplica estrictamente toda la normativa de formato y estilo**: Todas las cadenas legibles por el usuario dentro del catálogo (`title`, `summary`, `description_markdown`, `changelog`, `tags`, `developer`) deben cumplir rigurosamente las reglas de puntuación, capitalización de oración, español profesional, concisión y prohibición de símbolos visuales embebidos.
 
-#### 2.6.2. Reglas Específicas por Atributo del Catálogo
+#### 2.7.2. Reglas Específicas por Atributo del Catálogo
 
-1. **Título de la Aplicación o Juego (`title`)**:
-   - **Capitalización**: Mayúscula inicial o *Title Case*.
-   - **Puntuación**: **Nunca lleva punto final**.
+1. **Título de la Aplicación (`title`)**:
+   - **Capitalización**: Nombre propio de la obra, sin punto final.
    - **Símbolos**: Prohibido el uso de emojis, numerales decorativos o símbolos (`#`, `+`, `•`, etc.).
    - *Correcto*: `"Tecate Simulator"`, `"Platinum World Management System"`, `"CAT Helper"`
    - *Incorrecto*: `"Tecate Simulator."`, `"Juego #1: Tecate"`
 
 2. **Resumen de Tarjeta (`summary`)**:
-   - **Estructura**: Una o dos oraciones completas, gramaticalmente depuradas y directas que definan el propósito primordial del software.
-   - **Puntuación**: Comienza obligatoriamente con mayúscula y **finaliza siempre con punto (`.`)**.
-   - **Español Técnico**: Sin anglicismos crudos ni términos no adaptados (*offline-first* $\rightarrow$ *con funcionamiento local prioritario*; *ranking* $\rightarrow$ *clasificación*; *mod* $\rightarrow$ *modificación*; *skins* $\rightarrow$ *aspectos personalizados*).
+   - **Estructura**: Una o dos oraciones completas, gramaticalmente depuradas y directas que definan el propósito primordial de la aplicación.
+   - **Puntuación**: Comienza obligatoriamente con mayúscula, sigue capitalización normal de oración y **finaliza siempre con punto (`.`)**.
+   - **Español Profesional**: Sin anglicismos crudos ni términos no adaptados.
    - *Correcto*: `"Simulación y renderizado 3D de rayos y arcos eléctricos siguiendo trayectorias de menor resistencia y autosimilitud fractal."`
    - *Incorrecto*: `"Simulación 3D de rayos y arcos eléctricos"` *(sin punto final)*
 
 3. **Descripción Detallada en Markdown (`description_markdown`)**:
    - **Estructura Semántica**: Estructura Markdown clara y profesional.
-   - **Encabezados (`#`, `##`, `###`)**: Mayúscula inicial y **estrictamente sin punto final**.
+   - **Encabezados (`#`, `##`, `###`)**: Capitalización de oración (solo mayúscula inicial y nombres propios) y **estrictamente sin punto final**.
    - **Párrafos de Prosa**: Oraciones completas que inician con mayúscula y **concluyen con punto final (`.`)**.
-   - **Listas de Características (`- **Nombre**: Descripción.` )**:
-     - Cada elemento de lista debe contar con un título destacado en negrita con mayúscula inicial y sin punto previo a los dos puntos (`- **Nombre de Característica**:`).
+   - **Listas de Características (`- **Nombre de característica**: Descripción.` )**:
+     - Cada elemento de lista debe contar con un título destacado en negrita con **capitalización de oración** (sin *Title Case*) y sin punto previo a los dos puntos (`- **Soporte multiplataforma**:`).
      - La explicación posterior a los dos puntos debe comenzar con mayúscula y **finalizar obligatoriamente con punto (`.`)**.
    - **Español Profesional Integral (Prohibición de Inglés Residual)**: Queda terminantemente prohibido incorporar párrafos, introducciones o fragmentos en inglés importados directamente desde repositorios externos. Todo texto descriptivo debe redactarse en español profesional.
-   - **Eliminación de Anglicismos Crudos**: Adaptar sistemáticamente términos del ecosistema de software (*lore* $\rightarrow$ *trasfondo histórico*; *bundle* $\rightarrow$ *paquete de aplicación*; *offline-ready* $\rightarrow$ *operación sin conexión*; *client-side* $\rightarrow$ *del lado del cliente*; *keycodes* $\rightarrow$ *códigos de tecla*).
 
 4. **Notas de la Versión (`changelog`)**:
-   - **Propósito**: Comunicar con dignidad técnica y claridad los cambios de cada entrega histórica para el usuario final.
-   - **Puntuación**: Toda nota o elemento descriptivo debe comenzar con mayúscula y **finalizar obligatoriamente con punto final (`.`)**.
+   - **Propósito**: Comunicar con claridad los cambios de cada entrega histórica para el usuario final.
+   - **Puntuación**: Toda nota o elemento descriptivo debe comenzar con mayúscula, usar capitalización de oración y **finalizar obligatoriamente con punto final (`.`)**.
    - **Prohibición Absoluta de Residuos de Git o GitHub**:
      - **Prohibido el volcado directo de mensajes de commits**: Cadenas crudas como `"- Merge branch 'master' into stable"`, `"- Update release.yaml"`, `"- versionado visible"` o historiales no curados de Git están prohibidos. Deben sintetizarse en notas descriptivas redactadas formalmente.
      - **Prohibidos enlaces de comparación de Git**: Cadenas como `"**Full Changelog**: https://github.com/..."` deben reemplazarse por la síntesis en español de los cambios introducidos.
-     - **Prohibidas tablas Markdown crudas de GitHub Releases**: Tablas de descargas con códigos criptográficos SHA-256 truncados (`a5ff201a1cfc...`) o enlaces markdown dentro de la nota deben reemplazarse por una descripción textual limpia de la entrega (el lanzador ya expone descargas y sumas de verificación nativamente).
+     - **Prohibidas tablas Markdown crudas de GitHub Releases**: Tablas de descargas con códigos criptográficos SHA-256 truncados (`a5ff201a1cfc...`) o enlaces markdown dentro de la nota deben reemplazarse por una descripción textual limpia de la entrega.
      - **Prohibidas notas informales, bromas o cadenas vacías**: Textos como `"meow"`, `"meow 2"`, `"test"` o cadenas de depuración deben sustituirse por notas formales de entrega.
    - *Correcto*: `"Lanzamiento de Tecate Simulator versión 26.10.08-13 con soporte optimizado para Windows y macOS."`
-   - *Correcto*: `"Lanzamiento inicial de Smart Scheduler versión 2.0.0 con interfaz visual y soporte de restricciones."`
    - *Incorrecto*: `"**Full Changelog**: https://github.com/Bonsanbec/tecate-simulator/commits/latest"`
-   - *Incorrecto*: `"meow 3"`
 
 5. **Etiquetas Temáticas (`tags`)**:
-   - **Formato**: Cada etiqueta se redacta con mayúscula inicial (*Title Case*).
+   - **Formato**: Cada etiqueta se redacta con capitalización de oración (mayúscula solo en la primera palabra y nombres propios).
    - **Puntuación**: **Nunca llevan punto final**.
-   - **Estandarización Lingüística**: Se redactan preferentemente en español técnico (*Simulación*, *Mundo abierto*, *Ciencia*, *Física*, *Educación*, *Herramienta*, *Juegos*, *Solidaridad*, *Emergencias*, *Atención médica*), salvo siglas o términos técnicos universales consolidados (*3D*, *Drift*, *SQLite*, *macOS*, *Android*, *Windows*, *AutoHotkey*, *HID*).
+   - **Estandarización Lingüística**: Se redactan en español (*Simulación*, *Mundo abierto*, *Ciencia*, *Física*, *Educación*, *Herramienta*, *Juego*, *Solidaridad*, *Emergencias*, *Atención médica*), salvo siglas o nombres propios universales (*3D*, *Drift*, *SQLite*, *macOS*, *Android*, *Windows*, *AutoHotkey*, *HID*).
    - *Correcto*: `["Simulación", "Física", "Electricidad", "Fractales", "Ciencia", "3D"]`
-   - *Incorrecto*: `["Simulation.", "3d", "game"]`
+   - *Incorrecto*: `["Simulation.", "3d", "game", "Mundo Abierto"]`
 
 6. **Desarrollador (`developer`)**:
    - **Formato**: Nombre propio o institucional del autor u organización responsable.
@@ -219,10 +225,10 @@ El catálogo (`docs/catalog.json`) y sus manifiestos remotos constituyen fuentes
 
 ### 3.1. Constantes Estáticas vs. Métodos Parametrizados
 1. **Cadenas Fijas (`static const String`)**:
-   Se declaran como constantes en tiempo de compilación con identificadores descriptivos en `camelCase`:
+   Se declaran como constantes en tiempo de compilación con identificadores descriptivos en `camelCase` y capitalización de oración:
    ```dart
    static const install = 'Instalar';
-   static const cleanTemporaryFiles = 'Limpiar Archivos Temporales';
+   static const cleanTemporaryFiles = 'Limpiar archivos temporales';
    ```
 
 2. **Cadenas Dinámicas con Parámetros (`static String metodo(...)`)**:

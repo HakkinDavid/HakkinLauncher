@@ -55,7 +55,7 @@
       "category": "game",
       "developer": "Bonsanbec",
       "summary": "Videojuego social ambientado en una reconstrucción histórica 1:1 de Tecate de 2009. Minijuegos, vehículos, personajes, topografía, geografía y edificios fidedignos.",
-      "description_markdown": "# Tecate Simulator\n\nVideojuego social cuyo mapa y trasfondo histórico constituyen una reconstrucción fidedigna del Tecate, Baja California, de 2009.\n\n### Características:\n- **Reconstrucción 1:1**: Topografía, geografía y arquitectura fidedigna del municipio basada en fotogrametría y registros históricos.\n- **Mundo Social e Interactivo**: Minijuegos, vehículos conducibles, personajes y misiones de exploración urbana.\n- **Soporte Multiplataforma**: Compilaciones nativas optimizadas para Windows x64 y macOS Apple Silicon.",
+      "description_markdown": "# Tecate Simulator\n\nVideojuego social cuyo mapa y trasfondo histórico constituyen una reconstrucción fidedigna del Tecate, Baja California, de 2009.\n\n### Características\n- **Reconstrucción 1:1**: Topografía, geografía y arquitectura fidedigna del municipio basada en fotogrametría y registros históricos.\n- **Mundo social e interactivo**: Minijuegos, vehículos conducibles, personajes y misiones de exploración urbana.\n- **Soporte multiplataforma**: Compilaciones nativas optimizadas para Windows x64 y macOS Apple Silicon.",
       "tags": [
         "Juego",
         "Social",
@@ -179,7 +179,7 @@
       "category": "app",
       "developer": "Bonsanbec",
       "summary": "Simulación y renderizado 3D de rayos y arcos eléctricos siguiendo trayectorias de menor resistencia y autosimilitud fractal.",
-      "description_markdown": "# Fractochales\n\nPrograma que simula el comportamiento de rayos y arcos eléctricos en diversos entornos, modelando su tendencia a seguir trayectorias de menor resistencia y presentar autosimilitud fractal.\n\n### Características:\n- **Física de Rayos**: Renderizado 3D dinámico que modela la propagación eléctrica y las estructuras fractales de descarga.\n- **Personalización y Gamificación**: Múltiples opciones de configuración de entorno, conductividad y modos lúdicos.\n- **Investigación Científica**: Útil para comprender la física de la electricidad y realizar experimentación sobre descargas atmosféricas.\n- **Desarrollo y Rendimiento**: Implementado en C++ con bibliotecas SFML y OpenAL.",
+      "description_markdown": "# Fractochales\n\nPrograma que simula el comportamiento de rayos y arcos eléctricos en diversos entornos, modelando su tendencia a seguir trayectorias de menor resistencia y presentar autosimilitud fractal.\n\n### Características\n- **Física de rayos**: Renderizado 3D dinámico que modela la propagación eléctrica y las estructuras fractales de descarga.\n- **Personalización y gamificación**: Múltiples opciones de configuración de entorno, conductividad y modos lúdicos.\n- **Investigación científica**: Útil para comprender la física de la electricidad y realizar experimentación sobre descargas atmosféricas.\n- **Desarrollo y rendimiento**: Implementado en C++ con bibliotecas SFML y OpenAL.",
       "tags": [
         "Simulación",
         "Física",
@@ -302,7 +302,7 @@
       "category": "app",
       "developer": "Bonsanbec",
       "summary": "Herramienta comunitaria de apoyo y solidaridad digital nacida en Tijuana para conectar a personas migrantes con albergues, servicios y comedores.",
-      "description_markdown": "# Sistema de Apoyo Migrante\n\nEste proyecto nació al observar una necesidad urgente en las calles de Tijuana: personas migrantes buscando ayuda, orientación y un lugar seguro.\n\n### Propósito:\n- **Conectividad Humanitaria**: Vinculación de personas en movilidad con albergues, comedores y servicios médicos gratuitos según directorios de OIM y ACNUR.\n- **Enfoque Solidario**: Diseñado para acompañar, orientar y brindar apoyo directo en comunidad.\n- **Disponibilidad Continua**: Plataforma accesible vía web y aplicación móvil para Android con operación garantizada sin conexión.",
+      "description_markdown": "# Sistema de Apoyo Migrante\n\nEste proyecto nació al observar una necesidad urgente en las calles de Tijuana: personas migrantes buscando ayuda, orientación y un lugar seguro.\n\n### Propósito\n- **Conectividad humanitaria**: Vinculación de personas en movilidad con albergues, comedores y servicios médicos gratuitos según directorios de OIM y ACNUR.\n- **Enfoque solidario**: Diseñado para acompañar, orientar y brindar apoyo directo en comunidad.\n- **Disponibilidad continua**: Plataforma accesible vía web y aplicación móvil para Android con operación garantizada sin conexión.",
       "tags": [
         "Humanitario",
         "Comunidad",
@@ -379,7 +379,7 @@
       "category": "app",
       "developer": "HakkinDavid",
       "summary": "Sistema para digitalizar, optimizar y centralizar el registro y consulta de atenciones médicas e incidentes del cuerpo de bomberos de Tijuana.",
-      "description_markdown": "# Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos\n\nProyecto dirigido a digitalizar, optimizar y centralizar el registro, almacenamiento y consulta de información sobre incidentes y atenciones médicas realizadas por el cuerpo de bomberos de Tijuana.\n\n### Objetivos Principales:\n- **Validez Legal y Digitalización**: Formatos prehospitalarios estandarizados con folios únicos y firmas digitales.\n- **Operación sin Conexión**: Funcionamiento garantizado en zonas sin cobertura celular con sincronización automática posterior.\n- **Reportes y Estadísticas**: Generación y exportación de reportes PDF e interoperabilidad con sistemas institucionales.",
+      "description_markdown": "# Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos\n\nProyecto dirigido a digitalizar, optimizar y centralizar el registro, almacenamiento y consulta de información sobre incidentes y atenciones médicas realizadas por el cuerpo de bomberos de Tijuana.\n\n### Objetivos principales\n- **Validez legal y digitalización**: Formatos prehospitalarios estandarizados con folios únicos y firmas digitales.\n- **Operación sin conexión**: Funcionamiento garantizado en zonas sin cobertura celular con sincronización automática posterior.\n- **Reportes y estadísticas**: Generación y exportación de reportes PDF e interoperabilidad con sistemas institucionales.",
       "tags": [
         "Emergencias",
         "Bomberos",
@@ -779,7 +779,7 @@
       "category": "app",
       "developer": "HakkinDavid",
       "summary": "Gemelo digital personal, autocontenido y con funcionamiento local prioritario con arquitectura 4NF y Drift para catalogar objetos físicos, seres vivos, herramientas y documentos con auditoría e inventario.",
-      "description_markdown": "# Platinum World Management System\n\nAplicación personal, autocontenida y con operación local prioritaria desarrollada con Flutter, Riverpod, GoRouter y Drift sobre SQLite diseñada para actuar como el gemelo digital completo del mundo del usuario.\n\n### Visión y Filosofía:\n- **Normalización 4NF**: Unifica objetos físicos, herramientas, seres vivos, documentos, proyectos e infraestructura digital en un modelo relacional en Cuarta Forma Normal.\n- **Operación Local Exclusiva**: SQLite local como única fuente de verdad, sin servidores externos obligatorios.\n- **Historial y Trazabilidad**: Todo cambio de ubicación o edición genera eventos automáticos de auditoría.",
+      "description_markdown": "# Platinum World Management System\n\nAplicación personal, autocontenida y con operación local prioritaria desarrollada con Flutter, Riverpod, GoRouter y Drift sobre SQLite diseñada para actuar como el gemelo digital completo del mundo del usuario.\n\n### Visión y filosofía\n- **Normalización 4NF**: Unifica objetos físicos, herramientas, seres vivos, documentos, proyectos e infraestructura digital en un modelo relacional en cuarta forma normal.\n- **Operación local exclusiva**: SQLite local como única fuente de verdad, sin servidores externos obligatorios.\n- **Historial y trazabilidad**: Todo cambio de ubicación o edición genera eventos automáticos de auditoría.",
       "tags": [
         "Gemelo digital",
         "Operación local",
@@ -920,7 +920,7 @@
       "category": "app",
       "developer": "HakkinDavid",
       "summary": "Generador y optimizador de horarios académicos sin traslapes y con clasificación por comodidad percibida.",
-      "description_markdown": "# Smart Scheduler\n\nGenerador inteligente y optimizador de combinaciones de horarios académicos y universitarios.\n\n### Características:\n- **Sin Traslapes**: Resolución de restricciones temporales para garantizar combinaciones de materias compatibles.\n- **Clasificación por Comodidad Percibida**: Ordenación de combinaciones según cercanía de clases, minimización de huecos libres y preferencias horarias del estudiante.\n- **Empaquetado Nativo**: Distribución optimizada para macOS Apple Silicon en paquete de aplicación .app.",
+      "description_markdown": "# Smart Scheduler\n\nGenerador inteligente y optimizador de combinaciones de horarios académicos y universitarios.\n\n### Características\n- **Sin traslapes**: Resolución de restricciones temporales para garantizar combinaciones de materias compatibles.\n- **Clasificación por comodidad percibida**: Ordenación de combinaciones según cercanía de clases, minimización de huecos libres y preferencias horarias del estudiante.\n- **Empaquetado nativo**: Distribución optimizada para macOS Apple Silicon en paquete de aplicación .app.",
       "tags": [
         "Productividad",
         "Educación",
@@ -994,7 +994,7 @@
       "category": "tool",
       "developer": "HakkinDavid",
       "summary": "Utilidad de terminal en espacio de usuario para macOS que traduce entradas de Nintendo Wiimote a pulsaciones de teclado mediante IOHIDManager.",
-      "description_markdown": "# Wiimote Userland Driver\n\nControlador ligero en espacio de usuario para macOS que permite utilizar un mando Nintendo Wiimote como dispositivo de entrada estándar para juegos y aplicaciones fuera del emulador Dolphin.\n\n### Aspectos Técnicos:\n- **Entrada Basada en IOHIDManager**: Lee reportes de entrada del Wiimote sin requerir extensiones de kernel KEXT.\n- **Soporte Completo de Botones**: D-Pad, A/B, 1/2, +, -, HOME y combinaciones simultáneas de teclas.\n- **Emulación de Teclado**: Mapea acciones del mando a códigos nativos de pulsación del sistema operativo.",
+      "description_markdown": "# Wiimote Userland Driver\n\nControlador ligero en espacio de usuario para macOS que permite utilizar un mando Nintendo Wiimote como dispositivo de entrada estándar para juegos y aplicaciones fuera del emulador Dolphin.\n\n### Aspectos técnicos\n- **Entrada basada en IOHIDManager**: Lee reportes de entrada del Wiimote sin requerir extensiones de kernel KEXT.\n- **Soporte completo de botones**: D-Pad, A/B, 1/2, +, -, HOME y combinaciones simultáneas de teclas.\n- **Emulación de teclado**: Mapea acciones del mando a códigos nativos de pulsación del sistema operativo.",
       "tags": [
         "Controlador",
         "HID",
@@ -1042,7 +1042,7 @@
       "category": "tool",
       "developer": "HakkinDavid",
       "summary": "Utilidad residente con AutoHotkey para escribir caracteres especiales en español y tonos pinyin sin cambiar la distribución del teclado.",
-      "description_markdown": "# Language Input Hotkey\n\nUtilidad residente en segundo plano desarrollada con AutoHotkey para agilizar la entrada de caracteres especiales en español y tonos pinyin imitando las combinaciones de acceso rápido de Microsoft Word.\n\n### Módulos Disponibles:\n- **Módulo de Español**: Entrada rápida de vocales acentuadas, diéresis y signos de apertura de interrogación y exclamación.\n- **Módulo de Pinyin**: Mapeo tonal para caracteres fonéticos en mandarín.",
+      "description_markdown": "# Language Input Hotkey\n\nUtilidad residente en segundo plano desarrollada con AutoHotkey para agilizar la entrada de caracteres especiales en español y tonos pinyin imitando las combinaciones de acceso rápido de Microsoft Word.\n\n### Módulos disponibles\n- **Módulo de español**: Entrada rápida de vocales acentuadas, diéresis y signos de apertura de interrogación y exclamación.\n- **Módulo de pinyin**: Mapeo tonal para caracteres fonéticos en mandarín.",
       "tags": [
         "Utilidad",
         "Escritura",
@@ -1119,7 +1119,7 @@
       "category": "tool",
       "developer": "HakkinDavid",
       "summary": "Calculadora de física y estadística matemática con temática felina dividida en física y probabilidad.",
-      "description_markdown": "# CAT Helper\n\nAplicación móvil Android concebida como asistente de cálculo en dos vertientes:\n\n### Modalidades:\n- **Calculadora de Física**: Resolución rápida de magnitudes mecánicas, cinemáticas y dinámicas.\n- **Calculadora Estadística y de Probabilidad**: Análisis combinatorio, distribuciones y cálculo probabilístico.\n- **Diseño Temático**: Todo integrado con una estética y temática felina distintiva.",
+      "description_markdown": "# CAT Helper\n\nAplicación móvil Android concebida como asistente de cálculo en dos vertientes:\n\n### Modalidades\n- **Calculadora de física**: Resolución rápida de magnitudes mecánicas, cinemáticas y dinámicas.\n- **Calculadora estadística y de probabilidad**: Análisis combinatorio, distribuciones y cálculo probabilístico.\n- **Diseño temático**: Todo integrado con una estética y temática felina distintiva.",
       "tags": [
         "Calculadora",
         "Física",
@@ -1213,7 +1213,7 @@
       "category": "tool",
       "developer": "HakkinDavid",
       "summary": "Modificación para el cliente en Minecraft 26.1 adaptada a Forge que transforma el modelo del jugador en gato, con soporte para aspectos personalizados y ajuste de escala.",
-      "description_markdown": "# Catify Mod Forge\n\nModificación exclusiva para el cliente en Minecraft 26.1 adaptada a Forge que transforma visualmente el modelo del jugador en un gato.\n\n### Características:\n- **Cambio de Aspecto Visual**: No altera colisiones ni físicas del jugador, garantizando juego limpio.\n- **Variantes y Aspectos Personalizados**: Admite 11 aspectos originales y adición de texturas personalizadas en data/catify/cat_enitity_skins con el comando /catvariant <nombre>.\n- **Ajuste de Tamaño**: Comando /catsize <small/normal/large> para alternar el tamaño del modelo felino.\n- **Compatibilidad**: Sincronización visual en servidores multijugador.",
+      "description_markdown": "# Catify Mod Forge\n\nModificación exclusiva para el cliente en Minecraft 26.1 adaptada a Forge que transforma visualmente el modelo del jugador en un gato.\n\n### Características\n- **Cambio de aspecto visual**: No altera colisiones ni físicas del jugador, garantizando juego limpio.\n- **Variantes y aspectos personalizados**: Admite 11 aspectos originales y adición de texturas personalizadas en data/catify/cat_enitity_skins con el comando /catvariant <nombre>.\n- **Ajuste de tamaño**: Comando /catsize <small/normal/large> para alternar el tamaño del modelo felino.\n- **Compatibilidad**: Sincronización visual en servidores multijugador.",
       "tags": [
         "Minecraft",
         "Modificación",
