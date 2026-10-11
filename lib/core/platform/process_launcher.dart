@@ -183,9 +183,7 @@ class ProcessLauncher {
         }
       }
 
-      final workDir = (workingDirectory != null && await Directory(workingDirectory).exists())
-          ? workingDirectory
-          : targetFile.parent.path;
+      final workDir = targetFile.parent.path;
 
       // Lanzamiento desacoplado (spawn detached process)
       final process = await Process.start(
