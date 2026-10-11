@@ -35,10 +35,39 @@ void main() {
         expect(app.id, isNotEmpty);
         expect(app.slug, isNotEmpty);
         expect(app.title, isNotEmpty);
+        expect(app.title.endsWith('.'), isFalse, reason: 'App ${app.id} title must not end with a period');
+        expect(app.title.endsWith(':'), isFalse, reason: 'App ${app.id} title must not end with a colon');
         expect(app.category, isIn(['game', 'app', 'tool']));
         expect(app.developer, isNotEmpty);
+        expect(app.developer.endsWith('.'), isFalse, reason: 'App ${app.id} developer must not end with a period');
         expect(app.summary, isNotEmpty);
+        expect(app.summary.endsWith('.'), isTrue, reason: 'App ${app.id} summary must end with a period');
         expect(app.descriptionMarkdown, isNotEmpty);
+        expect(app.tags, isNotEmpty, reason: 'App ${app.id} must have tags');
+        for (final tag in app.tags) {
+          expect(tag.endsWith('.'), isFalse, reason: 'App ${app.id} tag "$tag" must not end with a period');
+          expect(
+            RegExp(r'\b(Flutter|Riverpod|GoRouter|Drift|SQLite|4NF|SFML|OpenAL|IOHIDManager|KEXT|AutoHotkey)\b',
+                    caseSensitive: false)
+                .hasMatch(tag),
+            isFalse,
+            reason: 'App ${app.id} tag "$tag" must not expose internal technical stack',
+          );
+        }
+        expect(
+          RegExp(r'\b(Flutter|Riverpod|GoRouter|Drift|SQLite|4NF|SFML|OpenAL|IOHIDManager|KEXT|AutoHotkey)\b',
+                  caseSensitive: false)
+              .hasMatch(app.summary),
+          isFalse,
+          reason: 'App ${app.id} summary must not expose internal technical stack',
+        );
+        expect(
+          RegExp(r'\b(Flutter|Riverpod|GoRouter|Drift|SQLite|4NF|SFML|OpenAL|IOHIDManager|KEXT)\b',
+                  caseSensitive: false)
+              .hasMatch(app.descriptionMarkdown),
+          isFalse,
+          reason: 'App ${app.id} descriptionMarkdown must not expose internal technical stack',
+        );
         expect(app.latestVersion, isNotEmpty);
         expect(app.platforms, isNotEmpty, reason: 'App ${app.id} must support at least one platform');
 
@@ -55,6 +84,12 @@ void main() {
             expect(ver.version, isNotEmpty);
             expect(ver.entryPoint, isNotEmpty,
                 reason: 'App ${app.id} on $platformKey version ${ver.version} missing entry point');
+            expect(ver.changelog, isNotEmpty,
+                reason: 'App ${app.id} on $platformKey version ${ver.version} missing changelog');
+            expect(ver.changelog.endsWith('.'), isTrue,
+                reason: 'App ${app.id} on $platformKey version ${ver.version} changelog must end with period');
+            expect(ver.changelog.contains('\n'), isFalse,
+                reason: 'App ${app.id} on $platformKey version ${ver.version} changelog must be single-line');
 
             final pkg = ver.package;
             expect(pkg.url, startsWith('https://github.com/'));
@@ -67,6 +102,16 @@ void main() {
           }
         }
       }
+
+      // Verificar capitalización de oración en títulos descriptivos en español
+      final migrantMap = manifest.apps.firstWhere((a) => a.id == 'dev.bonsanbec.migrant-aid-map');
+      expect(migrantMap.title, 'Sistema de apoyo migrante');
+
+      final bomberosApp = manifest.apps.firstWhere((a) => a.id == 'dev.bonsanbec.firefighter-form');
+      expect(
+        bomberosApp.title,
+        'Aplicación de atención prehospitalaria y servicios digitales para bomberos',
+      );
 
       // 1. Verificación de tecate-simulator
       final tecate = manifest.apps.firstWhere((a) => a.id == 'dev.bonsanbec.tecate');

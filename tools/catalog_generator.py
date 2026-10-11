@@ -280,28 +280,244 @@ def clean_version(tag="", release_name="", filename="", url=""):
 
     return "1.0.0"
 
+PRESERVED_PROPER_TOKENS = {
+    "hakkinlauncher": "HakkinLauncher",
+    "hakkin": "Hakkin",
+    "windows": "Windows",
+    "macos": "macOS",
+    "linux": "Linux",
+    "android": "Android",
+    "ios": "iOS",
+    "3d": "3D",
+    "2d": "2D",
+    "pdf": "PDF",
+    "oim": "OIM",
+    "acnur": "ACNUR",
+    "nintendo": "Nintendo",
+    "wiimote": "Wiimote",
+    "wii": "Wii",
+    "minecraft": "Minecraft",
+    "forge": "Forge",
+    "fabric": "Fabric",
+    "microsoft": "Microsoft",
+    "word": "Word",
+    "tecate": "Tecate",
+    "simulator": "Simulator",
+    "fractochales": "Fractochales",
+    "pwms": "PWMS",
+    "smart": "Smart",
+    "scheduler": "Scheduler",
+    "cat": "CAT",
+    "helper": "Helper",
+    "catify": "Catify",
+    "mod": "Mod",
+    "bluetooth": "Bluetooth",
+    "hid": "HID",
+    "ram": "RAM",
+    "cpu": "CPU",
+    "gpu": "GPU",
+    "pinyin": "Pinyin",
+}
+
+PROHIBITED_TECHNICAL_PATTERN = re.compile(
+    r'(?:\b(?:Flutter|Riverpod|GoRouter|Drift|SQLite|4NF|SFML|OpenAL|IOHIDManager|KEXT|AutoHotkey)\b|(?<!\w)C\+\+(?!\w))',
+    re.IGNORECASE
+)
+
+PROHIBITED_DESDOBLAMIENTOS_PATTERN = re.compile(
+    r'(?:Simulación y renderizado|Generador y optimizador|digitalizar, optimizar y centralizar|juegos y aplicaciones|juegos y software|programas y videojuegos|gamificación)',
+    re.IGNORECASE
+)
+
+
+def _format_word_token(word, is_first_word=False):
+    """Formatea un token individual respetando signos de puntuación adyacentes y nombres propios."""
+    m = re.match(r'^([^A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9]*)([A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9]+)([^A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9]*)$', word)
+    if not m:
+        return word
+    prefix, core, suffix = m.groups()
+    lower_core = core.lower()
+    if lower_core in PRESERVED_PROPER_TOKENS:
+        formatted_core = PRESERVED_PROPER_TOKENS[lower_core]
+    elif is_first_word:
+        formatted_core = core[0].upper() + core[1:].lower()
+    else:
+        formatted_core = core.lower()
+    return f"{prefix}{formatted_core}{suffix}"
+
+
+def normalize_sentence_case_label(text):
+    """
+    Convierte etiquetas, encabezados y subtítulos a capitalización de oración en español,
+    eliminando puntos o dos puntos finales y preservando siglas/nombres propios reales.
+    """
+    if not text:
+        return ""
+    cleaned = str(text).strip().rstrip(".:;")
+    if not cleaned:
+        return ""
+    words = cleaned.split()
+    result = [_format_word_token(w, is_first_word=(i == 0)) for i, w in enumerate(words)]
+    return " ".join(result)
+
+
+def format_title(title_text):
+    """
+    Normaliza el título de una aplicación:
+    - Sin punto ni dos puntos finales.
+    - Si es un título descriptivo en español, aplica capitalización de oración.
+    """
+    if not title_text:
+        return ""
+    cleaned = str(title_text).strip().rstrip(".:;")
+    spanish_connectors = {"de", "del", "la", "las", "el", "los", "para", "y", "en", "con", "por"}
+    words_lower = {w.lower() for w in cleaned.split()}
+    if words_lower & spanish_connectors:
+        return normalize_sentence_case_label(cleaned)
+    if len(cleaned) > 0 and not cleaned[0].isupper() and cleaned.split()[0].lower() not in PRESERVED_PROPER_TOKENS:
+        cleaned = cleaned[0].upper() + cleaned[1:]
+    return cleaned
+
+
+def format_summary(summary_text):
+    """
+    Normaliza el resumen corto de una aplicación:
+    - Capitalización de oración con mayúscula inicial.
+    - Punto final obligatorio.
+    """
+    if not summary_text:
+        return ""
+    s = str(summary_text).strip().rstrip(":;")
+    if not s:
+        return ""
+    if not s[0].isupper() and s.split()[0].lower() not in PRESERVED_PROPER_TOKENS:
+        s = s[0].upper() + s[1:]
+    if not s.endswith("."):
+        s += "."
+    return s
+
+
+def format_tags(tags_list):
+    """
+    Normaliza la lista de etiquetas (tags):
+    - Capitalización de oración por etiqueta.
+    - Sin punto final ni términos técnicos internos.
+    """
+    if not isinstance(tags_list, list):
+        return []
+    formatted = []
+    for tag in tags_list:
+        raw = str(tag).strip()
+        if not raw or PROHIBITED_TECHNICAL_PATTERN.search(raw):
+            continue
+        norm = normalize_sentence_case_label(raw)
+        if norm and norm not in formatted:
+            formatted.append(norm)
+    return formatted
+
+
+def format_description_markdown(md_text, title=None):
+    """
+    Normaliza description_markdown según docs/strings.md y GEMINI.md:
+    - Encabezados (#, ##, ###) sin punto ni dos puntos finales y con capitalización de oración.
+    - Viñetas con etiqueta en negrita (- **Etiqueta**: Descripción.) con capitalización de oración en la etiqueta y punto final en la descripción.
+    - Párrafos descriptivos con mayúscula inicial y punto final obligatorio.
+    """
+    if not md_text:
+        return ""
+    lines = str(md_text).strip().splitlines()
+    out_lines = []
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            out_lines.append("")
+            continue
+
+        # Encabezados Markdown
+        m_heading = re.match(r'^(#{1,6})\s+(.+)$', stripped)
+        if m_heading:
+            hashes, h_text = m_heading.groups()
+            if len(hashes) == 1 and title:
+                out_lines.append(f"{hashes} {format_title(title)}")
+            elif len(hashes) == 1:
+                out_lines.append(f"{hashes} {format_title(h_text)}")
+            else:
+                out_lines.append(f"{hashes} {normalize_sentence_case_label(h_text)}")
+            continue
+
+        # Viñetas con negrita: - **Etiqueta**: Descripción.
+        m_bold_bullet = re.match(r'^-\s+\*\*([^*]+)\*\*:\s*(.+)$', stripped)
+        if m_bold_bullet:
+            label, desc = m_bold_bullet.groups()
+            norm_label = normalize_sentence_case_label(label)
+            desc_clean = desc.strip().rstrip(":;")
+            if desc_clean and not desc_clean[0].isupper() and desc_clean.split()[0].lower() not in PRESERVED_PROPER_TOKENS:
+                desc_clean = desc_clean[0].upper() + desc_clean[1:]
+            if desc_clean and not desc_clean.endswith("."):
+                desc_clean += "."
+            out_lines.append(f"- **{norm_label}**: {desc_clean}")
+            continue
+
+        # Viñetas simples: - Texto.
+        m_bullet = re.match(r'^-\s+(.+)$', stripped)
+        if m_bullet:
+            desc_clean = m_bullet.group(1).strip().rstrip(":;")
+            if desc_clean and not desc_clean[0].isupper() and desc_clean.split()[0].lower() not in PRESERVED_PROPER_TOKENS:
+                desc_clean = desc_clean[0].upper() + desc_clean[1:]
+            if desc_clean and not desc_clean.endswith("."):
+                desc_clean += "."
+            out_lines.append(f"- {desc_clean}")
+            continue
+
+        # Párrafo normal
+        p_clean = stripped.rstrip(":;")
+        if p_clean and not p_clean[0].isupper() and p_clean.split()[0].lower() not in PRESERVED_PROPER_TOKENS:
+            p_clean = p_clean[0].upper() + p_clean[1:]
+        if p_clean and not p_clean.endswith("."):
+            p_clean += "."
+        out_lines.append(p_clean)
+
+    return "\n".join(out_lines)
+
+
 def format_changelog(changelog_text, title, version):
     """
-    Normaliza el changelog según las normas de docs/strings.md (Sección 2.6):
+    Normaliza el changelog según las normas de docs/strings.md y GEMINI.md:
     - Mayúscula inicial y punto final obligatorio.
-    - Prohíbe volcados crudos de Git, enlaces Markdown, tablas truncadas y notas informales.
+    - Prohíbe volcados crudos de Git, enlaces Markdown, tablas truncadas, notas informales,
+      símbolos visuales embebidos y jerga de arquitectura interna.
     """
+    norm_title = format_title(title) if title else "la aplicación"
     if not changelog_text:
-        return f"Lanzamiento de {title} versión {version}."
+        return f"Lanzamiento de {norm_title} versión {version}."
 
     cl = str(changelog_text).strip()
 
     prohibited_patterns = [
         r'\*\*Full Changelog\*\*',
+        r'What\'s Changed',
+        r'New Contributors',
         r'Merge branch',
+        r'Merge pull request',
         r'Update release\.yaml',
         r'\| Plataforma \|',
-        r'^(meow(\s+\d+)?)$'
+        r'https?://',
+        r'^#+\s',
+        r'\n',
+        r'[•➔<>+]',
+        r'^(meow(\s+\d+)?)$',
     ]
     for pattern in prohibited_patterns:
-        if re.search(pattern, cl, flags=re.IGNORECASE):
-            return f"Lanzamiento de {title} versión {version} con mejoras y correcciones."
+        if re.search(pattern, cl, flags=re.IGNORECASE | re.MULTILINE):
+            return f"Lanzamiento de {norm_title} versión {version} con mejoras y correcciones."
 
+    if PROHIBITED_TECHNICAL_PATTERN.search(cl) or PROHIBITED_DESDOBLAMIENTOS_PATTERN.search(cl):
+        return f"Lanzamiento de {norm_title} versión {version} con mejoras y correcciones."
+
+    if norm_title and norm_title.lower() in cl.lower():
+        cl = re.sub(re.escape(norm_title), norm_title, cl, flags=re.IGNORECASE)
+
+    cl = cl.rstrip(":;")
     if len(cl) > 0 and not cl[0].isupper():
         cl = cl[0].upper() + cl[1:]
 
@@ -309,6 +525,7 @@ def format_changelog(changelog_text, title, version):
         cl = cl + '.'
 
     return cl
+
 
 DEFAULT_ASSET_PATTERNS = {
     ("tecate-simulator", "windows-x64"): r"tecate-windows.*\.zip",
@@ -803,15 +1020,21 @@ def generate_catalog(
         if not app_latest_version and platforms_dict:
             app_latest_version = next(iter(platforms_dict.values()))["latest_version"]
 
+        raw_title = existing_app.get("title") if existing_app and existing_app.get("title") else meta["title"]
+        norm_title = format_title(raw_title)
+        raw_summary = existing_app.get("summary") if existing_app and existing_app.get("summary") else meta.get("summary", "")
+        raw_desc = existing_app.get("description_markdown") if existing_app and existing_app.get("description_markdown") else meta.get("description_markdown", "")
+        raw_tags = existing_app.get("tags") if existing_app and existing_app.get("tags") else meta.get("tags", [])
+
         app_entry = {
             "id": meta["id"],
             "slug": meta["slug"],
-            "title": (existing_app.get("title") if existing_app and existing_app.get("title") else meta["title"]),
+            "title": norm_title,
             "category": (existing_app.get("category") if existing_app and existing_app.get("category") else meta.get("category", "app")),
-            "developer": (existing_app.get("developer") if existing_app and existing_app.get("developer") else meta.get("developer", "Hakkin")),
-            "summary": (existing_app.get("summary") if existing_app and existing_app.get("summary") else meta.get("summary", "")),
-            "description_markdown": (existing_app.get("description_markdown") if existing_app and existing_app.get("description_markdown") else meta.get("description_markdown", "")),
-            "tags": (existing_app.get("tags") if existing_app and existing_app.get("tags") else meta.get("tags", [])),
+            "developer": (existing_app.get("developer") if existing_app and existing_app.get("developer") else meta.get("developer", "Hakkin")).strip().rstrip(".:;"),
+            "summary": format_summary(raw_summary),
+            "description_markdown": format_description_markdown(raw_desc, title=norm_title),
+            "tags": format_tags(raw_tags),
             "assets": (existing_app.get("assets") if existing_app and existing_app.get("assets") else {
                 "icon": (meta.get("assets", {}).get("icon") if meta.get("assets", {}).get("icon") and not any(p in meta.get("assets", {}).get("icon", "") for p in ["unsplash.com", "placeholder"]) else None),
                 "poster": (meta.get("assets", {}).get("poster") if meta.get("assets", {}).get("poster") and not any(p in meta.get("assets", {}).get("poster", "") for p in ["unsplash.com", "placeholder"]) else None),
@@ -951,7 +1174,7 @@ def purge_orphaned_and_nonexistent_versions(manifest):
     return manifest
 
 def validate_manifest(manifest, schema_path):
-    """Validate manifest against CATALOG_SCHEMA.json rules."""
+    """Valida el manifiesto contra CATALOG_SCHEMA.json y las directivas de GEMINI.md / docs/strings.md."""
     with open(schema_path, 'r', encoding='utf-8') as f:
         schema = json.load(f)
 
@@ -962,10 +1185,43 @@ def validate_manifest(manifest, schema_path):
     allowed_categories = schema["properties"]["apps"]["items"]["properties"]["category"]["enum"]
 
     for app in manifest["apps"]:
+        app_id = app.get("id", "<unknown>")
         for req in ["id", "title", "category", "latest_version", "platforms"]:
-            assert req in app and app[req], f"App {app.get('id')} missing {req}"
+            assert req in app and app[req], f"App {app_id} missing {req}"
         assert app["category"] in allowed_categories, f"Invalid category {app['category']}"
-        assert len(app["platforms"]) > 0, f"App {app['id']} must have at least one platform"
+        assert len(app["platforms"]) > 0, f"App {app_id} must have at least one platform"
+
+        # Validación de título y desarrollador (sin punto final y con capitalización normativa)
+        title = app["title"]
+        assert not title.endswith((".", ":")), f"App {app_id} title must not end with punctuation: {title}"
+        assert title == format_title(title), f"App {app_id} title violates sentence capitalization: '{title}' != '{format_title(title)}'"
+
+        developer = app.get("developer", "")
+        assert developer and not developer.endswith((".", ":")), f"App {app_id} developer invalid: {developer}"
+
+        # Validación de summary (capitalización de oración, punto final, sin jerga técnica ni desdoblamientos)
+        summary = app.get("summary", "")
+        assert summary, f"App {app_id} missing summary"
+        assert summary[0].isupper(), f"App {app_id} summary must start with uppercase: {summary}"
+        assert summary.endswith("."), f"App {app_id} summary must end with period: {summary}"
+        assert not PROHIBITED_TECHNICAL_PATTERN.search(summary), f"App {app_id} summary contains prohibited technical jargon: {summary}"
+        assert not PROHIBITED_DESDOBLAMIENTOS_PATTERN.search(summary), f"App {app_id} summary contains prohibited lexical doubling: {summary}"
+
+        # Validación de tags (capitalización de oración, sin punto final, sin jerga técnica)
+        tags = app.get("tags", [])
+        assert isinstance(tags, list) and len(tags) > 0, f"App {app_id} must have non-empty tags list"
+        for tag in tags:
+            assert not tag.endswith((".", ":")), f"App {app_id} tag must not end with punctuation: {tag}"
+            assert tag == normalize_sentence_case_label(tag), f"App {app_id} tag violates sentence capitalization: '{tag}' != '{normalize_sentence_case_label(tag)}'"
+            assert not PROHIBITED_TECHNICAL_PATTERN.search(tag), f"App {app_id} tag contains prohibited technical jargon: {tag}"
+
+        # Validación de description_markdown
+        desc_md = app.get("description_markdown", "")
+        assert desc_md, f"App {app_id} missing description_markdown"
+        assert not PROHIBITED_TECHNICAL_PATTERN.search(desc_md), f"App {app_id} description_markdown contains prohibited technical jargon"
+        assert not PROHIBITED_DESDOBLAMIENTOS_PATTERN.search(desc_md), f"App {app_id} description_markdown contains prohibited lexical doubling"
+        assert desc_md == format_description_markdown(desc_md, title=title), \
+            f"App {app_id} description_markdown is not normalized according to docs/strings.md"
 
         for pkey, pval in app["platforms"].items():
             assert "latest_version" in pval, f"Platform {pkey} missing latest_version"
@@ -976,7 +1232,7 @@ def validate_manifest(manifest, schema_path):
                 f"Platform {pkey} latest_version {pval['latest_version']} not in versions {valid_vers}"
             for v_obj in pval["versions"]:
                 assert "version" in v_obj and v_obj["version"], f"Platform {pkey} missing version string"
-                assert v_obj["version"] != "64.0.0", f"Corrupt phantom version 64.0.0 found in {app['id']} {pkey}"
+                assert v_obj["version"] != "64.0.0", f"Corrupt phantom version 64.0.0 found in {app_id} {pkey}"
                 entry_point = v_obj.get("entry_point") or v_obj.get("executable_relative_path")
                 assert entry_point, f"Platform {pkey} missing entry_point / executable_relative_path"
                 v_obj["entry_point"] = entry_point
@@ -986,15 +1242,24 @@ def validate_manifest(manifest, schema_path):
                 assert "sha256" in pkg and len(pkg["sha256"]) == 64, f"Invalid sha256 in {pkey}: {pkg['sha256']}"
                 assert "size_bytes" in pkg and pkg["size_bytes"] > 0, f"Invalid size_bytes in {pkey}: {pkg['size_bytes']}"
 
+                # Validación de changelog de cada versión
+                cl = v_obj.get("changelog", "")
+                assert cl, f"Missing changelog in {app_id} {pkey} v{v_obj['version']}"
+                assert cl[0].isupper(), f"Changelog must start with uppercase in {app_id} {pkey} v{v_obj['version']}: {cl}"
+                assert cl.endswith("."), f"Changelog must end with period in {app_id} {pkey} v{v_obj['version']}: {cl}"
+                assert "\n" not in cl, f"Changelog must be a single clean sentence in {app_id} {pkey} v{v_obj['version']}"
+                assert not PROHIBITED_TECHNICAL_PATTERN.search(cl), f"Changelog contains prohibited technical jargon in {app_id} {pkey}: {cl}"
+
                 # Comprobar que ningún parche delta apunte a versiones huérfanas
                 for dp in v_obj.get("delta_patches", []):
                     assert dp.get("from_version") in valid_vers, \
-                        f"Delta patch in {app['id']} {pkey} v{v_obj['version']} references orphaned from_version {dp.get('from_version')}"
+                        f"Delta patch in {app_id} {pkey} v{v_obj['version']} references orphaned from_version {dp.get('from_version')}"
                     assert dp.get("from_version") != v_obj["version"], \
-                        f"Delta patch in {app['id']} {pkey} v{v_obj['version']} has reflexive from_version"
+                        f"Delta patch in {app_id} {pkey} v{v_obj['version']} has reflexive from_version"
 
-    print(f"Validation successful: {len(manifest['apps'])} applications validated against schema v2.0.0 contract.")
+    print(f"Validación exitosa: {len(manifest['apps'])} aplicaciones verificadas contra el esquema v2.0.0 y la normativa de cadenas.")
     return True
+
 
 def main():
     parser = argparse.ArgumentParser(description="HakkinLauncher Catalog Generator v2.0 (Single Source of Truth)")

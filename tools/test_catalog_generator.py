@@ -18,6 +18,12 @@ from catalog_generator import (
     validate_manifest,
     generate_catalog,
     purge_orphaned_and_nonexistent_versions,
+    normalize_sentence_case_label,
+    format_title,
+    format_summary,
+    format_tags,
+    format_description_markdown,
+    format_changelog,
     KNOWN_ASSET_CACHE
 )
 
@@ -271,6 +277,69 @@ class TestCatalogGenerator(unittest.TestCase):
                         self.assertIn(from_v, valid_vers)
                         self.assertNotEqual(from_v, v["version"])
 
+    def test_string_normativa_normalization(self):
+        self.assertEqual(
+            format_title("Sistema de Apoyo Migrante."),
+            "Sistema de apoyo migrante"
+        )
+        self.assertEqual(
+            format_title("Aplicación de Atención Prehospitalaria y Servicios Digitales para Bomberos"),
+            "Aplicación de atención prehospitalaria y servicios digitales para bomberos"
+        )
+        self.assertEqual(
+            format_title("Tecate Simulator."),
+            "Tecate Simulator"
+        )
+        self.assertEqual(
+            normalize_sentence_case_label("Características Principales:"),
+            "Características principales"
+        )
+        self.assertEqual(
+            normalize_sentence_case_label("Compatibilidad con Windows, macOS y 3D."),
+            "Compatibilidad con Windows, macOS y 3D"
+        )
+        self.assertEqual(
+            format_summary("simulador interactivo en primera persona:"),
+            "Simulador interactivo en primera persona."
+        )
+        self.assertEqual(
+            format_tags(["Atención Prehospitalaria.", "Flutter", "AutoHotkey", "Mapas", "OIM"]),
+            ["Atención prehospitalaria", "Mapas", "OIM"]
+        )
+
+        raw_md = (
+            "# Sistema de Apoyo Migrante.\n\n"
+            "Aplicación móvil de asistencia humanitaria:\n\n"
+            "### Características Principales:\n"
+            "- **Mapa Interactivo**: Muestra albergues y comedores en tiempo real\n"
+            "- **Exportación a PDF**: Genera documentos listos para imprimir."
+        )
+        expected_md = (
+            "# Sistema de apoyo migrante\n\n"
+            "Aplicación móvil de asistencia humanitaria.\n\n"
+            "### Características principales\n"
+            "- **Mapa interactivo**: Muestra albergues y comedores en tiempo real.\n"
+            "- **Exportación a PDF**: Genera documentos listos para imprimir."
+        )
+        self.assertEqual(
+            format_description_markdown(raw_md, title="Sistema de Apoyo Migrante"),
+            expected_md
+        )
+
+        self.assertEqual(
+            format_changelog("What's Changed\n* Fix bug in https://github.com/test/pr/1", "Sistema de Apoyo Migrante", "3.0"),
+            "Lanzamiento de Sistema de apoyo migrante versión 3.0 con mejoras y correcciones."
+        )
+        self.assertEqual(
+            format_changelog("Actualización con soporte de Riverpod y SQLite", "Fractochales", "3.27"),
+            "Lanzamiento de Fractochales versión 3.27 con mejoras y correcciones."
+        )
+        self.assertEqual(
+            format_changelog("corrección de errores menores", "Fractochales", "3.27"),
+            "Corrección de errores menores."
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
+
