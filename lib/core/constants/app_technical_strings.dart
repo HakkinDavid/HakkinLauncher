@@ -139,6 +139,10 @@ class AppTechnicalStrings {
   static const cmdPowershell = 'powershell';
   static const cmdCmd = 'cmd';
   static const cmdOpen = 'open';
+  static const cmdExplorer = 'explorer';
+  static const cmdXdgOpen = 'xdg-open';
+  static const cmdZenity = 'zenity';
+  static const cmdKdialog = 'kdialog';
   static const cmdHdiutil = 'hdiutil';
   static const cmdDpkgDeb = 'dpkg-deb';
   static const cmdPkexec = 'pkexec';
@@ -158,10 +162,14 @@ class AppTechnicalStrings {
   static const argMinusD = '-d';
   static const argMinusF = '-f';
   static const argMinusV = '-v';
+  static const argMinusE = '-e';
   static const argMinusZero = '-0';
   static const argMinusNine = '-9';
   static const argForce = '--force';
   static const argDeep = '--deep';
+  static const argFileSelection = '--file-selection';
+  static const argDirectory = '--directory';
+  static const argGetExistingDirectory = '--getexistingdirectory';
   static const argMinusS = '-s';
   static const argMinus = '-';
   static const argSlashNh = '/nh';
@@ -323,6 +331,7 @@ class AppTechnicalStrings {
   static const errorHashMismatch = 'hash_mismatch';
   static const errorEmptyUrl = 'empty_url';
   static const errorUnsupportedPlatform = 'unsupported_platform';
+  static const appleScriptCancelCode = '-128';
 
   // ---------------------------------------------------------------------------
   // Helpers & Formatters
@@ -674,6 +683,40 @@ Path=$workingDir
 $iconLine
 Terminal=false
 Categories=Game;Utility;
+''';
+  }
+
+  static String zenityTitleArg(String title) => '--title=$title';
+
+  static String generateMacOsChooseFolderScript({
+    required String prompt,
+    String? defaultLocation,
+  }) {
+    final escapedPrompt = prompt.replaceAll('"', r'\"');
+    if (defaultLocation != null && defaultLocation.isNotEmpty) {
+      final escapedLoc = defaultLocation.replaceAll('"', r'\"');
+      return 'POSIX path of (choose folder with prompt "$escapedPrompt" default location POSIX file "$escapedLoc")';
+    }
+    return 'POSIX path of (choose folder with prompt "$escapedPrompt")';
+  }
+
+  static String generateWindowsChooseFolderScript({
+    required String description,
+    String? initialDirectory,
+  }) {
+    final escapedDesc = description.replaceAll("'", "''");
+    final escapedInit = (initialDirectory ?? empty).replaceAll("'", "''");
+    return '''
+Add-Type -AssemblyName System.Windows.Forms
+\$dialog = New-Object System.Windows.Forms.FolderBrowserDialog
+\$dialog.Description = '$escapedDesc'
+\$dialog.ShowNewFolderButton = \$true
+if ('$escapedInit' -ne '' -and (Test-Path '$escapedInit')) {
+  \$dialog.SelectedPath = '$escapedInit'
+}
+if (\$dialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
+  Write-Output \$dialog.SelectedPath
+}
 ''';
   }
 }

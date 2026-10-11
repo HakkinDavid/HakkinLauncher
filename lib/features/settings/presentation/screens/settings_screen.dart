@@ -12,6 +12,7 @@ import 'package:hakkin_launcher/core/theme/app_colors.dart';
 import 'package:hakkin_launcher/features/catalog/presentation/controllers/catalog_controller.dart';
 import 'package:hakkin_launcher/features/self_update/services/self_update_service.dart';
 import 'package:hakkin_launcher/shared/widgets/hakkin_button.dart';
+import 'package:path/path.dart' as p;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -22,7 +23,7 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  final _customInstallPathController = TextEditingController();
+  String _installPath = AppTechnicalStrings.empty;
   bool _closeToTray = true;
   String _baseDir = AppTechnicalStrings.empty;
   String _toolsDir = AppTechnicalStrings.empty;
@@ -39,24 +40,29 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     _loadSettings();
   }
 
-  @override
-  void dispose() {
-    _customInstallPathController.dispose();
-    super.dispose();
-  }
-
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
-    final customPath = prefs.getString(AppConstants.prefCustomInstallPathKey) ?? AppTechnicalStrings.empty;
+    var customPath = prefs.getString(AppConstants.prefCustomInstallPathKey) ?? AppTechnicalStrings.empty;
     final closeToTray = prefs.getBool(AppConstants.prefCloseToTrayKey) ?? true;
     final baseDir = await OsPaths.getAppBaseDirectory();
     final defaultAppsDir = await OsPaths.getDefaultAppsInstallDirectory();
     final toolsDir = await OsPaths.getToolsDirectory();
     final hpatchzStatus = await ComponentManager.instance.getComponentStatus();
 
+    // Limpiar ruta por defecto heredada si apuntaba a la subcarpeta anidada redundante
+    final legacyNestedDefault = p.join(
+      baseDir.path,
+      AppTechnicalStrings.dirHakkinLauncher,
+      AppTechnicalStrings.dirApps,
+    );
+    if (customPath == legacyNestedDefault || customPath == defaultAppsDir.path) {
+      await prefs.remove(AppConstants.prefCustomInstallPathKey);
+      customPath = AppTechnicalStrings.empty;
+    }
+
     if (mounted) {
       setState(() {
-        _customInstallPathController.text = customPath.isNotEmpty ? customPath : defaultAppsDir.path;
+        _installPath = customPath.isNotEmpty ? customPath : defaultAppsDir.path;
         _closeToTray = closeToTray;
         _baseDir = baseDir.path;
         _toolsDir = toolsDir.path;
@@ -95,13 +101,49 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
   }
 
-  Future<void> _saveInstallPath() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(
-      AppConstants.prefCustomInstallPathKey,
-      _customInstallPathController.text.trim(),
+  Future<void> _selectInstallDirectory() async {
+    final selectedPath = await OsPaths.pickDirectory(
+      initialDirectory: _installPath,
     );
+    if (selectedPath == null || selectedPath.isEmpty) return;
+
+    final defaultDir = await OsPaths.getDefaultAppsInstallDirectory();
+    final prefs = await SharedPreferences.getInstance();
+    if (selectedPath == defaultDir.path) {
+      await prefs.remove(AppConstants.prefCustomInstallPathKey);
+    } else {
+      await prefs.setString(
+        AppConstants.prefCustomInstallPathKey,
+        selectedPath,
+      );
+    }
+
     if (mounted) {
+      setState(() => _installPath = selectedPath);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.installPathSavedSuccess)),
+      );
+    }
+  }
+
+  Future<void> _openInstallDirectory() async {
+    final opened = await OsPaths.openDirectory(_installPath);
+    if (!opened && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(AppStrings.couldNotOpenDirectory),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
+  }
+
+  Future<void> _restoreDefaultInstallPath() async {
+    final defaultDir = await OsPaths.getDefaultAppsInstallDirectory();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(AppConstants.prefCustomInstallPathKey);
+    if (mounted) {
+      setState(() => _installPath = defaultDir.path);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text(AppStrings.installPathSavedSuccess)),
       );
@@ -277,32 +319,79 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               title: AppStrings.installPathSectionTitle,
               description: AppStrings.installPathSectionDescription,
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  TextField(
-                    controller: _customInstallPathController,
-                    decoration: const InputDecoration(
-                      labelText: AppStrings.installDirectoryLabel,
-                      prefixIcon: Icon(Icons.folder_open),
+                  InkWell(
+                    onTap: _selectInstallDirectory,
+                    borderRadius: BorderRadius.circular(10),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.background,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: AppColors.surfaceBorder),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.folder_outlined,
+                            color: AppColors.celestialBlue,
+                            size: 22,
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  AppStrings.installDirectoryLabel,
+                                  style: TextStyle(
+                                    color: AppColors.platinumMuted,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  _installPath,
+                                  style: const TextStyle(
+                                    color: AppColors.platinum,
+                                    fontSize: 13,
+                                    fontFamily: AppTechnicalStrings.fontFamilyMonospace,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  Row(
+                  const SizedBox(height: 14),
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
                     children: [
                       HakkinButton(
-                        text: AppStrings.savePath,
-                        icon: Icons.save,
+                        text: AppStrings.selectInstallDirectory,
+                        icon: Icons.folder_open,
                         variant: HakkinButtonVariant.secondary,
-                        onPressed: _saveInstallPath,
+                        onPressed: _selectInstallDirectory,
                       ),
-                      const SizedBox(width: 12),
+                      HakkinButton(
+                        text: AppStrings.openInstallDirectory,
+                        icon: Icons.open_in_new,
+                        variant: HakkinButtonVariant.secondary,
+                        onPressed: _openInstallDirectory,
+                      ),
                       HakkinButton(
                         text: AppStrings.restoreDefaultPath,
+                        icon: Icons.restore,
                         variant: HakkinButtonVariant.secondary,
-                        onPressed: () async {
-                          final defaultDir = await OsPaths.getDefaultAppsInstallDirectory();
-                          _customInstallPathController.text = defaultDir.path;
-                          _saveInstallPath();
-                        },
+                        onPressed: _restoreDefaultInstallPath,
                       ),
                     ],
                   ),

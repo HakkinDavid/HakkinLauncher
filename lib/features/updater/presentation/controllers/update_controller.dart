@@ -4,6 +4,7 @@ import 'package:hakkin_launcher/core/platform/os_paths.dart';
 import 'package:hakkin_launcher/features/catalog/data/models/app_entry.dart';
 import 'package:hakkin_launcher/features/library/presentation/controllers/library_controller.dart';
 import 'package:hakkin_launcher/features/updater/services/patch_engine.dart';
+import 'package:path/path.dart' as p;
 import 'package:shared_preferences/shared_preferences.dart';
 
 final patchEngineProvider = Provider<PatchEngine>((ref) {
@@ -32,7 +33,9 @@ class UpdateProgressNotifier extends StateNotifier<Map<String, UpdateStatus>> {
       platformKey: platformKey,
       targetVersion: targetVersion,
       isCleanInstall: isCleanInstall,
-      customInstallPath: customPath?.isNotEmpty == true ? customPath : null,
+      customInstallPath: customPath != null && customPath.isNotEmpty
+          ? p.join(customPath, app.slug)
+          : null,
     )) {
       state = {...state, app.id: status};
 

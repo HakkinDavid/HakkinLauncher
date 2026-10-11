@@ -37,6 +37,8 @@ class AppStrings {
   static const goToStore = 'Ir a la Tienda';
   static const viewInStore = 'Ver en la Tienda';
   static const savePath = 'Guardar ruta';
+  static const selectInstallDirectory = 'Seleccionar carpeta';
+  static const openInstallDirectory = 'Abrir carpeta';
   static const restoreDefaultPath = 'Restaurar ruta por defecto';
   static const checkUpdatesNow = 'Buscar actualizaciones ahora';
   static const checkingUpdates = 'Buscando actualizaciones...';
@@ -183,8 +185,12 @@ class AppStrings {
   static const installPathSectionDescription =
       'Carpeta del sistema operativo donde se descargarán y extraerán los paquetes y binarios.';
   static const installDirectoryLabel = 'Directorio de Instalación';
+  static const selectInstallDirectoryPrompt =
+      'Selecciona la carpeta de instalación';
   static const installPathSavedSuccess =
       'Ruta de instalación guardada con éxito.';
+  static const couldNotOpenDirectory =
+      'No se pudo abrir la carpeta en el explorador del sistema.';
   static const backgroundAndUpdatesTitle =
       'Segundo Plano y Actualizaciones';
   static const backgroundAndUpdatesDescription =
@@ -461,6 +467,10 @@ class AppStrings {
       'Aviso: parche a nivel de directorio retornó $code, reintentando sobre ejecutable...';
   static String logHpatchzExecError(Object error) =>
       'Error al ejecutar hpatchz: $error.';
+  static String logDirectoryPickerError(Object error) =>
+      'Error al abrir el selector de carpetas: $error.';
+  static String logOpenDirectoryError(Object error) =>
+      'Error al abrir la carpeta en el sistema: $error.';
 
   // ---------------------------------------------------------------------------
   // macOS Relocation Service
