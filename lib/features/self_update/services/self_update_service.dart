@@ -365,8 +365,15 @@ class SelfUpdateService {
       await scriptFile.writeAsString(scriptContent);
 
       await Process.start(
-        AppTechnicalStrings.cmdCmd,
-        [AppTechnicalStrings.argSlashC, scriptFile.path],
+        AppTechnicalStrings.cmdPowershell,
+        [
+          AppTechnicalStrings.argNoProfile,
+          AppTechnicalStrings.argNonInteractive,
+          AppTechnicalStrings.argWindowStyle,
+          AppTechnicalStrings.argHidden,
+          AppTechnicalStrings.argMinusCommand,
+          AppTechnicalStrings.powershellStartHiddenCmd(scriptFile.path),
+        ],
         mode: ProcessStartMode.detached,
       );
       exit(0);

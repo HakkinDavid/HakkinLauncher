@@ -209,7 +209,15 @@ class AppTechnicalStrings {
   static const argBypass = 'Bypass';
   static const argMinusFile = '-File';
   static const argNoProfile = '-NoProfile';
+  static const argNonInteractive = '-NonInteractive';
+  static const argWindowStyle = '-WindowStyle';
+  static const argHidden = 'Hidden';
   static const argMinusCommand = '-Command';
+
+  static String powershellStartHiddenCmd(String scriptPath) {
+    final escaped = scriptPath.replaceAll("'", "''");
+    return "Start-Process -FilePath '$cmdCmd' -ArgumentList '$argSlashC \"\"$escaped\"\"' -WindowStyle $argHidden";
+  }
 
   // ---------------------------------------------------------------------------
   // Regex Patterns
@@ -556,11 +564,16 @@ $envSetup
 echo === HakkinLauncher Windows Auto-Update: %date% %time% === > "%LOG_FILE%"
 
 echo Esperando a que el proceso anterior finalice... >> "%LOG_FILE%"
+set PID_FILE=%TEMP%\\hakkin_pid_%CURRENT_PID%_%RANDOM%.tmp
 set /a COUNT=0
 :wait_loop
-tasklist /fi "PID eq %CURRENT_PID%" 2>NUL | find /i "%CURRENT_PID%" >NUL
-if not errorlevel 1 (
-    timeout /t 1 /nobreak >NUL
+set PID_ALIVE=0
+tasklist /fi "PID eq %CURRENT_PID%" /fo csv /nh > "%PID_FILE%" 2>NUL
+for /f "usebackq tokens=2 delims=," %%A in ("%PID_FILE%") do (
+    if "%%~A"=="%CURRENT_PID%" set PID_ALIVE=1
+)
+if "!PID_ALIVE!"=="1" (
+    ping 127.0.0.1 -n 2 >NUL 2>&1
     set /a COUNT+=1
     if !COUNT! geq 35 (
         taskkill /f /pid %CURRENT_PID% >NUL 2>&1
@@ -569,6 +582,7 @@ if not errorlevel 1 (
     goto wait_loop
 )
 :proceed
+del /f /q "%PID_FILE%" 2>NUL
 
 echo Creando staging en %STAGING_DIR%... >> "%LOG_FILE%"
 mkdir "%STAGING_DIR%" 2>NUL
@@ -595,7 +609,7 @@ echo Iniciando nueva versión de HakkinLauncher... >> "%LOG_FILE%"
 $launchCmd
 if errorlevel 1 goto rollback
 
-timeout /t 3 /nobreak >NUL
+ping 127.0.0.1 -n 4 >NUL 2>&1
 rmdir /s /q "%BACKUP_DIR%" 2>NUL
 rmdir /s /q "%STAGING_DIR%" 2>NUL
 del /f /q "%ZIP_FILE%" 2>NUL

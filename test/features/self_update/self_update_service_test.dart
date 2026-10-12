@@ -156,6 +156,15 @@ void main() {
       expect(script, contains(r'xcopy "%BACKUP_DIR%" "%APP_DIR%\"'));
       // Launch app
       expect(script, contains('start "" "%CURRENT_EXE%"'));
+      // Consoleless-safe wait loop (no find /i pipe or timeout command)
+      expect(script, isNot(contains('find /i')));
+      expect(script, isNot(contains('timeout /t')));
+      expect(script, contains('tasklist /fi "PID eq %CURRENT_PID%" /fo csv /nh > "%PID_FILE%"'));
+      expect(script, contains('ping 127.0.0.1 -n 2 >NUL 2>&1'));
+
+      final psCmd = AppTechnicalStrings.powershellStartHiddenCmd(r'C:\Hakkin\Downloads\update_helper.bat');
+      expect(psCmd, contains("Start-Process -FilePath 'cmd'"));
+      expect(psCmd, contains('-WindowStyle Hidden'));
     });
 
     test('generateLinuxUpdateScript contains staging, backup, and rollback', () {
