@@ -637,6 +637,17 @@ class ManifestAdapter:
             if not download_url or not sha256 or len(sha256) != 64 or size_bytes <= 0:
                 continue
 
+            status = str(binary_info.get("status", "")).upper()
+            origin_release = binary_info.get("origin_release")
+            # Si el binario fue PRESERVADO de un release previo:
+            # Su versión real corresponde a origin_release, no a release_ver.
+            if status == "PRESERVED" and origin_release:
+                effective_ver = str(origin_release)
+            elif origin_release and str(origin_release) != str(release_ver):
+                effective_ver = str(origin_release)
+            else:
+                effective_ver = str(release_ver)
+
             candidate_keys = ManifestAdapter.PLATFORM_MAPPING.get(raw_plat.lower(), [raw_plat])
 
             for target_plat_key in candidate_keys:
@@ -644,9 +655,9 @@ class ManifestAdapter:
                     plat_info = supported_platforms[target_plat_key]
                     exe_rel = plat_info.get("entry_point") or plat_info.get("executable_relative_path", binary_info.get("filename", "app"))
                     v_entry = {
-                        "version": str(release_ver),
+                        "version": effective_ver,
                         "release_date": published_at,
-                        "changelog": format_changelog(f"Lanzamiento de {app_meta.get('title', 'app')} versión {release_ver}.", app_meta.get('title', 'app'), str(release_ver)),
+                        "changelog": format_changelog(f"Lanzamiento de {app_meta.get('title', 'app')} versión {effective_ver}.", app_meta.get('title', 'app'), effective_ver),
                         "entry_point": exe_rel,
                         "package": {
                             "url": download_url,
@@ -975,13 +986,19 @@ def generate_catalog(
                     v["version"]: v for v in existing_app["platforms"][plat_key].get("versions", [])
                 }
                 for v in versions_list:
-                    if not v.get("delta_patches") and v["version"] in existing_ver_map:
-                        raw_patches = existing_ver_map[v["version"]].get("delta_patches", [])
-                        valid_patches = [
-                            p for p in raw_patches
-                            if p.get("from_version") in valid_versions and p.get("from_version") != v["version"]
-                        ]
-                        v["delta_patches"] = valid_patches
+                    if v["version"] in existing_ver_map:
+                        old_meta = existing_ver_map[v["version"]]
+                        if not v.get("delta_patches"):
+                            raw_patches = old_meta.get("delta_patches", [])
+                            valid_patches = [
+                                p for p in raw_patches
+                                if p.get("from_version") in valid_versions and p.get("from_version") != v["version"]
+                            ]
+                            v["delta_patches"] = valid_patches
+                        if old_meta.get("release_date"):
+                            v["release_date"] = old_meta["release_date"]
+                        if old_meta.get("changelog") and not (old_meta["changelog"].startswith("Lanzamiento de") and not v.get("changelog", "").startswith("Lanzamiento de")):
+                            v["changelog"] = old_meta["changelog"]
 
             # Generate differential deltas for immediate predecessor V_{N-1} -> V_N
             if generate_deltas and DeltaGenerator and len(versions_list) >= 2:

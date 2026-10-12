@@ -24,7 +24,8 @@ from catalog_generator import (
     format_tags,
     format_description_markdown,
     format_changelog,
-    KNOWN_ASSET_CACHE
+    KNOWN_ASSET_CACHE,
+    ManifestAdapter
 )
 
 
@@ -338,6 +339,44 @@ class TestCatalogGenerator(unittest.TestCase):
             format_changelog("corrección de errores menores", "Fractochales", "3.27"),
             "Corrección de errores menores."
         )
+
+    def test_manifest_adapter_preserved_binary(self):
+        mock_manifest = {
+            "release_version": "26.10.11-19",
+            "published_at_utc": "2026-10-12T02:34:10.225247+00:00",
+            "binaries": {
+                "macos": {
+                    "filename": "tecate-macos.zip",
+                    "sha256": "6" * 64,
+                    "size_bytes": 1000000,
+                    "status": "UPDATED",
+                    "origin_release": "26.10.11-19",
+                    "download_url": "https://github.com/Bonsanbec/tecate-simulator/releases/download/26.10.11-19/tecate-macos.zip"
+                },
+                "windows": {
+                    "filename": "tecate-windows.zip",
+                    "sha256": "b" * 64,
+                    "size_bytes": 1000000,
+                    "status": "PRESERVED",
+                    "origin_release": "26.10.08-13",
+                    "download_url": "https://github.com/Bonsanbec/tecate-simulator/releases/download/26.10.08-13/tecate-windows.zip"
+                }
+            }
+        }
+        app_meta = {
+            "title": "Tecate Simulator",
+            "platforms": {
+                "macos-arm64": {"entry_point": "tecate.app"},
+                "windows-x64": {"entry_point": "tecate.exe"}
+            }
+        }
+        adapted = ManifestAdapter.adapt(mock_manifest, app_meta)
+        self.assertIn("macos-arm64", adapted)
+        self.assertIn("windows-x64", adapted)
+        # El binario actualizado toma la versión del nuevo release
+        self.assertEqual(adapted["macos-arm64"]["version"], "26.10.11-19")
+        # El binario preservado mantiene su origin_release y no suplanta versiones previas
+        self.assertEqual(adapted["windows-x64"]["version"], "26.10.08-13")
 
 
 if __name__ == "__main__":

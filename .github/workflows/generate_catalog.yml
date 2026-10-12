@@ -7,7 +7,7 @@ on:
         description: 'Generar también parches diferenciales HDiffPatch'
         type: boolean
         required: false
-        default: false
+        default: true
       deltas_repo:
         description: 'Repositorio satélite de deltas (solo si se activan deltas)'
         type: string
@@ -83,17 +83,16 @@ jobs:
 
       - name: Run Unit Tests for Catalog & Deltas
         run: |
+          python3 tools/test_delta_generator.py
           python3 tools/test_catalog_generator.py
-          if [ "${{ github.event.inputs.generate_deltas }}" = "true" ]; then
-            python3 tools/test_delta_generator.py
-          fi
 
       - name: Generate Catalog
         env:
           GITHUB_TOKEN: ${{ secrets.DELTAS_REPO_TOKEN || secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.DELTAS_REPO_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           EXTRA_ARGS=()
-          if [ "${{ github.event.inputs.generate_deltas }}" = "true" ]; then
+          if [ "${{ github.event.inputs.generate_deltas }}" = "true" ] || [ -z "${{ github.event.inputs.generate_deltas }}" ]; then
             EXTRA_ARGS+=("--generate-deltas")
             DELTAS_TARGET="${{ github.event.inputs.deltas_repo }}"
             if [ -z "$DELTAS_TARGET" ]; then
@@ -126,7 +125,11 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add docs/catalog.json
           if ! git diff --staged --quiet; then
-            git commit -m "chore(catalog): sincronizar catálogo [skip ci]"
+            COMMIT_MSG="chore(catalog): sincronizar catálogo [skip ci]"
+            if [ "${{ github.event.inputs.generate_deltas }}" = "true" ] || [ -z "${{ github.event.inputs.generate_deltas }}" ]; then
+              COMMIT_MSG="chore(catalog): sincronizar catálogo y parches diferenciales [skip ci]"
+            fi
+            git commit -m "$COMMIT_MSG"
             git push origin HEAD:${{ github.ref_name }}
             echo "✅ Catálogo actualizado y subido al repositorio."
           else

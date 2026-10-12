@@ -134,6 +134,11 @@ class TestDeltaGenerator(unittest.TestCase):
                 else:
                     os.environ.pop("HAKKIN_PKG_CACHE_DIR", None)
 
+    def test_publish_to_satellite_returns_false_on_error(self):
+        gen = DeltaGenerator(deltas_repo="InvalidOwner/invalid-repo-deltas", dry_run=False)
+        result = gen._publish_to_satellite("fake.1.0-to-2.0", "/non/existent/path.hdiff", "app", "1.0", "2.0")
+        self.assertFalse(result)
+
 
 if __name__ == "__main__":
     unittest.main()

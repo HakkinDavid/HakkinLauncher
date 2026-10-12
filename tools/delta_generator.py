@@ -141,13 +141,17 @@ class DeltaGenerator:
     def check_remote_release_exists(self, tag):
         """Consulta si el release ya existe en el repositorio satélite vía GitHub API pública."""
         url = f"https://api.github.com/repos/{self.deltas_repo}/releases/tags/{tag}"
+        token = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
+        headers = {
+            "User-Agent": "HakkinLauncher-DeltaGenerator/2.0",
+            "Accept": "application/vnd.github.v3+json"
+        }
+        if token:
+            headers["Authorization"] = f"Bearer {token}"
         try:
             req = urllib.request.Request(
                 url,
-                headers={
-                    "User-Agent": "HakkinLauncher-DeltaGenerator/2.0",
-                    "Accept": "application/vnd.github.v3+json"
-                }
+                headers=headers
             )
             with urllib.request.urlopen(req, timeout=5) as resp:
                 if resp.status == 200:
@@ -277,7 +281,10 @@ class DeltaGenerator:
 
             # Publicar al repositorio satélite si no estamos en dry-run
             if not self.dry_run:
-                self._publish_to_satellite(tag, patch_file, app_slug, from_release['version'], to_release['version'])
+                published = self._publish_to_satellite(tag, patch_file, app_slug, from_release['version'], to_release['version'])
+                if not published:
+                    print(f"  [Aviso] No se pudo publicar el diferencial en el repositorio satélite. Omitiendo delta patch en el catálogo.", file=sys.stderr)
+                    return None
 
             return {
                 "from_version": from_release["version"],
@@ -307,12 +314,17 @@ class DeltaGenerator:
             print(f"  [Aviso] GitHub CLI (gh) no encontrado en PATH. El archivo {os.path.basename(patch_file)} debe subirse manualmente al release {tag}.", file=sys.stderr)
             return False
 
+        # Asegurar que GH_TOKEN esté poblado si GITHUB_TOKEN existe
+        auth_env = os.environ.copy()
+        if "GITHUB_TOKEN" in auth_env and "GH_TOKEN" not in auth_env:
+            auth_env["GH_TOKEN"] = auth_env["GITHUB_TOKEN"]
+
         try:
             # 1. Intentar subir asset a release existente
             view_cmd = ["gh", "release", "view", tag, "--repo", self.deltas_repo]
-            if subprocess.run(view_cmd, capture_output=True).returncode == 0:
+            if subprocess.run(view_cmd, capture_output=True, env=auth_env).returncode == 0:
                 upload_cmd = ["gh", "release", "upload", tag, patch_file, "--repo", self.deltas_repo, "--clobber"]
-                res = subprocess.run(upload_cmd, capture_output=True, text=True)
+                res = subprocess.run(upload_cmd, capture_output=True, text=True, env=auth_env)
                 if res.returncode == 0:
                     print(f"  [GitHub Satélite] Asset subido a release existente: {tag}")
                     return True
@@ -324,12 +336,22 @@ class DeltaGenerator:
                 "--title", title,
                 "--notes", notes
             ]
-            res = subprocess.run(create_cmd, capture_output=True, text=True)
+            res = subprocess.run(create_cmd, capture_output=True, text=True, env=auth_env)
             if res.returncode == 0:
                 print(f"  [GitHub Satélite] Nuevo release creado con éxito: {tag}")
                 return True
             else:
-                print(f"  [Aviso] No se pudo crear release satélite {tag}: {res.stderr.strip()}", file=sys.stderr)
+                err_msg = res.stderr.strip()
+                if "Resource not accessible by integration" in err_msg or "403" in err_msg:
+                    print(
+                        f"  [Error de Permisos HTTP 403] No se pudo crear release satélite {tag} en '{self.deltas_repo}':\n"
+                        f"    El GITHUB_TOKEN estándar de GitHub Actions no tiene permisos de escritura en repositorios externos.\n"
+                        f"    Solución: Configura un Personal Access Token (PAT) con permisos de 'repo' en el secreto de repositorio\n"
+                        f"    'DELTAS_REPO_TOKEN' (o exporta GH_TOKEN/DELTAS_REPO_TOKEN).",
+                        file=sys.stderr
+                    )
+                else:
+                    print(f"  [Aviso] No se pudo crear release satélite {tag}: {err_msg}", file=sys.stderr)
                 return False
         except Exception as e:
             print(f"  [Aviso] Error invocando gh CLI: {e}", file=sys.stderr)
