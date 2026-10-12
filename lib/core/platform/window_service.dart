@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -60,27 +61,35 @@ class WindowService with WindowListener {
         minimumSize: const Size(AppConstants.windowMinWidth, AppConstants.windowMinHeight),
         center: true,
         backgroundColor: Colors.transparent,
-        skipTaskbar: startHidden && (Platform.isMacOS || Platform.isLinux),
+        skipTaskbar: startHidden,
         titleBarStyle: TitleBarStyle.normal,
         title: AppConstants.appName,
       );
 
+      final readyCompleter = Completer<void>();
       await windowManager.waitUntilReadyToShow(windowOptions, () async {
-        if (Platform.isWindows) {
-          try {
-            await windowManager.setIcon(AppConstants.appIconIcoPath);
-          } catch (e) {
-            debugPrint(AppStrings.logWindowIconError(e));
+        try {
+          if (Platform.isWindows) {
+            try {
+              await windowManager.setIcon(AppConstants.appIconIcoPath);
+            } catch (e) {
+              debugPrint(AppStrings.logWindowIconError(e));
+            }
+          }
+          if (startHidden) {
+            await instance.hideToTray();
+          } else {
+            instance._setHidden(false);
+            await windowManager.show();
+            await windowManager.focus();
+          }
+        } finally {
+          if (!readyCompleter.isCompleted) {
+            readyCompleter.complete();
           }
         }
-        if (startHidden) {
-          await instance.hideToTray();
-        } else {
-          instance._setHidden(false);
-          await windowManager.show();
-          await windowManager.focus();
-        }
       });
+      await readyCompleter.future;
 
       // Interceptar evento de cierre para permitir minimizar a la bandeja
       await windowManager.setPreventClose(true);
@@ -92,7 +101,7 @@ class WindowService with WindowListener {
   Future<void> hideToTray() async {
     _setHidden(true);
     await windowManager.hide();
-    if (Platform.isMacOS || Platform.isLinux) {
+    if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
       await windowManager.setSkipTaskbar(true);
     }
   }
@@ -100,7 +109,7 @@ class WindowService with WindowListener {
   /// Restaura la ventana desde la bandeja del sistema y devuelve el icono al Dock en macOS.
   Future<void> restoreWindow() async {
     _setHidden(false);
-    if (Platform.isMacOS || Platform.isLinux) {
+    if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
       await windowManager.setSkipTaskbar(false);
     }
     await windowManager.show();
