@@ -162,7 +162,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text(AppStrings.allUpToDateLong),
-              backgroundColor: AppColors.surfaceElevated,
+              backgroundColor: AppColors.platinumSheen,
               duration: Duration(seconds: 3),
             ),
           );
