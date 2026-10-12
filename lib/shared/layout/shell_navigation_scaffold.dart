@@ -29,6 +29,10 @@ class _ShellNavigationScaffoldState
   @override
   void initState() {
     super.initState();
+    BackgroundCheckService.instance.registerCatalogRefreshHandler(() {
+      if (!mounted) return;
+      ref.invalidate(catalogManifestProvider);
+    });
     BackgroundCheckService.instance.registerAutoUpdateHandler(
       (app, {targetVersion}) async {
         if (!mounted) return;

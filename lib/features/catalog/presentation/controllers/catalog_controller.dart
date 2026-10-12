@@ -11,7 +11,7 @@ final catalogRepositoryProvider = Provider<CatalogRepository>((ref) {
 final catalogManifestProvider =
     FutureProvider.autoDispose<CatalogManifest>((ref) async {
   final repo = ref.watch(catalogRepositoryProvider);
-  return repo.fetchCatalog();
+  return repo.fetchCatalog(forceRefresh: true);
 });
 
 /// Filtro de búsqueda por texto

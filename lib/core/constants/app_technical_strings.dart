@@ -34,7 +34,7 @@ class AppTechnicalStrings {
   static const hpatchzDownloadBaseUrl =
       'https://github.com/sisong/HDiffPatch/releases/download/$defaultHpatchzVersion';
 
-  static const backgroundCheckInterval = Duration(hours: 4);
+  static const backgroundCheckInterval = Duration(minutes: 15);
   static const startupAutoUpdateDelay = Duration(minutes: 5);
 
   // ---------------------------------------------------------------------------

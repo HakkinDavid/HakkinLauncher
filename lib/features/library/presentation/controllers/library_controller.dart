@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/constants/app_technical_strings.dart';
 import '../../../../core/crypto/hash_validator.dart';
+import '../../../../core/platform/background_check_service.dart';
 import '../../../../core/platform/process_launcher.dart';
 import '../../../catalog/presentation/controllers/catalog_controller.dart';
 import '../../data/models/installed_app.dart';
@@ -71,6 +72,9 @@ class InstalledAppsNotifier extends StateNotifier<AsyncValue<List<InstalledApp>>
       final updated = app.copyWith(autoUpdate: enabled);
       await _repo.saveInstalledApp(updated);
       await loadApps();
+      if (enabled && BackgroundCheckService.instance.isInitialDebounceCompleted) {
+        await BackgroundCheckService.instance.runAutoUpdates();
+      }
     }
   }
 

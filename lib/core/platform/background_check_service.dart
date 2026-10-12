@@ -28,10 +28,15 @@ class BackgroundCheckService {
   Timer? _timer;
   Timer? _autoUpdateDebounceTimer;
   bool _isRunningAutoUpdates = false;
+  bool _initialDebounceCompleted = false;
   AutoUpdateAppHandler? _onAutoUpdateApp;
+  VoidCallback? _onCatalogRefreshed;
 
   final CatalogRepository _catalogRepository = CatalogRepository();
   final LibraryRepository _libraryRepository = LibraryRepository();
+
+  /// Indica si ya transcurrió el tiempo de espera inicial tras el arranque.
+  bool get isInitialDebounceCompleted => _initialDebounceCompleted;
 
   /// Registra el manejador conectado al estado de la interfaz para reflejar el progreso
   /// y recargar la biblioteca tras completarse cada actualización automática.
@@ -39,30 +44,58 @@ class BackgroundCheckService {
     _onAutoUpdateApp = handler;
   }
 
-  /// Inicia el temporizador de sondeo periódico en segundo plano con comprobación automática inicial
-  /// y un debounce de 5 minutos tras el arranque para ejecutar las actualizaciones automáticas.
+  /// Registra el manejador para refrescar el catálogo reactivo en la interfaz
+  /// cada vez que el servicio en segundo plano obtiene una versión fresca del catálogo.
+  void registerCatalogRefreshHandler(VoidCallback handler) {
+    _onCatalogRefreshed = handler;
+  }
+
+  /// Refresca el catálogo desde el origen remoto y sincroniza el estado de la interfaz.
+  Future<CatalogManifest> refreshCatalog() async {
+    final manifest = await _catalogRepository.fetchCatalog(forceRefresh: true);
+    _onCatalogRefreshed?.call();
+    return manifest;
+  }
+
+  /// Inicia el temporizador de sondeo periódico en segundo plano con comprobación automática inicial,
+  /// un debounce de 5 minutos tras el arranque y ejecución periódica continua de refresco de catálogo
+  /// y actualizaciones automáticas.
   void startPeriodicChecks({
     Duration interval = AppConstants.backgroundCheckInterval,
     Duration autoUpdateDelay = AppConstants.startupAutoUpdateDelay,
   }) {
     _timer?.cancel();
     _autoUpdateDebounceTimer?.cancel();
+    _initialDebounceCompleted = false;
 
-    // Comprobación automática inmediata tras el arranque de la aplicación (3s de gracia)
+    // Comprobación y refresco inicial del catálogo tras el arranque de la aplicación (3s de gracia)
     Timer(const Duration(seconds: 3), () {
       checkForUpdates(silent: true);
     });
 
-    // Debounce de 5 minutos tras arrancar el lanzador para actualizar automáticamente
-    // todas las aplicaciones marcadas con actualización automática activa.
-    _autoUpdateDebounceTimer = Timer(autoUpdateDelay, () {
-      runAutoUpdates();
+    // Debounce de 5 minutos tras arrancar el lanzador para refrescar el catálogo y actualizar
+    // en automático todas las aplicaciones marcadas con actualización automática activa.
+    _autoUpdateDebounceTimer = Timer(autoUpdateDelay, () async {
+      _initialDebounceCompleted = true;
+      await _runPeriodicCatalogAndAutoUpdateCycle();
     });
 
-    _timer = Timer.periodic(interval, (_) {
-      checkForUpdates(silent: true);
-      runAutoUpdates();
+    // Ciclo periódico continuo de refresco del catálogo y actualización automática
+    _timer = Timer.periodic(interval, (_) async {
+      await _runPeriodicCatalogAndAutoUpdateCycle();
     });
+  }
+
+  /// Ejecuta un ciclo completo: refresca el catálogo remoto, comprueba actualizaciones
+  /// y actualiza automáticamente las aplicaciones que tengan activa la opción.
+  Future<void> _runPeriodicCatalogAndAutoUpdateCycle() async {
+    try {
+      final manifest = await refreshCatalog();
+      await checkForUpdates(silent: true, preloadedManifest: manifest);
+      await runAutoUpdates(preloadedManifest: manifest);
+    } catch (e) {
+      debugPrint(AppStrings.logAutoUpdateError(e));
+    }
   }
 
   /// Detiene los temporizadores en segundo plano.
@@ -75,12 +108,12 @@ class BackgroundCheckService {
 
   /// Actualiza automáticamente todas las aplicaciones instaladas que tengan
   /// activa la opción de actualización automática y cuenten con una versión nueva.
-  Future<void> runAutoUpdates() async {
+  Future<void> runAutoUpdates({CatalogManifest? preloadedManifest}) async {
     if (_isRunningAutoUpdates) return;
     _isRunningAutoUpdates = true;
 
     try {
-      final manifest = await _catalogRepository.fetchCatalog(forceRefresh: true);
+      final manifest = preloadedManifest ?? await refreshCatalog();
       final installedApps = await _libraryRepository.getInstalledApps();
 
       for (final installed in installedApps) {
@@ -144,12 +177,15 @@ class BackgroundCheckService {
   }
 
   /// Comprueba si hay actualizaciones disponibles para las aplicaciones instaladas
-  /// o para el lanzador.
-  Future<Map<String, String>> checkForUpdates({bool silent = false}) async {
+  /// o para el lanzador, refrescando primero el catálogo.
+  Future<Map<String, String>> checkForUpdates({
+    bool silent = false,
+    CatalogManifest? preloadedManifest,
+  }) async {
     final updatesFound = <String, String>{};
 
     try {
-      final manifest = await _catalogRepository.fetchCatalog(forceRefresh: true);
+      final manifest = preloadedManifest ?? await refreshCatalog();
       final installedApps = await _libraryRepository.getInstalledApps();
 
       for (final installed in installedApps) {
@@ -163,11 +199,16 @@ class BackgroundCheckService {
             installedVersion: installed.installedVersion,
           );
           if (hasUpdate) {
-            updatesFound[installed.title] = catalogApp.latestVersion;
-            if (silent) {
+            final latestVersion =
+                catalogApp.getPlatformRelease(targetPlatKey)?.latestVersion ??
+                    catalogApp.latestVersion;
+            updatesFound[installed.title] = latestVersion;
+            final willAutoUpdateImmediately =
+                _initialDebounceCompleted && installed.autoUpdate;
+            if (silent && !willAutoUpdateImmediately) {
               await NotificationService.notifyUpdateAvailable(
                 installed.title,
-                catalogApp.latestVersion,
+                latestVersion,
               );
             }
           }
