@@ -1029,24 +1029,20 @@ def generate_catalog(
                         for d in target_ver.get("delta_patches", [])
                     )
                     if not has_delta:
-                        tag = format_delta_tag(meta["slug"], source_ver["version"], target_ver["version"])
-                        # Generar si es el salto a la versión más reciente (idx == 0)
-                        # o si el delta ya existe en el release satélite remoto
-                        if idx == 0 or d_gen.check_remote_release_exists(tag):
-                            print(f"  [Delta Worker] Procesando diferencial para {meta['slug']} ({plat_key}): v{source_ver['version']} -> v{target_ver['version']}...")
-                            patch_entry = d_gen.generate_delta_patch(
-                                app_slug=meta["slug"],
-                                platform_key=plat_key,
-                                from_release=source_ver,
-                                to_release=target_ver
-                            )
-                            if patch_entry:
-                                if "delta_patches" not in target_ver:
-                                    target_ver["delta_patches"] = []
-                                target_ver["delta_patches"] = [
-                                    d for d in target_ver["delta_patches"] if d.get("from_version") != source_ver["version"]
-                                ]
-                                target_ver["delta_patches"].append(patch_entry)
+                        print(f"  [Delta Worker] Procesando diferencial para {meta['slug']} ({plat_key}): v{source_ver['version']} -> v{target_ver['version']}...")
+                        patch_entry = d_gen.generate_delta_patch(
+                            app_slug=meta["slug"],
+                            platform_key=plat_key,
+                            from_release=source_ver,
+                            to_release=target_ver
+                        )
+                        if patch_entry:
+                            if "delta_patches" not in target_ver:
+                                target_ver["delta_patches"] = []
+                            target_ver["delta_patches"] = [
+                                d for d in target_ver["delta_patches"] if d.get("from_version") != source_ver["version"]
+                            ]
+                            target_ver["delta_patches"].append(patch_entry)
 
             platforms_dict[plat_key] = {
                 "latest_version": plat_latest_version,
@@ -1255,48 +1251,49 @@ def verify_catalog_deltas(manifest, strict=False):
             if len(versions) < 2:
                 continue
 
-            target_ver = versions[0]
-            source_ver = versions[1]
-            target_v_str = target_ver.get("version")
-            source_v_str = source_ver.get("version")
+            for idx in range(len(versions) - 1):
+                target_ver = versions[idx]
+                source_ver = versions[idx + 1]
+                target_v_str = target_ver.get("version")
+                source_v_str = source_ver.get("version")
 
-            if target_ver.get("package", {}).get("url") == source_ver.get("package", {}).get("url"):
-                continue
+                if target_ver.get("package", {}).get("url") == source_ver.get("package", {}).get("url"):
+                    continue
 
-            matching_deltas = [
-                d for d in target_ver.get("delta_patches", [])
-                if d.get("from_version") == source_v_str
-            ]
+                matching_deltas = [
+                    d for d in target_ver.get("delta_patches", [])
+                    if d.get("from_version") == source_v_str
+                ]
 
-            if not matching_deltas:
-                missing_jumps.append(f"{slug} ({plat_key}): v{source_v_str} -> v{target_v_str} no tiene parche delta registrado.")
-                continue
+                if not matching_deltas:
+                    missing_jumps.append(f"{slug} ({plat_key}): v{source_v_str} -> v{target_v_str} no tiene parche delta registrado.")
+                    continue
 
-            for delta in matching_deltas:
-                p_format = delta.get("patch_format")
-                p_url = delta.get("url", "")
-                p_sha = delta.get("patch_sha256", "")
-                t_sha = delta.get("target_sha256", "")
-                p_size = delta.get("size_bytes", 0)
+                for delta in matching_deltas:
+                    p_format = delta.get("patch_format")
+                    p_url = delta.get("url", "")
+                    p_sha = delta.get("patch_sha256", "")
+                    t_sha = delta.get("target_sha256", "")
+                    p_size = delta.get("size_bytes", 0)
 
-                field_issues = []
-                if p_format != "hdiff":
-                    field_issues.append(f"formato '{p_format}' != 'hdiff'")
-                if not p_url.startswith("https://"):
-                    field_issues.append(f"URL inválida '{p_url}'")
-                if len(p_sha) != 64:
-                    field_issues.append(f"patch_sha256 inválido (longitud {len(p_sha)})")
-                if len(t_sha) != 64:
-                    field_issues.append(f"target_sha256 inválido (longitud {len(t_sha)})")
-                if p_size <= 0:
-                    field_issues.append(f"tamaño no positivo ({p_size} bytes)")
+                    field_issues = []
+                    if p_format != "hdiff":
+                        field_issues.append(f"formato '{p_format}' != 'hdiff'")
+                    if not p_url.startswith("https://"):
+                        field_issues.append(f"URL inválida '{p_url}'")
+                    if len(p_sha) != 64:
+                        field_issues.append(f"patch_sha256 inválido (longitud {len(p_sha)})")
+                    if len(t_sha) != 64:
+                        field_issues.append(f"target_sha256 inválido (longitud {len(t_sha)})")
+                    if p_size <= 0:
+                        field_issues.append(f"tamaño no positivo ({p_size} bytes)")
 
-                if field_issues:
-                    errors.append(f"{slug} ({plat_key}) v{source_v_str} -> v{target_v_str}: {', '.join(field_issues)}")
-                else:
-                    verified_jumps.append(
-                        f"{slug} ({plat_key}): v{source_v_str} -> v{target_v_str} [hdiff, {p_size:,} bytes, sha256:{p_sha[:8]}...]"
-                    )
+                    if field_issues:
+                        errors.append(f"{slug} ({plat_key}) v{source_v_str} -> v{target_v_str}: {', '.join(field_issues)}")
+                    else:
+                        verified_jumps.append(
+                            f"{slug} ({plat_key}): v{source_v_str} -> v{target_v_str} [hdiff, {p_size:,} bytes, sha256:{p_sha[:8]}...]"
+                        )
 
     print(f"✅ Saltos con delta verificado ({len(verified_jumps)}):")
     for vj in verified_jumps:
