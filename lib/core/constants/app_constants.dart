@@ -23,6 +23,8 @@ class AppConstants {
   static const String prefCustomInstallPathKey =
       AppTechnicalStrings.prefCustomInstallPathKey;
   static const String prefCloseToTrayKey = AppTechnicalStrings.prefCloseToTrayKey;
+  static const String prefLaunchAtStartupKey =
+      AppTechnicalStrings.prefLaunchAtStartupKey;
   static const String prefAutoCheckUpdatesKey =
       AppTechnicalStrings.prefAutoCheckUpdatesKey;
   static const String prefCachedCatalogJson =

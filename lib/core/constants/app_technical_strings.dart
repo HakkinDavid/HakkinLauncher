@@ -42,6 +42,7 @@ class AppTechnicalStrings {
   static const prefCatalogUrlKey = 'hakkin_catalog_url';
   static const prefCustomInstallPathKey = 'hakkin_install_path';
   static const prefCloseToTrayKey = 'hakkin_close_to_tray';
+  static const prefLaunchAtStartupKey = 'hakkin_launch_at_startup';
   static const prefAutoCheckUpdatesKey = 'hakkin_auto_check_updates';
   static const prefCachedCatalogJson = 'hakkin_cached_catalog_json';
   static const prefInstalledAppsJson = 'hakkin_installed_apps_json';
@@ -95,12 +96,19 @@ class AppTechnicalStrings {
   static const dirStartMenuLegacyHakkin =
       'Microsoft/Windows/Start Menu/Programs/Hakkin';
   static const dirStartMenuPrograms = 'Microsoft/Windows/Start Menu/Programs';
+  static const dirWindowsStartup =
+      'Microsoft/Windows/Start Menu/Programs/Startup';
+  static const dirMacOsLaunchAgents = 'Library/LaunchAgents';
   static const dirLinuxApps = '.local/share/applications';
+  static const dirLinuxAutostart = '.config/autostart';
   static const dirApplicationsSystem = '/Applications';
   static const dirApplicationsUser = 'Applications';
   static const dirVolumes = '/Volumes';
   static const dirDownloadsSystem = 'Downloads';
   static const parentDir = '..';
+
+  static const fileMacOsLaunchAgentPlist = 'dev.bonsanbec.hakkinlauncher.plist';
+  static const fileLinuxAutostartDesktop = 'hakkin_launcher.desktop';
 
   static const extExe = '.exe';
   static const extZip = '.zip';
@@ -156,6 +164,9 @@ class AppTechnicalStrings {
   static const binBash = '/bin/bash';
   static const cmdWhere = 'where';
   static const cmdWhich = 'which';
+  static const cmdReg = 'reg';
+  static const winRegistryRunKey =
+      r'HKCU\Software\Microsoft\Windows\CurrentVersion\Run';
 
   static const argPlusX = '+x';
   static const argMinusCr = '-cr';
@@ -183,6 +194,13 @@ class AppTechnicalStrings {
   static const argSlashF = '/F';
   static const argSlashPid = '/PID';
   static const argSlashC = '/c';
+  static const argAdd = 'add';
+  static const argDelete = 'delete';
+  static const argQuery = 'query';
+  static const argSlashV = '/v';
+  static const argSlashT = '/t';
+  static const argRegSz = 'REG_SZ';
+  static const argSlashD = '/d';
   static const argExecutionPolicy = '-ExecutionPolicy';
   static const argBypass = 'Bypass';
   static const argMinusFile = '-File';
@@ -690,6 +708,48 @@ Path=$workingDir
 $iconLine
 Terminal=false
 Categories=Game;Utility;
+''';
+  }
+
+  static String quotedPath(String path) => '"$path"';
+
+  static String generateMacOsLaunchAgentPlist({
+    required String label,
+    required String executablePath,
+  }) {
+    return '''<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>$label</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>$executablePath</string>
+  </array>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <false/>
+  <key>ProcessType</key>
+  <string>Interactive</string>
+</dict>
+</plist>
+''';
+  }
+
+  static String generateLinuxAutostartDesktopEntry({
+    required String appTitle,
+    required String executablePath,
+    required String workingDir,
+  }) {
+    return '''[Desktop Entry]
+Type=Application
+Name=$appTitle
+Exec="$executablePath"
+Path=$workingDir
+Terminal=false
+X-GNOME-Autostart-enabled=true
 ''';
   }
 

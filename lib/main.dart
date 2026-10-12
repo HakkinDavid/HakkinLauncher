@@ -8,6 +8,7 @@ import 'core/housekeeping/cleaner_service.dart';
 import 'core/platform/background_check_service.dart';
 import 'core/platform/component_manager.dart';
 import 'core/platform/notification_service.dart';
+import 'core/platform/startup_service.dart';
 import 'core/platform/tray_service.dart';
 import 'core/platform/window_service.dart';
 
@@ -19,6 +20,7 @@ void main() async {
     try {
       await NotificationService.initialize();
       await WindowService.initialize();
+      await StartupService.initialize();
       await TrayService.initialize(
         onCheckUpdates: () => BackgroundCheckService.instance.checkForUpdates(silent: false),
       );

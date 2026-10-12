@@ -195,6 +195,10 @@ class AppStrings {
   static const backgroundAndUpdatesTitle = 'Sistema';
   static const backgroundAndUpdatesDescription =
       'Comportamiento de la ventana y actualizaciones.';
+  static const launchAtStartupTitle =
+      'Ejecutar al arranque del sistema';
+  static const launchAtStartupSubtitle =
+      'Inicia el lanzador automáticamente al encender el equipo.';
   static const minimizeToTrayTitle =
       'Mantener activo al cerrar la ventana';
   static const minimizeToTraySubtitle =
@@ -456,6 +460,8 @@ class AppStrings {
       'Error al abrir el selector de carpetas: $error.';
   static String logOpenDirectoryError(Object error) =>
       'Error al abrir la carpeta en el sistema: $error.';
+  static String logStartupServiceError(Object error) =>
+      'Aviso al configurar el inicio automático del sistema: $error.';
 
   // ---------------------------------------------------------------------------
   // macOS Relocation Service

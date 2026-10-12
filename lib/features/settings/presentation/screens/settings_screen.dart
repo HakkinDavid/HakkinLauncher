@@ -6,6 +6,7 @@ import 'package:hakkin_launcher/core/constants/app_technical_strings.dart';
 import 'package:hakkin_launcher/core/housekeeping/cleaner_service.dart';
 import 'package:hakkin_launcher/core/platform/background_check_service.dart';
 import 'package:hakkin_launcher/core/platform/os_paths.dart';
+import 'package:hakkin_launcher/core/platform/startup_service.dart';
 import 'package:hakkin_launcher/core/platform/window_service.dart';
 import 'package:hakkin_launcher/core/theme/app_colors.dart';
 import 'package:hakkin_launcher/features/catalog/presentation/controllers/catalog_controller.dart';
@@ -23,6 +24,7 @@ class SettingsScreen extends ConsumerStatefulWidget {
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   String _installPath = AppTechnicalStrings.empty;
+  bool _launchAtStartup = true;
   bool _closeToTray = true;
   String _baseDir = AppTechnicalStrings.empty;
   int _deletedFiles = -1;
@@ -39,6 +41,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
     var customPath = prefs.getString(AppConstants.prefCustomInstallPathKey) ?? AppTechnicalStrings.empty;
+    final launchAtStartup = prefs.getBool(AppConstants.prefLaunchAtStartupKey) ?? true;
     final closeToTray = prefs.getBool(AppConstants.prefCloseToTrayKey) ?? true;
     final baseDir = await OsPaths.getAppBaseDirectory();
     final defaultAppsDir = await OsPaths.getDefaultAppsInstallDirectory();
@@ -57,6 +60,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     if (mounted) {
       setState(() {
         _installPath = customPath.isNotEmpty ? customPath : defaultAppsDir.path;
+        _launchAtStartup = launchAtStartup;
         _closeToTray = closeToTray;
         _baseDir = baseDir.path;
       });
@@ -368,6 +372,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               description: AppStrings.backgroundAndUpdatesDescription,
               child: Column(
                 children: [
+                  SwitchListTile(
+                    value: _launchAtStartup,
+                    contentPadding: EdgeInsets.zero,
+                    activeThumbColor: AppColors.celestialBlue,
+                    title: const Text(
+                      AppStrings.launchAtStartupTitle,
+                      style: TextStyle(color: AppColors.platinum, fontSize: 14),
+                    ),
+                    subtitle: const Text(
+                      AppStrings.launchAtStartupSubtitle,
+                      style: TextStyle(color: AppColors.platinumMuted, fontSize: 12),
+                    ),
+                    onChanged: (val) async {
+                      setState(() => _launchAtStartup = val);
+                      final prefs = await SharedPreferences.getInstance();
+                      await prefs.setBool(AppConstants.prefLaunchAtStartupKey, val);
+                      await StartupService.setLaunchAtStartup(val);
+                    },
+                  ),
                   SwitchListTile(
                     value: _closeToTray,
                     contentPadding: EdgeInsets.zero,
