@@ -1,49 +1,49 @@
 {
   "version": "2.0.0",
-  "catalog_timestamp": "2026-10-12T05:04:55.796024+00:00",
+  "catalog_timestamp": "2026-10-12T06:12:03.279841+00:00",
   "launcher_meta": {
-    "latest_version": "26.10.11-09",
+    "latest_version": "26.10.12-06",
     "min_required_launcher_version": "1.0.0",
     "installers": {
       "windows-x64": {
         "format": "msi",
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.11-09/HakkinLauncher-windows-x64.msi",
-        "sha256": "a8489da2d7f49ba839bf5b925df2d87182e80b4040c495e36acd9e5565ad18dc",
-        "size_bytes": 13258752
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.12-06/HakkinLauncher-windows-x64.msi",
+        "sha256": "dfa94f2183ba4f30c03ec830ae8977b2eefcdd18c33fa74cef806d9e2b9c8c53",
+        "size_bytes": 13287424
       },
       "macos": {
         "format": "dmg",
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.11-09/HakkinLauncher-macos.dmg",
-        "sha256": "1f4343aa5bc096cb9d20598e4124d5011caab6fb5d521bd04653cf16e337b7d8",
-        "size_bytes": 12763607
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.12-06/HakkinLauncher-macos.dmg",
+        "sha256": "10da5beda13298175121959a0a4933d9c6980430cdcda400f6fadcea5a7d1711",
+        "size_bytes": 12799909
       },
       "linux-x64": {
         "format": "deb",
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.11-09/HakkinLauncher-linux-amd64.deb",
-        "sha256": "fd70a40a9b727752e0e23bfb76725809ab697769cda2158acfc879a1a0e059c6",
-        "size_bytes": 8795922
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.12-06/HakkinLauncher-linux-amd64.deb",
+        "sha256": "b08390a3e511c961390840619c82680cf5b8eb9a2a380ab39a328373a5e3c0c9",
+        "size_bytes": 8819308
       }
     },
     "releases": {
       "linux-x64": {
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.11-09/HakkinLauncher-linux-x64.zip",
-        "sha256": "5d261d976b008c9d0823f5a268dc52cbe8e364db456f472f3c1a3797dae72f17",
-        "size_bytes": 10905500
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.12-06/HakkinLauncher-linux-x64.zip",
+        "sha256": "d9d6d49e5de23ab3e6608c826531e5b56dd5e93a7dcb212373d80804deae0fc2",
+        "size_bytes": 10936122
       },
       "macos-arm64": {
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.11-09/HakkinLauncher-macos-arm64.zip",
-        "sha256": "440ea00c126310e1ddd2296434df8eb9949443fd32d47ffb4df4beeb1546bf36",
-        "size_bytes": 11619047
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.12-06/HakkinLauncher-macos-arm64.zip",
+        "sha256": "965c657cd97ce512fee710a1201a5be1e20a45be8f9b9eb9a0c39abf7a32ead3",
+        "size_bytes": 11652161
       },
       "macos-x64": {
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.11-09/HakkinLauncher-macos-x64.zip",
-        "sha256": "91902e928e1df6f174ca118e67cdb000da99f4348a4863c60295c5fc55a56d54",
-        "size_bytes": 11619047
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.12-06/HakkinLauncher-macos-x64.zip",
+        "sha256": "c61c423ae78e718ed52a40072d89cd645ec89c77acada494aaffa7cce109ced8",
+        "size_bytes": 11652161
       },
       "windows-x64": {
-        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.11-09/HakkinLauncher-windows-x64.zip",
-        "sha256": "cb3f435b44747e0256d217efb38ec9173f222826d6723b7188ffa26c27fc47df",
-        "size_bytes": 12738195
+        "url": "https://github.com/HakkinDavid/HakkinLauncher/releases/download/26.10.12-06/HakkinLauncher-windows-x64.zip",
+        "sha256": "a0bbfa1504e8cbeb0b8e874033e7f1c84e3f3f0d124f213c96ba599dfb0aa0a9",
+        "size_bytes": 12765046
       }
     }
   },
@@ -72,12 +72,28 @@
           "https://raw.githubusercontent.com/Bonsanbec/tecate-simulator/master/godot_project/branding/icon.png"
         ]
       },
-      "latest_version": "26.10.11-20",
+      "latest_version": "26.10.11-23",
       "platforms": {
         "windows-x64": {
-          "latest_version": "26.10.11-20",
+          "latest_version": "26.10.11-23",
           "protected_user_paths": [],
           "versions": [
+            {
+              "version": "26.10.11-23",
+              "release_date": "2026-10-12T06:02:40.970660+00:00",
+              "changelog": "Lanzamiento de Tecate Simulator versión 26.10.11-23.",
+              "entry_point": "tecate.exe",
+              "package": {
+                "url": "https://github.com/Bonsanbec/tecate-simulator/releases/download/26.10.11-23/tecate-windows.zip",
+                "size_bytes": 1084918984,
+                "sha256": "7601668b5bae56755249de9e2feae4991e1db0cabb4e7a46f96cf9d8f18a7b19"
+              },
+              "delta_patches": [],
+              "scripts": {
+                "pre_install": null,
+                "post_install": null
+              }
+            },
             {
               "version": "26.10.11-20",
               "release_date": "2026-10-12T03:21:40Z",
@@ -149,9 +165,25 @@
           ]
         },
         "macos-arm64": {
-          "latest_version": "26.10.11-20",
+          "latest_version": "26.10.11-23",
           "protected_user_paths": [],
           "versions": [
+            {
+              "version": "26.10.11-23",
+              "release_date": "2026-10-12T06:02:40.970660+00:00",
+              "changelog": "Lanzamiento de Tecate Simulator versión 26.10.11-23.",
+              "entry_point": "tecate.app",
+              "package": {
+                "url": "https://github.com/Bonsanbec/tecate-simulator/releases/download/26.10.11-23/tecate-macos.zip",
+                "size_bytes": 1111812261,
+                "sha256": "8522e729da6e75bc25d01d3c277e6818aa70b661265f65b8cf8edd07282ebb8b"
+              },
+              "delta_patches": [],
+              "scripts": {
+                "pre_install": null,
+                "post_install": null
+              }
+            },
             {
               "version": "26.10.11-20",
               "release_date": "2026-10-12T03:21:40Z",
