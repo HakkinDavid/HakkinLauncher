@@ -10,6 +10,21 @@ import '../constants/app_technical_strings.dart';
 class StartupService {
   StartupService._();
 
+  /// Determina si la instancia actual fue iniciada automáticamente por el arranque del sistema.
+  static bool isLaunchedFromStartup([List<String> args = const []]) {
+    if (args.contains(AppTechnicalStrings.argStartup)) {
+      return true;
+    }
+    if (Platform.executableArguments.contains(AppTechnicalStrings.argStartup)) {
+      return true;
+    }
+    if (Platform.environment[AppTechnicalStrings.envHakkinStartup] ==
+        AppTechnicalStrings.valStartupActive) {
+      return true;
+    }
+    return false;
+  }
+
   /// Inicializa el estado de arranque del sistema, activándolo por defecto si no se ha configurado.
   static Future<void> initialize() async {
     if (!Platform.isWindows && !Platform.isMacOS && !Platform.isLinux) {
@@ -89,7 +104,7 @@ class StartupService {
               AppTechnicalStrings.argSlashT,
               AppTechnicalStrings.argRegSz,
               AppTechnicalStrings.argSlashD,
-              AppTechnicalStrings.quotedPath(executablePath),
+              AppTechnicalStrings.windowsStartupCommand(executablePath),
               AppTechnicalStrings.argSlashF,
             ],
           );

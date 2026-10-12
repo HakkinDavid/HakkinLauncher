@@ -12,14 +12,15 @@ import 'core/platform/startup_service.dart';
 import 'core/platform/tray_service.dart';
 import 'core/platform/window_service.dart';
 
-void main() async {
+void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Inicialización de servicios de escritorio
   if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
     try {
+      final startHidden = StartupService.isLaunchedFromStartup(args);
       await NotificationService.initialize();
-      await WindowService.initialize();
+      await WindowService.initialize(startHidden: startHidden);
       await StartupService.initialize();
       await TrayService.initialize(
         onCheckUpdates: () => BackgroundCheckService.instance.checkForUpdates(silent: false),

@@ -29,14 +29,29 @@ void main() {
       expect(defaultValue, isTrue);
     });
 
-    test('Genera correctamente plantillas de arranque para macOS y Linux', () {
+    test('Detecta correctamente si fue iniciado automáticamente mediante --startup', () {
+      expect(StartupService.isLaunchedFromStartup([]), isFalse);
+      expect(
+        StartupService.isLaunchedFromStartup([AppTechnicalStrings.argStartup]),
+        isTrue,
+      );
+    });
+
+    test('Genera correctamente plantillas de arranque para macOS, Windows y Linux con flag de inicio oculto', () {
       final plist = AppTechnicalStrings.generateMacOsLaunchAgentPlist(
         label: AppTechnicalStrings.launcherId1,
         executablePath: '/Applications/HakkinLauncher.app/Contents/MacOS/hakkin_launcher',
       );
       expect(plist, contains(AppTechnicalStrings.launcherId1));
+      expect(plist, contains('<string>${AppTechnicalStrings.argStartup}</string>'));
+      expect(plist, contains('<key>${AppTechnicalStrings.envHakkinStartup}</key>'));
       expect(plist, contains('<key>RunAtLoad</key>'));
       expect(plist, contains('<true/>'));
+
+      final winCmd = AppTechnicalStrings.windowsStartupCommand(
+        r'C:\Program Files\HakkinLauncher\HakkinLauncher.exe',
+      );
+      expect(winCmd, contains(AppTechnicalStrings.argStartup));
 
       final desktopEntry = AppTechnicalStrings.generateLinuxAutostartDesktopEntry(
         appTitle: AppConstants.appName,
@@ -44,6 +59,10 @@ void main() {
         workingDir: '/opt/hakkin_launcher',
       );
       expect(desktopEntry, contains('Name=HakkinLauncher'));
+      expect(
+        desktopEntry,
+        contains('Exec="/opt/hakkin_launcher/hakkin_launcher" ${AppTechnicalStrings.argStartup}'),
+      );
       expect(desktopEntry, contains('X-GNOME-Autostart-enabled=true'));
     });
 

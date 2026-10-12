@@ -19,7 +19,7 @@ class WindowService with WindowListener {
   bool get closeToTray => _closeToTray;
 
   /// Inicializa la ventana de escritorio.
-  static Future<void> initialize() async {
+  static Future<void> initialize({bool startHidden = false}) async {
     if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
       await windowManager.ensureInitialized();
 
@@ -30,12 +30,12 @@ class WindowService with WindowListener {
         debugPrint(AppStrings.logCloseToTrayPrefError(e));
       }
 
-      const windowOptions = WindowOptions(
-        size: Size(1280, 800),
-        minimumSize: Size(AppConstants.windowMinWidth, AppConstants.windowMinHeight),
+      final windowOptions = WindowOptions(
+        size: const Size(1280, 800),
+        minimumSize: const Size(AppConstants.windowMinWidth, AppConstants.windowMinHeight),
         center: true,
         backgroundColor: Colors.transparent,
-        skipTaskbar: false,
+        skipTaskbar: startHidden && Platform.isMacOS,
         titleBarStyle: TitleBarStyle.normal,
         title: AppConstants.appName,
       );
@@ -48,8 +48,12 @@ class WindowService with WindowListener {
             debugPrint(AppStrings.logWindowIconError(e));
           }
         }
-        await windowManager.show();
-        await windowManager.focus();
+        if (startHidden) {
+          await instance.hideToTray();
+        } else {
+          await windowManager.show();
+          await windowManager.focus();
+        }
       });
 
       // Interceptar evento de cierre para permitir minimizar a la bandeja
