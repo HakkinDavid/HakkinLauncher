@@ -34,6 +34,8 @@ class AppConstants {
 
   static const Duration backgroundCheckInterval =
       AppTechnicalStrings.backgroundCheckInterval;
+  static const Duration startupAutoUpdateDelay =
+      AppTechnicalStrings.startupAutoUpdateDelay;
 
   static const double windowMinWidth = 1080;
   static const double windowMinHeight = 680;

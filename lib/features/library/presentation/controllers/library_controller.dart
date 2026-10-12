@@ -65,6 +65,15 @@ class InstalledAppsNotifier extends StateNotifier<AsyncValue<List<InstalledApp>>
     }
   }
 
+  Future<void> setAutoUpdate(String id, bool enabled) async {
+    final app = await _repo.getInstalledApp(id);
+    if (app != null) {
+      final updated = app.copyWith(autoUpdate: enabled);
+      await _repo.saveInstalledApp(updated);
+      await loadApps();
+    }
+  }
+
   /// Verifica la integridad de la aplicación instalada.
   Future<Map<String, dynamic>> verifyAppIntegrity(String id) async {
     final app = await _repo.getInstalledApp(id);

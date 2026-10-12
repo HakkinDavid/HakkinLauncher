@@ -5,9 +5,11 @@ import 'package:hakkin_launcher/core/constants/app_constants.dart';
 import 'package:hakkin_launcher/core/constants/app_strings.dart';
 import 'package:hakkin_launcher/core/constants/app_technical_strings.dart';
 import 'package:hakkin_launcher/core/theme/app_colors.dart';
+import 'package:hakkin_launcher/core/platform/background_check_service.dart';
 import 'package:hakkin_launcher/core/platform/macos_relocation_service.dart';
 import 'package:hakkin_launcher/features/catalog/presentation/controllers/catalog_controller.dart';
 import 'package:hakkin_launcher/features/self_update/services/self_update_service.dart';
+import 'package:hakkin_launcher/features/updater/presentation/controllers/update_controller.dart';
 
 class ShellNavigationScaffold extends ConsumerStatefulWidget {
   final Widget child;
@@ -27,6 +29,15 @@ class _ShellNavigationScaffoldState
   @override
   void initState() {
     super.initState();
+    BackgroundCheckService.instance.registerAutoUpdateHandler(
+      (app, {targetVersion}) async {
+        if (!mounted) return;
+        await ref.read(updateProgressProvider.notifier).startInstallOrUpdate(
+              app,
+              targetVersion: targetVersion,
+            );
+      },
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         MacOsRelocationService.checkAndRelocateIfNecessary(context);

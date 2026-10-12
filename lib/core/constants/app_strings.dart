@@ -101,6 +101,7 @@ class AppStrings {
   static const emptyLibrarySubtitle =
       'Explora la tienda para instalar aplicaciones.';
   static const manageVersions = 'Ir a la página de la tienda';
+  static const autoUpdate = 'Actualización automática';
   static const launchArguments = 'Argumentos de inicio';
   static const createDesktopShortcut = 'Crear acceso directo en el escritorio';
   static const addToStartMenu = 'Añadir al menú de aplicaciones';
@@ -462,6 +463,10 @@ class AppStrings {
       'Error al abrir la carpeta en el sistema: $error.';
   static String logStartupServiceError(Object error) =>
       'Aviso al configurar el inicio automático del sistema: $error.';
+  static String logAutoUpdateStarting(String title, String version) =>
+      'Iniciando actualización automática de $title a v$version.';
+  static String logAutoUpdateError(Object error) =>
+      'Error en actualización automática: $error.';
 
   // ---------------------------------------------------------------------------
   // macOS Relocation Service

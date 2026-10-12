@@ -35,6 +35,7 @@ class AppTechnicalStrings {
       'https://github.com/sisong/HDiffPatch/releases/download/$defaultHpatchzVersion';
 
   static const backgroundCheckInterval = Duration(hours: 4);
+  static const startupAutoUpdateDelay = Duration(minutes: 5);
 
   // ---------------------------------------------------------------------------
   // SharedPreferences Keys
@@ -184,6 +185,7 @@ class AppTechnicalStrings {
   static const argMinusNine = '-9';
   static const argForce = '--force';
   static const argDeep = '--deep';
+  static const argStartup = '--startup';
   static const argFileSelection = '--file-selection';
   static const argDirectory = '--directory';
   static const argGetExistingDirectory = '--getexistingdirectory';
@@ -282,6 +284,7 @@ class AppTechnicalStrings {
   static const keyLastLaunchedAt = 'last_launched_at';
   static const keyPlatformKey = 'platform_key';
   static const keyLaunchArguments = 'launch_arguments';
+  static const keyAutoUpdate = 'auto_update';
   static const keyIsValid = 'isValid';
   static const keyMessage = 'message';
   static const keyIsAnomalous = 'isAnomalous';
@@ -315,6 +318,7 @@ class AppTechnicalStrings {
   // Popup Menu Values
   // ---------------------------------------------------------------------------
   static const menuValueVersions = 'versions';
+  static const menuValueAutoUpdate = 'auto_update';
   static const menuValueArgs = 'args';
   static const menuValueShortcut = 'shortcut';
   static const menuValueStartMenu = 'startmenu';
@@ -713,6 +717,12 @@ Categories=Game;Utility;
 
   static String quotedPath(String path) => '"$path"';
 
+  static String windowsStartupCommand(String executablePath) =>
+      '"$executablePath" $argStartup';
+
+  static const envHakkinStartup = 'HAKKIN_STARTUP';
+  static const valStartupActive = '1';
+
   static String generateMacOsLaunchAgentPlist({
     required String label,
     required String executablePath,
@@ -726,7 +736,13 @@ Categories=Game;Utility;
   <key>ProgramArguments</key>
   <array>
     <string>$executablePath</string>
+    <string>$argStartup</string>
   </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>$envHakkinStartup</key>
+    <string>$valStartupActive</string>
+  </dict>
   <key>RunAtLoad</key>
   <true/>
   <key>KeepAlive</key>
@@ -746,7 +762,7 @@ Categories=Game;Utility;
     return '''[Desktop Entry]
 Type=Application
 Name=$appTitle
-Exec="$executablePath"
+Exec="$executablePath" $argStartup
 Path=$workingDir
 Terminal=false
 X-GNOME-Autostart-enabled=true

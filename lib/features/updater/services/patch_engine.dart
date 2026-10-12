@@ -816,15 +816,20 @@ class PatchEngine {
       } catch (_) {}
     }
 
+    final existing = await _libraryRepository.getInstalledApp(app.id);
+
     final installedApp = InstalledApp(
       id: app.id,
       title: app.title,
       installedVersion: versionRelease.version,
       executablePath: exePath,
       installDirectory: targetInstallDir.path,
-      installedAt: DateTime.now(),
+      installedAt: existing?.installedAt ?? DateTime.now(),
+      lastLaunchedAt: existing?.lastLaunchedAt,
       sizeBytes: versionRelease.package.sizeBytes,
       platformKey: platformKey,
+      launchArguments: existing?.launchArguments,
+      autoUpdate: existing?.autoUpdate ?? true,
     );
 
     await _libraryRepository.saveInstalledApp(installedApp);

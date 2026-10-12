@@ -12,6 +12,7 @@ class InstalledApp {
   final int sizeBytes;
   final String platformKey;
   final String? launchArguments;
+  final bool autoUpdate;
 
   const InstalledApp({
     required this.id,
@@ -24,6 +25,7 @@ class InstalledApp {
     this.sizeBytes = 0,
     required this.platformKey,
     this.launchArguments,
+    this.autoUpdate = true,
   });
 
   factory InstalledApp.fromJson(Map<String, dynamic> json) {
@@ -48,6 +50,7 @@ class InstalledApp {
       platformKey: json[AppTechnicalStrings.keyPlatformKey] as String? ??
           AppTechnicalStrings.empty,
       launchArguments: json[AppTechnicalStrings.keyLaunchArguments] as String?,
+      autoUpdate: json[AppTechnicalStrings.keyAutoUpdate] as bool? ?? true,
     );
   }
 
@@ -64,6 +67,7 @@ class InstalledApp {
         AppTechnicalStrings.keyPlatformKey: platformKey,
         if (launchArguments != null)
           AppTechnicalStrings.keyLaunchArguments: launchArguments,
+        AppTechnicalStrings.keyAutoUpdate: autoUpdate,
       };
 
   InstalledApp copyWith({
@@ -73,6 +77,7 @@ class InstalledApp {
     DateTime? lastLaunchedAt,
     int? sizeBytes,
     String? launchArguments,
+    bool? autoUpdate,
   }) {
     return InstalledApp(
       id: id,
@@ -85,6 +90,7 @@ class InstalledApp {
       sizeBytes: sizeBytes ?? this.sizeBytes,
       platformKey: platformKey,
       launchArguments: launchArguments ?? this.launchArguments,
+      autoUpdate: autoUpdate ?? this.autoUpdate,
     );
   }
 }

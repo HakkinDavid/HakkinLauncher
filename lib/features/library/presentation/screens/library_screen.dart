@@ -13,6 +13,8 @@ import 'package:hakkin_launcher/features/catalog/data/models/app_entry.dart';
 import 'package:hakkin_launcher/features/catalog/presentation/controllers/catalog_controller.dart';
 import 'package:hakkin_launcher/features/library/data/models/installed_app.dart';
 import 'package:hakkin_launcher/features/library/presentation/controllers/library_controller.dart';
+import 'package:hakkin_launcher/features/updater/presentation/controllers/update_controller.dart';
+import 'package:hakkin_launcher/features/updater/services/patch_engine.dart';
 
 class LibraryScreen extends ConsumerWidget {
   const LibraryScreen({super.key});
@@ -22,6 +24,7 @@ class LibraryScreen extends ConsumerWidget {
     final installedAppsAsync = ref.watch(installedAppsProvider);
     final runningAppsAsync = ref.watch(runningAppsStreamProvider);
     final manifestAsync = ref.watch(catalogManifestProvider);
+    final updateProgressMap = ref.watch(updateProgressProvider);
 
     final runningMap = runningAppsAsync.value ?? {};
     final catalogAppsMap = manifestAsync.maybeWhen(
@@ -105,6 +108,11 @@ class LibraryScreen extends ConsumerWidget {
                       final installedApp = apps[index];
                       final catalogApp = catalogAppsMap[installedApp.id];
                       final isRunning = runningMap[installedApp.id] ?? false;
+                      final updateStatus = updateProgressMap[installedApp.id];
+                      final isUpdating = updateStatus != null &&
+                          updateStatus.stage != UpdateStage.completed &&
+                          updateStatus.stage != UpdateStage.failed &&
+                          updateStatus.stage != UpdateStage.idle;
                       final platformRelease = catalogApp?.platforms[installedApp.platformKey] ??
                           catalogApp?.getPlatformRelease(OsPaths.getCurrentPlatformKey());
                       final isAnomalous = platformRelease != null &&
@@ -163,21 +171,25 @@ class LibraryScreen extends ConsumerWidget {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    isAnomalous
-                                        ? AppStrings.anomalyInstalledVersionLabel(
-                                            installedApp.installedVersion,
-                                            catalogApp?.latestVersion ?? platformRelease.latestVersion,
-                                          )
-                                        : (hasUpdate
-                                            ? AppStrings.installedVersionWithUpdateLabel(
+                                    isUpdating
+                                        ? updateStatus.message
+                                        : (isAnomalous
+                                            ? AppStrings.anomalyInstalledVersionLabel(
                                                 installedApp.installedVersion,
-                                                catalogApp?.latestVersion ?? AppTechnicalStrings.empty,
+                                                catalogApp?.latestVersion ?? platformRelease.latestVersion,
                                               )
-                                            : AppStrings.installedVersionLabel(installedApp.installedVersion)),
+                                            : (hasUpdate
+                                                ? AppStrings.installedVersionWithUpdateLabel(
+                                                    installedApp.installedVersion,
+                                                    catalogApp?.latestVersion ?? AppTechnicalStrings.empty,
+                                                  )
+                                                : AppStrings.installedVersionLabel(installedApp.installedVersion))),
                                     style: TextStyle(
-                                      color: hasUpdate
-                                          ? AppColors.warning
-                                          : AppColors.platinumMuted,
+                                      color: isUpdating
+                                          ? AppColors.celestialBlue
+                                          : (hasUpdate
+                                              ? AppColors.warning
+                                              : AppColors.platinumMuted),
                                       fontSize: 12,
                                     ),
                                   ),
@@ -193,16 +205,62 @@ class LibraryScreen extends ConsumerWidget {
                                       ),
                                     ),
                                   ],
+                                  const SizedBox(height: 6),
+                                  InkWell(
+                                    borderRadius: BorderRadius.circular(6),
+                                    onTap: () {
+                                      ref
+                                          .read(installedAppsProvider.notifier)
+                                          .setAutoUpdate(installedApp.id, !installedApp.autoUpdate);
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 2),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          SizedBox(
+                                            width: 18,
+                                            height: 18,
+                                            child: Checkbox(
+                                              value: installedApp.autoUpdate,
+                                              activeColor: AppColors.celestialBlue,
+                                              checkColor: AppColors.background,
+                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                              visualDensity: VisualDensity.compact,
+                                              onChanged: (val) {
+                                                if (val != null) {
+                                                  ref
+                                                      .read(installedAppsProvider.notifier)
+                                                      .setAutoUpdate(installedApp.id, val);
+                                                }
+                                              },
+                                            ),
+                                          ),
+                                          const SizedBox(width: 6),
+                                          const Text(
+                                            AppStrings.autoUpdate,
+                                            style: TextStyle(
+                                              color: AppColors.platinumMuted,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
 
-                            if (hasUpdate && catalogApp != null) ...[
+                            if ((hasUpdate || isUpdating) && catalogApp != null) ...[
                               HakkinButton(
-                                text: isAnomalous ? AppStrings.updateFull : AppStrings.update,
+                                text: isUpdating
+                                    ? AppStrings.updating
+                                    : (isAnomalous ? AppStrings.updateFull : AppStrings.update),
                                 icon: isAnomalous ? Icons.system_update_alt : Icons.arrow_circle_up,
+                                isLoading: isUpdating,
                                 variant: HakkinButtonVariant.primaryPlatinum,
-                                onPressed: isRunning
+                                onPressed: (isRunning || isUpdating)
                                     ? null
                                     : () => context.push(AppTechnicalStrings.appDetailPath(catalogApp.id)),
                               ),
@@ -213,7 +271,7 @@ class LibraryScreen extends ConsumerWidget {
                               text: isRunning ? AppStrings.running : AppStrings.play,
                               icon: isRunning ? Icons.hourglass_top : Icons.play_arrow,
                               variant: HakkinButtonVariant.successPlay,
-                              onPressed: isRunning
+                              onPressed: (isRunning || isUpdating)
                                   ? null
                                   : () => ref
                                       .read(installedAppsProvider.notifier)
@@ -229,6 +287,10 @@ class LibraryScreen extends ConsumerWidget {
                                   if (catalogApp != null) {
                                     context.push(AppTechnicalStrings.appDetailPath(catalogApp.id));
                                   }
+                                } else if (val == AppTechnicalStrings.menuValueAutoUpdate) {
+                                  await ref
+                                      .read(installedAppsProvider.notifier)
+                                      .setAutoUpdate(installedApp.id, !installedApp.autoUpdate);
                                 } else if (val == AppTechnicalStrings.menuValueArgs) {
                                   _showArgumentsDialog(context, ref, installedApp);
                                 } else if (val == AppTechnicalStrings.menuValueShortcut) {
@@ -271,6 +333,24 @@ class LibraryScreen extends ConsumerWidget {
                                       Icon(Icons.storefront_outlined, size: 18, color: AppColors.platinum),
                                       SizedBox(width: 8),
                                       Text(AppStrings.manageVersions),
+                                    ],
+                                  ),
+                                ),
+                                PopupMenuItem(
+                                  value: AppTechnicalStrings.menuValueAutoUpdate,
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        installedApp.autoUpdate
+                                            ? Icons.check_box
+                                            : Icons.check_box_outline_blank,
+                                        size: 18,
+                                        color: installedApp.autoUpdate
+                                            ? AppColors.celestialBlue
+                                            : AppColors.platinum,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      const Text(AppStrings.autoUpdate),
                                     ],
                                   ),
                                 ),

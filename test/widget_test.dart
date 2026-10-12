@@ -129,7 +129,7 @@ void main() {
   });
 
   group('InstalledApp Model & Launch Arguments Tests', () {
-    test('Serializa y deserializa InstalledApp con argumentos de lanzamiento', () {
+    test('Serializa y deserializa InstalledApp con argumentos de lanzamiento y autoUpdate activo por defecto', () {
       final app = InstalledApp(
         id: 'dev.bonsanbec.game1',
         title: 'Eclipse',
@@ -141,15 +141,28 @@ void main() {
         launchArguments: '-windowed -novsync',
       );
 
+      expect(app.autoUpdate, isTrue);
+      expect(AppConstants.startupAutoUpdateDelay, const Duration(minutes: 5));
+
       final json = app.toJson();
       expect(json['launch_arguments'], '-windowed -novsync');
+      expect(json['auto_update'], isTrue);
 
       final reconstructed = InstalledApp.fromJson(json);
       expect(reconstructed.id, app.id);
       expect(reconstructed.launchArguments, '-windowed -novsync');
+      expect(reconstructed.autoUpdate, isTrue);
 
-      final modified = reconstructed.copyWith(launchArguments: '-fps 60');
+      final legacyJson = Map<String, dynamic>.from(json)..remove('auto_update');
+      final fromLegacy = InstalledApp.fromJson(legacyJson);
+      expect(fromLegacy.autoUpdate, isTrue);
+
+      final modified = reconstructed.copyWith(
+        launchArguments: '-fps 60',
+        autoUpdate: false,
+      );
       expect(modified.launchArguments, '-fps 60');
+      expect(modified.autoUpdate, isFalse);
     });
   });
 

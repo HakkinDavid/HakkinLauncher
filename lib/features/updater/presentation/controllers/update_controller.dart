@@ -22,6 +22,14 @@ class UpdateProgressNotifier extends StateNotifier<Map<String, UpdateStatus>> {
     String? targetVersion,
     bool isCleanInstall = false,
   }) async {
+    final currentStatus = state[app.id];
+    if (currentStatus != null &&
+        currentStatus.stage != UpdateStage.completed &&
+        currentStatus.stage != UpdateStage.failed &&
+        currentStatus.stage != UpdateStage.idle) {
+      return;
+    }
+
     final patchEngine = _ref.read(patchEngineProvider);
     final platformKey = OsPaths.getCurrentPlatformKey();
 
