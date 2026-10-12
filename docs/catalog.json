@@ -1,6 +1,6 @@
 {
   "version": "2.0.0",
-  "catalog_timestamp": "2026-10-12T04:41:11.814758+00:00",
+  "catalog_timestamp": "2026-10-12T05:04:55.796024+00:00",
   "launcher_meta": {
     "latest_version": "26.10.11-09",
     "min_required_launcher_version": "1.0.0",
@@ -484,7 +484,17 @@
                 "size_bytes": 16025163,
                 "sha256": "f9289b8b5138617ca430848cf67f451b1bc8c04bd7d6dc5f6ebd2f7c05f0d0b9"
               },
-              "delta_patches": [],
+              "delta_patches": [
+                {
+                  "from_version": "26.05.21",
+                  "to_version": "26.06.02",
+                  "patch_format": "hdiff",
+                  "url": "https://github.com/HakkinDavid/hakkin-launcher-deltas/releases/download/firefighter-form.26.05.21-to-26.06.02/firefighter-form_windows-x64.hdiff",
+                  "size_bytes": 9210887,
+                  "patch_sha256": "c464243808d69e759a4cc1a3e5bc14e771bf8a94c1c41d59e49f165c6f583f7a",
+                  "target_sha256": "ad64badf2e518dbfc372c5fbbff8b52c7edca27908e52c21234fdee34e9a68b1"
+                }
+              ],
               "scripts": {
                 "pre_install": null,
                 "post_install": null
@@ -500,7 +510,17 @@
                 "size_bytes": 15966209,
                 "sha256": "6cb8165f9ebfc1aaaeab3114f5ec34741b291fdc49c657d38b64723b3dd66f09"
               },
-              "delta_patches": [],
+              "delta_patches": [
+                {
+                  "from_version": "26.04.02",
+                  "to_version": "26.05.21",
+                  "patch_format": "hdiff",
+                  "url": "https://github.com/HakkinDavid/hakkin-launcher-deltas/releases/download/firefighter-form.26.04.02-to-26.05.21/firefighter-form_windows-x64.hdiff",
+                  "size_bytes": 9137567,
+                  "patch_sha256": "e7958a3b79fbef20e96f68b225d2802857a796461f7093c8548dd7e069289680",
+                  "target_sha256": "bef959e7818d0996d83ad4d66966c393db1ed15824761b498ca3ca3fb1525196"
+                }
+              ],
               "scripts": {
                 "pre_install": null,
                 "post_install": null
@@ -516,7 +536,17 @@
                 "size_bytes": 15862010,
                 "sha256": "9ce13af44c6e1079dde00842d1d9879e36d92b569dab143cd95f581e4348d3da"
               },
-              "delta_patches": [],
+              "delta_patches": [
+                {
+                  "from_version": "26.03.17",
+                  "to_version": "26.04.02",
+                  "patch_format": "hdiff",
+                  "url": "https://github.com/HakkinDavid/hakkin-launcher-deltas/releases/download/firefighter-form.26.03.17-to-26.04.02/firefighter-form_windows-x64.hdiff",
+                  "size_bytes": 7442494,
+                  "patch_sha256": "d869fd8ae663b67deb468a3e056682750f0e819bbc60691cd518be932bcafa1d",
+                  "target_sha256": "8e82873c13b001174dd01d537aaac53bbdb4ddeb04564bfe084b45afb8db73a3"
+                }
+              ],
               "scripts": {
                 "pre_install": null,
                 "post_install": null
@@ -532,7 +562,17 @@
                 "size_bytes": 15861517,
                 "sha256": "e06d12944100b81ff71c00392d8a4c0c375db46ac6ad17d3276e920b7b95da36"
               },
-              "delta_patches": [],
+              "delta_patches": [
+                {
+                  "from_version": "26.03.11",
+                  "to_version": "26.03.17",
+                  "patch_format": "hdiff",
+                  "url": "https://github.com/HakkinDavid/hakkin-launcher-deltas/releases/download/firefighter-form.26.03.11-to-26.03.17/firefighter-form_windows-x64.hdiff",
+                  "size_bytes": 5210110,
+                  "patch_sha256": "f368dd382867d0f59330133eac3e736afb557419c54044418d058b6b4ce9603d",
+                  "target_sha256": "dfda0d3fd467cfbf2c7c1cf4a621bbf8b236d8e52894ac322408c901fc63f63b"
+                }
+              ],
               "scripts": {
                 "pre_install": null,
                 "post_install": null
@@ -548,7 +588,17 @@
                 "size_bytes": 15861469,
                 "sha256": "a1a37187e238d9ec58bad698322b13fc5961f90d4f69928d7f9d5d70927a48da"
               },
-              "delta_patches": [],
+              "delta_patches": [
+                {
+                  "from_version": "26.02.27",
+                  "to_version": "26.03.11",
+                  "patch_format": "hdiff",
+                  "url": "https://github.com/HakkinDavid/hakkin-launcher-deltas/releases/download/firefighter-form.26.02.27-to-26.03.11/firefighter-form_windows-x64.hdiff",
+                  "size_bytes": 8759223,
+                  "patch_sha256": "fa1e84f304ad07127e0a480c7e2cef594e8521c8f2f21ee484a4edf60bcb5dbf",
+                  "target_sha256": "f4b8da6daa5a6ab97f310b90358426388670d9ec774da2e183aaab3fef4344e3"
+                }
+              ],
               "scripts": {
                 "pre_install": null,
                 "post_install": null
