@@ -85,7 +85,7 @@ class StoreScreen extends ConsumerWidget {
                 ),
               ),
 
-              if (featured != null && ref.watch(searchQueryProvider).isEmpty)
+              if (featured != null && ref.watch(searchQueryProvider).isEmpty && ref.watch(selectedCategoryProvider) == AppTechnicalStrings.categoryAll)
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
