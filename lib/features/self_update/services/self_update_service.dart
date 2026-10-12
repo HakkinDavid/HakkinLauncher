@@ -211,10 +211,19 @@ class SelfUpdateService {
         p.join(downloadsDir.path, AppTechnicalStrings.selfUpdateZipFileName);
     final zipFile = File(updateZipPath);
 
-    // Si ya existía un archivo de descarga con hash mismatch o corrupto, limpiarlo
-    if (await zipFile.exists() && expectedSha256.isNotEmpty) {
-      final matches = await HashValidator.verifySha256(zipFile, expectedSha256);
-      if (!matches) {
+    // Si ya existe un archivo previo, verificar si ya corresponde al paquete completo válido
+    bool alreadyVerified = false;
+    if (await zipFile.exists()) {
+      if (expectedSha256.isNotEmpty) {
+        final matches = await HashValidator.verifySha256(zipFile, expectedSha256);
+        if (matches) {
+          alreadyVerified = true;
+        } else {
+          try {
+            await zipFile.delete();
+          } catch (_) {}
+        }
+      } else {
         try {
           await zipFile.delete();
         } catch (_) {}
@@ -229,20 +238,22 @@ class SelfUpdateService {
     );
 
     try {
-      await for (final dl in _downloader.downloadFileStream(
-        url: downloadUrl,
-        destinationPath: updateZipPath,
-      )) {
-        final mappedProgress = 0.05 + (dl.progress * 0.65);
-        final speedStr = dl.speedFormatted.isNotEmpty
-            ? AppStrings.speedSeparator(dl.speedFormatted)
-            : AppTechnicalStrings.empty;
-        yield SelfUpdateStatus(
-          stage: SelfUpdateStage.downloading,
-          message: AppStrings.selfUpdateDownloading(dl.statusText, speedStr),
-          progress: mappedProgress,
-          newVersion: launcherMeta.latestVersion,
-        );
+      if (!alreadyVerified) {
+        await for (final dl in _downloader.downloadFileStream(
+          url: downloadUrl,
+          destinationPath: updateZipPath,
+        )) {
+          final mappedProgress = 0.05 + (dl.progress * 0.65);
+          final speedStr = dl.speedFormatted.isNotEmpty
+              ? AppStrings.speedSeparator(dl.speedFormatted)
+              : AppTechnicalStrings.empty;
+          yield SelfUpdateStatus(
+            stage: SelfUpdateStage.downloading,
+            message: AppStrings.selfUpdateDownloading(dl.statusText, speedStr),
+            progress: mappedProgress,
+            newVersion: launcherMeta.latestVersion,
+          );
+        }
       }
 
       yield const SelfUpdateStatus(
@@ -251,7 +262,7 @@ class SelfUpdateService {
         progress: 0.6,
       );
 
-      if (expectedSha256.isNotEmpty) {
+      if (expectedSha256.isNotEmpty && !alreadyVerified) {
         final isValid = await HashValidator.verifySha256(zipFile, expectedSha256);
         if (!isValid) {
           try {

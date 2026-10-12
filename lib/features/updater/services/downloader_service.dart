@@ -81,7 +81,8 @@ class DownloaderService {
               : null,
           followRedirects: true,
           validateStatus: (status) =>
-              status != null && status >= 200 && status < 400,
+              status != null &&
+              ((status >= 200 && status < 400) || status == 416),
         );
 
         final response = await _dio.get<ResponseBody>(
@@ -92,11 +93,15 @@ class DownloaderService {
 
         final statusCode = response.statusCode ?? 200;
         if (statusCode == 416) {
-          // Rango no satisfecho; reiniciar archivo limpio
+          // Rango no satisfecho; reiniciar archivo limpio sin consumir reintentos
           if (await destFile.exists()) {
-            await destFile.delete();
+            try {
+              await destFile.delete();
+            } catch (_) {}
           }
           existingLength = 0;
+          allowResume = false;
+          attempt--;
           continue;
         }
 

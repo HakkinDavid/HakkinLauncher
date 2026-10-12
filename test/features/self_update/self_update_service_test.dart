@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hakkin_launcher/core/constants/app_constants.dart';
 import 'package:hakkin_launcher/core/constants/app_technical_strings.dart';
@@ -7,6 +10,7 @@ import 'package:hakkin_launcher/core/platform/startup_service.dart';
 import 'package:hakkin_launcher/core/platform/window_service.dart';
 import 'package:hakkin_launcher/features/catalog/data/models/app_entry.dart';
 import 'package:hakkin_launcher/features/self_update/services/self_update_service.dart';
+import 'package:hakkin_launcher/features/updater/services/downloader_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -408,4 +412,94 @@ void main() {
       expect(resolvedOnNextSystemBoot, isTrue);
     });
   });
+
+  group('Catalog Check Interval & HTTP 416 Recovery', () {
+    test('Default catalog background check interval is 5 minutes', () {
+      expect(AppConstants.backgroundCheckInterval, const Duration(minutes: 5));
+      expect(
+        AppTechnicalStrings.backgroundCheckInterval,
+        const Duration(minutes: 5),
+      );
+    });
+
+    test('DownloaderService recovers automatically from HTTP 416 Range Not Satisfiable', () async {
+      final tempDir = await Directory.systemTemp.createTemp('hakkin_dl_416_test_');
+      try {
+        final destPath = '${tempDir.path}/HakkinLauncher_update.zip';
+        final destFile = File(destPath);
+        // Simular archivo previo completo o residual que provoca HTTP 416 al enviar Range
+        await destFile.writeAsBytes([1, 2, 3, 4, 5, 6, 7, 8]);
+
+        int requestCount = 0;
+        final recordedRanges = <String?>[];
+        final dio = Dio();
+        dio.httpClientAdapter = _Fake416Then200Adapter(
+          onRequest: (options) {
+            requestCount++;
+            recordedRanges.add(
+              options.headers[AppTechnicalStrings.headerRange] as String?,
+            );
+          },
+          payload: Uint8List.fromList([10, 20, 30, 40]),
+        );
+
+        final downloader = DownloaderService(dio: dio);
+        final events = await downloader
+            .downloadFileStream(
+              url: 'https://example.com/HakkinLauncher-windows-x64.zip',
+              destinationPath: destPath,
+              maxRetries: 1,
+            )
+            .toList();
+
+        // Primera petición envió Range por el archivo existente (recibió 416);
+        // segunda petición limpió el archivo y descargó desde cero sin Range (recibió 200).
+        expect(requestCount, 2);
+        expect(recordedRanges[0], 'bytes=8-');
+        expect(recordedRanges[1], isNull);
+        expect(events.last.progress, 1.0);
+        expect(await destFile.readAsBytes(), [10, 20, 30, 40]);
+      } finally {
+        await tempDir.delete(recursive: true);
+      }
+    });
+  });
+}
+
+class _Fake416Then200Adapter implements HttpClientAdapter {
+  final void Function(RequestOptions options) onRequest;
+  final Uint8List payload;
+  bool _returned416 = false;
+
+  _Fake416Then200Adapter({
+    required this.onRequest,
+    required this.payload,
+  });
+
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
+    onRequest(options);
+    if (!_returned416 &&
+        options.headers.containsKey(AppTechnicalStrings.headerRange)) {
+      _returned416 = true;
+      return ResponseBody.fromBytes(
+        Uint8List(0),
+        416,
+      );
+    }
+    return ResponseBody.fromBytes(
+      payload,
+      200,
+      headers: {
+        AppTechnicalStrings.headerContentLength: [payload.length.toString()],
+      },
+    );
+  }
+
+  @override
+  void close({bool force = false}) {}
 }

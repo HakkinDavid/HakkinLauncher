@@ -56,6 +56,28 @@ class PatchEngine {
   })  : _downloader = downloader ?? DownloaderService(),
         _libraryRepository = libraryRepository ?? LibraryRepository();
 
+  /// Prepara el archivo de destino antes de iniciar una descarga:
+  /// retorna true si el archivo ya existe íntegro con el hash esperado;
+  /// elimina el archivo si ya alcanzó o superó el tamaño esperado pero su hash no coincide.
+  Future<bool> _prepareDownloadDestination(
+    File file,
+    String expectedSha256,
+    int expectedSizeBytes,
+  ) async {
+    if (!await file.exists()) return false;
+    if (expectedSha256.isNotEmpty) {
+      final matches = await HashValidator.verifySha256(file, expectedSha256);
+      if (matches) return true;
+    }
+    final currentLen = await file.length();
+    if (expectedSizeBytes > 0 && currentLen >= expectedSizeBytes) {
+      try {
+        await file.delete();
+      } catch (_) {}
+    }
+    return false;
+  }
+
   /// Compara dos versiones semánticas para determinar si v1 es estrictamente menor que v2
   bool _isOlderVersion(String v1, String v2) {
     final p1 = RegExp(AppTechnicalStrings.regexDigits).allMatches(v1).map((m) => int.parse(m.group(0)!)).toList();
@@ -159,24 +181,32 @@ class PatchEngine {
         downloadsDir.path,
         AppTechnicalStrings.cleanZipFileName(app.slug, targetVersionStr),
       );
+      final zipFile = File(cleanZipPath);
       try {
-        await for (final dl in _downloader.downloadFileStream(
-          url: pkg.url,
-          destinationPath: cleanZipPath,
-        )) {
-          final mappedProgress = 0.05 + (dl.progress * 0.65);
-          final speedStr = dl.speedFormatted.isNotEmpty
-              ? AppStrings.speedSeparator(dl.speedFormatted)
-              : AppTechnicalStrings.empty;
-          yield UpdateStatus(
-            stage: UpdateStage.downloading,
-            message: AppStrings.downloadingVersionMessage(
-              targetVersionStr,
-              dl.statusText,
-              speedStr,
-            ),
-            progress: mappedProgress,
-          );
+        final alreadyVerified = await _prepareDownloadDestination(
+          zipFile,
+          pkg.sha256,
+          pkg.sizeBytes,
+        );
+        if (!alreadyVerified) {
+          await for (final dl in _downloader.downloadFileStream(
+            url: pkg.url,
+            destinationPath: cleanZipPath,
+          )) {
+            final mappedProgress = 0.05 + (dl.progress * 0.65);
+            final speedStr = dl.speedFormatted.isNotEmpty
+                ? AppStrings.speedSeparator(dl.speedFormatted)
+                : AppTechnicalStrings.empty;
+            yield UpdateStatus(
+              stage: UpdateStage.downloading,
+              message: AppStrings.downloadingVersionMessage(
+                targetVersionStr,
+                dl.statusText,
+                speedStr,
+              ),
+              progress: mappedProgress,
+            );
+          }
         }
 
         yield const UpdateStatus(
@@ -185,8 +215,8 @@ class PatchEngine {
           progress: 0.72,
         );
 
-        final zipFile = File(cleanZipPath);
-        final isPkgValid = pkg.sha256.isEmpty ||
+        final isPkgValid = alreadyVerified ||
+            pkg.sha256.isEmpty ||
             await HashValidator.verifySha256(zipFile, pkg.sha256);
 
         if (!isPkgValid) {
@@ -307,25 +337,33 @@ class PatchEngine {
         downloadsDir.path,
         AppTechnicalStrings.updatePatchFileName(app.slug),
       );
+      final patchFile = File(patchFilePath);
       bool deltaSuccess = false;
 
       try {
-        await for (final dl in _downloader.downloadFileStream(
-          url: matchedDelta.url,
-          destinationPath: patchFilePath,
-        )) {
-          final mappedProgress = 0.05 + (dl.progress * 0.45);
-          final speedStr = dl.speedFormatted.isNotEmpty
-              ? AppStrings.speedSeparator(dl.speedFormatted)
-              : AppTechnicalStrings.empty;
-          yield UpdateStatus(
-            stage: UpdateStage.downloading,
-            message: AppStrings.downloadingPatchMessage(
-              dl.statusText,
-              speedStr,
-            ),
-            progress: mappedProgress,
-          );
+        final alreadyVerifiedPatch = await _prepareDownloadDestination(
+          patchFile,
+          matchedDelta.patchSha256,
+          matchedDelta.sizeBytes,
+        );
+        if (!alreadyVerifiedPatch) {
+          await for (final dl in _downloader.downloadFileStream(
+            url: matchedDelta.url,
+            destinationPath: patchFilePath,
+          )) {
+            final mappedProgress = 0.05 + (dl.progress * 0.45);
+            final speedStr = dl.speedFormatted.isNotEmpty
+                ? AppStrings.speedSeparator(dl.speedFormatted)
+                : AppTechnicalStrings.empty;
+            yield UpdateStatus(
+              stage: UpdateStage.downloading,
+              message: AppStrings.downloadingPatchMessage(
+                dl.statusText,
+                speedStr,
+              ),
+              progress: mappedProgress,
+            );
+          }
         }
 
         yield const UpdateStatus(
@@ -334,8 +372,8 @@ class PatchEngine {
           progress: 0.55,
         );
 
-        final patchFile = File(patchFilePath);
-        final patchValid = matchedDelta.patchSha256.isEmpty ||
+        final patchValid = alreadyVerifiedPatch ||
+            matchedDelta.patchSha256.isEmpty ||
             await HashValidator.verifySha256(patchFile, matchedDelta.patchSha256);
 
         if (patchValid) {
@@ -452,25 +490,33 @@ class PatchEngine {
       downloadsDir.path,
       AppTechnicalStrings.fullZipFileName(app.slug, targetVersionStr),
     );
+    final zipFile = File(fullPackageZipPath);
 
     try {
-      await for (final dl in _downloader.downloadFileStream(
-        url: pkg.url,
-        destinationPath: fullPackageZipPath,
-      )) {
-        final mappedProgress = 0.05 + (dl.progress * 0.65);
-        final speedStr = dl.speedFormatted.isNotEmpty
-            ? AppStrings.speedSeparator(dl.speedFormatted)
-            : AppTechnicalStrings.empty;
-        yield UpdateStatus(
-          stage: UpdateStage.downloading,
-          message: AppStrings.downloadingVersionMessage(
-            targetVersionStr,
-            dl.statusText,
-            speedStr,
-          ),
-          progress: mappedProgress,
-        );
+      final alreadyVerifiedFull = await _prepareDownloadDestination(
+        zipFile,
+        pkg.sha256,
+        pkg.sizeBytes,
+      );
+      if (!alreadyVerifiedFull) {
+        await for (final dl in _downloader.downloadFileStream(
+          url: pkg.url,
+          destinationPath: fullPackageZipPath,
+        )) {
+          final mappedProgress = 0.05 + (dl.progress * 0.65);
+          final speedStr = dl.speedFormatted.isNotEmpty
+              ? AppStrings.speedSeparator(dl.speedFormatted)
+              : AppTechnicalStrings.empty;
+          yield UpdateStatus(
+            stage: UpdateStage.downloading,
+            message: AppStrings.downloadingVersionMessage(
+              targetVersionStr,
+              dl.statusText,
+              speedStr,
+            ),
+            progress: mappedProgress,
+          );
+        }
       }
 
       yield const UpdateStatus(
@@ -479,8 +525,8 @@ class PatchEngine {
         progress: 0.72,
       );
 
-      final zipFile = File(fullPackageZipPath);
-      final isFullValid = pkg.sha256.isEmpty ||
+      final isFullValid = alreadyVerifiedFull ||
+          pkg.sha256.isEmpty ||
           await HashValidator.verifySha256(zipFile, pkg.sha256);
 
       if (!isFullValid) {

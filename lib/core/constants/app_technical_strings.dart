@@ -34,7 +34,7 @@ class AppTechnicalStrings {
   static const hpatchzDownloadBaseUrl =
       'https://github.com/sisong/HDiffPatch/releases/download/$defaultHpatchzVersion';
 
-  static const backgroundCheckInterval = Duration(minutes: 15);
+  static const backgroundCheckInterval = Duration(minutes: 5);
   static const startupAutoUpdateDelay = Duration(minutes: 5);
   static const selfUpdateNavigationDebounce = Duration(minutes: 1);
 
@@ -550,7 +550,7 @@ rm -f "\$0" 2>/dev/null || true
         ? 'start "" "%CURRENT_EXE%" $argStartup'
         : 'start "" "%CURRENT_EXE%"';
 
-    return '''@echo off
+    final script = '''@echo off
 setlocal enabledelayedexpansion
 set CURRENT_PID=$currentPid
 set CURRENT_EXE=$currentExePath
@@ -583,13 +583,17 @@ if "!PID_ALIVE!"=="1" (
 )
 :proceed
 del /f /q "%PID_FILE%" 2>NUL
+ping 127.0.0.1 -n 2 >NUL 2>&1
 
 echo Creando staging en %STAGING_DIR%... >> "%LOG_FILE%"
 mkdir "%STAGING_DIR%" 2>NUL
 
 echo Descomprimiendo actualización... >> "%LOG_FILE%"
 tar -xf "%ZIP_FILE%" -C "%STAGING_DIR%" >> "%LOG_FILE%" 2>&1
-if errorlevel 1 goto rollback
+if errorlevel 1 (
+    powershell -NoProfile -NonInteractive -WindowStyle Hidden -Command "Expand-Archive -LiteralPath '%ZIP_FILE%' -DestinationPath '%STAGING_DIR%' -Force" >> "%LOG_FILE%" 2>&1
+    if errorlevel 1 goto rollback
+)
 
 set STAGING_CONTENT=%STAGING_DIR%
 for /d %%D in ("%STAGING_DIR%\\*") do (
@@ -599,11 +603,20 @@ for /d %%D in ("%STAGING_DIR%\\*") do (
 
 echo Creando respaldo de la versión actual en %BACKUP_DIR%... >> "%LOG_FILE%"
 rmdir /s /q "%BACKUP_DIR%" 2>NUL
-xcopy "%APP_DIR%" "%BACKUP_DIR%\\" /E /I /H /Y /Q >> "%LOG_FILE%" 2>&1
+xcopy "%APP_DIR%" "%BACKUP_DIR%\\" /E /I /H /R /Y /Q >> "%LOG_FILE%" 2>&1
 
 echo Copiando archivos de la nueva versión... >> "%LOG_FILE%"
-xcopy "%STAGING_CONTENT%" "%APP_DIR%\\" /E /I /H /Y /Q >> "%LOG_FILE%" 2>&1
-if errorlevel 1 goto rollback
+set /a COPY_TRY=0
+:copy_loop
+xcopy "%STAGING_CONTENT%" "%APP_DIR%\\" /E /I /H /R /Y /Q >> "%LOG_FILE%" 2>&1
+if errorlevel 1 (
+    set /a COPY_TRY+=1
+    if !COPY_TRY! lss 5 (
+        ping 127.0.0.1 -n 2 >NUL 2>&1
+        goto copy_loop
+    )
+    goto rollback
+)
 
 echo Iniciando nueva versión de HakkinLauncher... >> "%LOG_FILE%"
 $launchCmd
@@ -620,12 +633,14 @@ exit /b 0
 :rollback
 echo ERROR: Fallo durante la actualización. Restaurando desde backup... >> "%LOG_FILE%"
 if exist "%BACKUP_DIR%" (
-    xcopy "%BACKUP_DIR%" "%APP_DIR%\\" /E /I /H /Y /Q >> "%LOG_FILE%" 2>&1
+    xcopy "%BACKUP_DIR%" "%APP_DIR%\\" /E /I /H /R /Y /Q >> "%LOG_FILE%" 2>&1
 )
+del /f /q "%ZIP_FILE%" 2>NUL
 $launchCmd
 rmdir /s /q "%STAGING_DIR%" 2>NUL
 exit /b 1
 ''';
+    return script.replaceAll('\r\n', '\n').replaceAll('\n', '\r\n');
   }
 
   static String generateLinuxUpdateScript({
