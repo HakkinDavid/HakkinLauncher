@@ -15,13 +15,15 @@ import sys
 import urllib.request
 
 try:
-    from tools.delta_generator import DeltaGenerator, DEFAULT_DELTAS_REPO
+    from tools.delta_generator import DeltaGenerator, DEFAULT_DELTAS_REPO, format_delta_tag
 except ImportError:
     try:
-        from delta_generator import DeltaGenerator, DEFAULT_DELTAS_REPO
+        from delta_generator import DeltaGenerator, DEFAULT_DELTAS_REPO, format_delta_tag
     except ImportError:
         DeltaGenerator = None
         DEFAULT_DELTAS_REPO = "HakkinDavid/hakkin-launcher-deltas"
+        def format_delta_tag(slug, from_v, to_v):
+            return f"{slug}.{str(from_v).lstrip('vV')}-to-{str(to_v).lstrip('vV')}"
 
 # Pre-resolved checksums and byte sizes cache for known release assets
 KNOWN_ASSET_CACHE = {
@@ -980,13 +982,18 @@ def generate_catalog(
             plat_latest_version = versions_list[0]["version"]
 
             # Preserve and sanitize existing delta_patches
+            # Preserve and sanitize existing delta_patches (strictly excluding Android/APKs)
+            is_android_plat = "android" in plat_key.lower()
             valid_versions = {v["version"] for v in versions_list}
             if existing_app and "platforms" in existing_app and plat_key in existing_app["platforms"]:
                 existing_ver_map = {
                     v["version"]: v for v in existing_app["platforms"][plat_key].get("versions", [])
                 }
                 for v in versions_list:
-                    if v["version"] in existing_ver_map:
+                    is_apk = v.get("package", {}).get("url", "").lower().endswith(".apk")
+                    if is_android_plat or is_apk:
+                        v["delta_patches"] = []
+                    elif v["version"] in existing_ver_map:
                         old_meta = existing_ver_map[v["version"]]
                         if not v.get("delta_patches"):
                             raw_patches = old_meta.get("delta_patches", [])
@@ -995,36 +1002,51 @@ def generate_catalog(
                                 if p.get("from_version") in valid_versions and p.get("from_version") != v["version"]
                             ]
                             v["delta_patches"] = valid_patches
+
+                    if v["version"] in existing_ver_map:
+                        old_meta = existing_ver_map[v["version"]]
                         if old_meta.get("release_date"):
                             v["release_date"] = old_meta["release_date"]
                         if old_meta.get("changelog") and not (old_meta["changelog"].startswith("Lanzamiento de") and not v.get("changelog", "").startswith("Lanzamiento de")):
                             v["changelog"] = old_meta["changelog"]
 
-            # Generate differential deltas for immediate predecessor V_{N-1} -> V_N
-            if generate_deltas and DeltaGenerator and len(versions_list) >= 2:
-                target_ver = versions_list[0]
-                source_ver = versions_list[1]
-                if target_ver["package"]["url"] != source_ver["package"]["url"] and target_ver["version"] != source_ver["version"]:
+            # Generate differential deltas for version jumps (strictly excluding Android and APKs)
+            if not is_android_plat and generate_deltas and DeltaGenerator and len(versions_list) >= 2:
+                d_gen = DeltaGenerator(deltas_repo=deltas_repo, dry_run=dry_run_deltas)
+                for idx in range(len(versions_list) - 1):
+                    target_ver = versions_list[idx]
+                    source_ver = versions_list[idx + 1]
+                    target_url = target_ver.get("package", {}).get("url", "").lower()
+                    source_url = source_ver.get("package", {}).get("url", "").lower()
+
+                    if target_url.endswith(".apk") or source_url.endswith(".apk"):
+                        continue
+                    if target_ver["package"]["url"] == source_ver["package"]["url"] or target_ver["version"] == source_ver["version"]:
+                        continue
+
                     has_delta = any(
                         d.get("from_version") == source_ver["version"] and d.get("patch_sha256")
                         for d in target_ver.get("delta_patches", [])
                     )
                     if not has_delta:
-                        print(f"  [Delta Worker] Generando diferencial para {meta['slug']} ({plat_key}): v{source_ver['version']} -> v{target_ver['version']}...")
-                        d_gen = DeltaGenerator(deltas_repo=deltas_repo, dry_run=dry_run_deltas)
-                        patch_entry = d_gen.generate_delta_patch(
-                            app_slug=meta["slug"],
-                            platform_key=plat_key,
-                            from_release=source_ver,
-                            to_release=target_ver
-                        )
-                        if patch_entry:
-                            if "delta_patches" not in target_ver:
-                                target_ver["delta_patches"] = []
-                            target_ver["delta_patches"] = [
-                                d for d in target_ver["delta_patches"] if d.get("from_version") != source_ver["version"]
-                            ]
-                            target_ver["delta_patches"].append(patch_entry)
+                        tag = format_delta_tag(meta["slug"], source_ver["version"], target_ver["version"])
+                        # Generar si es el salto a la versión más reciente (idx == 0)
+                        # o si el delta ya existe en el release satélite remoto
+                        if idx == 0 or d_gen.check_remote_release_exists(tag):
+                            print(f"  [Delta Worker] Procesando diferencial para {meta['slug']} ({plat_key}): v{source_ver['version']} -> v{target_ver['version']}...")
+                            patch_entry = d_gen.generate_delta_patch(
+                                app_slug=meta["slug"],
+                                platform_key=plat_key,
+                                from_release=source_ver,
+                                to_release=target_ver
+                            )
+                            if patch_entry:
+                                if "delta_patches" not in target_ver:
+                                    target_ver["delta_patches"] = []
+                                target_ver["delta_patches"] = [
+                                    d for d in target_ver["delta_patches"] if d.get("from_version") != source_ver["version"]
+                                ]
+                                target_ver["delta_patches"].append(patch_entry)
 
             platforms_dict[plat_key] = {
                 "latest_version": plat_latest_version,
@@ -1154,8 +1176,14 @@ def purge_orphaned_and_nonexistent_versions(manifest):
             valid_versions.sort(key=lambda x: parse_version_tuple(x["version"]), reverse=True)
             valid_version_strings = {v["version"] for v in valid_versions}
 
-            # 5. Eliminar COMPLETAMENTE cualquier referencia a versiones inexistentes o huérfanas en delta_patches
+            # 5. Exclusión normativa de deltas para Android/APKs y purga de deltas huérfanos
+            is_android_plat = "android" in plat_key.lower()
             for v in valid_versions:
+                is_apk = v.get("package", {}).get("url", "").lower().endswith(".apk")
+                if is_android_plat or is_apk:
+                    v["delta_patches"] = []
+                    continue
+
                 raw_patches = v.get("delta_patches", [])
                 cleaned_patches = []
                 for p in raw_patches:
@@ -1189,6 +1217,116 @@ def purge_orphaned_and_nonexistent_versions(manifest):
             )
 
     return manifest
+
+def verify_catalog_deltas(manifest, strict=False):
+    """
+    Verifica que:
+    1. Todas las plataformas Android y archivos APK estén COMPLETAMENTE EXCLUIDOS de delta_patches (0 deltas).
+    2. Todas las plataformas de escritorio / no-Android con al menos 2 versiones contengan un parche delta adecuado
+       para el salto de actualización hacia la versión más reciente (V_{N-1} -> V_N).
+    3. Cada parche delta contenga metadatos válidos (hdiff, SHA-256 de 64 hex, tamaño > 0, URL https).
+    Retorna un diccionario de resumen { 'verified': [...], 'missing': [...], 'excluded_android': [...], 'errors': [...] }
+    """
+    print("\n" + "=" * 70)
+    print("🔍 AUDITORÍA Y VERIFICACIÓN DE PARCHES DIFERENCIALES (DELTAS)")
+    print("=" * 70)
+
+    verified_jumps = []
+    missing_jumps = []
+    excluded_android = []
+    errors = []
+
+    for app in manifest.get("apps", []):
+        slug = app.get("slug", app.get("id"))
+        for plat_key, pdata in app.get("platforms", {}).items():
+            is_android = "android" in plat_key.lower()
+            versions = pdata.get("versions", [])
+
+            # Comprobar exclusión total de Android / APK
+            if is_android or any(v.get("package", {}).get("url", "").lower().endswith(".apk") for v in versions):
+                apk_deltas_count = sum(len(v.get("delta_patches", [])) for v in versions)
+                if apk_deltas_count > 0:
+                    errors.append(f"{slug} ({plat_key}): Se encontraron {apk_deltas_count} deltas en plataforma Android/APK (debe ser 0).")
+                else:
+                    excluded_android.append(f"{slug} ({plat_key}): {len(versions)} versión(es), 0 deltas (excluido por normativa).")
+                continue
+
+            # Plataformas de escritorio / no-Android
+            if len(versions) < 2:
+                continue
+
+            target_ver = versions[0]
+            source_ver = versions[1]
+            target_v_str = target_ver.get("version")
+            source_v_str = source_ver.get("version")
+
+            if target_ver.get("package", {}).get("url") == source_ver.get("package", {}).get("url"):
+                continue
+
+            matching_deltas = [
+                d for d in target_ver.get("delta_patches", [])
+                if d.get("from_version") == source_v_str
+            ]
+
+            if not matching_deltas:
+                missing_jumps.append(f"{slug} ({plat_key}): v{source_v_str} -> v{target_v_str} no tiene parche delta registrado.")
+                continue
+
+            for delta in matching_deltas:
+                p_format = delta.get("patch_format")
+                p_url = delta.get("url", "")
+                p_sha = delta.get("patch_sha256", "")
+                t_sha = delta.get("target_sha256", "")
+                p_size = delta.get("size_bytes", 0)
+
+                field_issues = []
+                if p_format != "hdiff":
+                    field_issues.append(f"formato '{p_format}' != 'hdiff'")
+                if not p_url.startswith("https://"):
+                    field_issues.append(f"URL inválida '{p_url}'")
+                if len(p_sha) != 64:
+                    field_issues.append(f"patch_sha256 inválido (longitud {len(p_sha)})")
+                if len(t_sha) != 64:
+                    field_issues.append(f"target_sha256 inválido (longitud {len(t_sha)})")
+                if p_size <= 0:
+                    field_issues.append(f"tamaño no positivo ({p_size} bytes)")
+
+                if field_issues:
+                    errors.append(f"{slug} ({plat_key}) v{source_v_str} -> v{target_v_str}: {', '.join(field_issues)}")
+                else:
+                    verified_jumps.append(
+                        f"{slug} ({plat_key}): v{source_v_str} -> v{target_v_str} [hdiff, {p_size:,} bytes, sha256:{p_sha[:8]}...]"
+                    )
+
+    print(f"✅ Saltos con delta verificado ({len(verified_jumps)}):")
+    for vj in verified_jumps:
+        print(f"   • {vj}")
+
+    print(f"\n🚫 Plataformas Android / APK excluidas ({len(excluded_android)}):")
+    for ea in excluded_android:
+        print(f"   • {ea}")
+
+    if missing_jumps:
+        print(f"\n⚠️ Saltos sin delta ({len(missing_jumps)}):", file=sys.stderr)
+        for mj in missing_jumps:
+            print(f"   • {mj}", file=sys.stderr)
+
+    if errors:
+        print(f"\n❌ Errores de validación de deltas ({len(errors)}):", file=sys.stderr)
+        for err in errors:
+            print(f"   • {err}", file=sys.stderr)
+
+    print("=" * 70 + "\n")
+
+    if strict and (missing_jumps or errors):
+        raise AssertionError(f"Fallo en verificación de deltas: {len(missing_jumps)} saltos sin delta y {len(errors)} errores.")
+
+    return {
+        "verified": verified_jumps,
+        "missing": missing_jumps,
+        "excluded_android": excluded_android,
+        "errors": errors
+    }
 
 def validate_manifest(manifest, schema_path):
     """Valida el manifiesto contra CATALOG_SCHEMA.json y las directivas de GEMINI.md / docs/strings.md."""
@@ -1267,12 +1405,27 @@ def validate_manifest(manifest, schema_path):
                 assert "\n" not in cl, f"Changelog must be a single clean sentence in {app_id} {pkey} v{v_obj['version']}"
                 assert not PROHIBITED_TECHNICAL_PATTERN.search(cl), f"Changelog contains prohibited technical jargon in {app_id} {pkey}: {cl}"
 
-                # Comprobar que ningún parche delta apunte a versiones huérfanas
+                # Exclusión obligatoria de Android/APK y validación de parches delta
+                is_android = "android" in pkey.lower() or pkg["url"].lower().endswith(".apk")
+                if is_android:
+                    assert len(v_obj.get("delta_patches", [])) == 0, \
+                        f"Plataforma Android/APK {app_id} {pkey} v{v_obj['version']} contiene deltas prohibidos"
+
                 for dp in v_obj.get("delta_patches", []):
                     assert dp.get("from_version") in valid_vers, \
                         f"Delta patch in {app_id} {pkey} v{v_obj['version']} references orphaned from_version {dp.get('from_version')}"
                     assert dp.get("from_version") != v_obj["version"], \
                         f"Delta patch in {app_id} {pkey} v{v_obj['version']} has reflexive from_version"
+                    assert dp.get("patch_format") == "hdiff", \
+                        f"Delta patch in {app_id} {pkey} v{v_obj['version']} must use patch_format 'hdiff'"
+                    assert dp.get("url", "").startswith("https://"), \
+                        f"Delta patch in {app_id} {pkey} v{v_obj['version']} must have valid https URL"
+                    assert len(dp.get("patch_sha256", "")) == 64, \
+                        f"Delta patch in {app_id} {pkey} v{v_obj['version']} must have 64-char patch_sha256"
+                    assert len(dp.get("target_sha256", "")) == 64, \
+                        f"Delta patch in {app_id} {pkey} v{v_obj['version']} must have 64-char target_sha256"
+                    assert dp.get("size_bytes", 0) > 0, \
+                        f"Delta patch in {app_id} {pkey} v{v_obj['version']} must have size_bytes > 0"
 
     print(f"Validación exitosa: {len(manifest['apps'])} aplicaciones verificadas contra el esquema v2.0.0 y la normativa de cadenas.")
     return True
@@ -1285,6 +1438,8 @@ def main():
     parser.add_argument("--schema", default="docs/CATALOG_SCHEMA.json", help="Path to CATALOG_SCHEMA.json")
     parser.add_argument("--output", default="docs/catalog.json", help="Output path for catalog.json")
     parser.add_argument("--generate-deltas", action="store_true", help="Generar parches diferenciales para saltos de versión")
+    parser.add_argument("--verify-deltas", action="store_true", help="Audita y verifica que todos los saltos contengan deltas adecuados")
+    parser.add_argument("--strict-deltas", action="store_true", help="Falla si falta algún delta en plataformas de escritorio con múltiples versiones")
     parser.add_argument("--deltas-repo", default=DEFAULT_DELTAS_REPO, help="Repositorio satélite de deltas (default: HakkinDavid/hakkin-launcher-deltas)")
     parser.add_argument("--dry-run-deltas", action="store_true", help="Simular generación de deltas sin publicar en GitHub")
     parser.add_argument("--pkg-cache-dir", default=None, help="Directorio de caché de paquetes para generación de deltas")
@@ -1303,6 +1458,9 @@ def main():
         dry_run_deltas=args.dry_run_deltas
     )
     validate_manifest(manifest, args.schema)
+
+    if args.generate_deltas or args.verify_deltas:
+        verify_catalog_deltas(manifest, strict=args.strict_deltas)
 
     output_dir = os.path.dirname(args.output)
     if output_dir:

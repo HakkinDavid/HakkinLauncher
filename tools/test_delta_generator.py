@@ -139,6 +139,18 @@ class TestDeltaGenerator(unittest.TestCase):
         result = gen._publish_to_satellite("fake.1.0-to-2.0", "/non/existent/path.hdiff", "app", "1.0", "2.0")
         self.assertFalse(result)
 
+    def test_generate_delta_patch_skips_android_and_apk(self):
+        gen = DeltaGenerator(deltas_repo="TestOrg/test-deltas", dry_run=True)
+        # Plataforma android
+        rel_from = {"version": "1.0", "package": {"url": "https://example.com/app.apk"}}
+        rel_to = {"version": "2.0", "package": {"url": "https://example.com/app_v2.apk"}}
+        res_android = gen.generate_delta_patch("app", "android", rel_from, rel_to)
+        self.assertIsNone(res_android)
+
+        # Paquete APK en otra clave de plataforma
+        res_apk = gen.generate_delta_patch("app", "custom-plat", rel_from, rel_to)
+        self.assertIsNone(res_apk)
+
 
 if __name__ == "__main__":
     unittest.main()

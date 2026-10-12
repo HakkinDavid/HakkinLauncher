@@ -72,7 +72,7 @@ jobs:
           tools/bin/hdiffz -v
 
       - name: Cache Application Packages for Deltas
-        if: ${{ github.event.inputs.generate_deltas == 'true' }}
+        if: ${{ github.event.inputs.generate_deltas != 'false' }}
         uses: actions/cache@v4
         with:
           path: .cache/hakkin_pkg_cache
@@ -93,7 +93,7 @@ jobs:
         run: |
           EXTRA_ARGS=()
           if [ "${{ github.event.inputs.generate_deltas }}" = "true" ] || [ -z "${{ github.event.inputs.generate_deltas }}" ]; then
-            EXTRA_ARGS+=("--generate-deltas")
+            EXTRA_ARGS+=("--generate-deltas" "--verify-deltas")
             DELTAS_TARGET="${{ github.event.inputs.deltas_repo }}"
             if [ -z "$DELTAS_TARGET" ]; then
               DELTAS_TARGET="HakkinDavid/hakkin-launcher-deltas"

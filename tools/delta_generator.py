@@ -173,6 +173,13 @@ class DeltaGenerator:
         Genera el parche diferencial entre from_release y to_release para una plataforma.
         Retorna el diccionario de entrada para delta_patches del catálogo o None si falla.
         """
+        # Exclusión normativa total para plataformas Android y archivos APK
+        if "android" in platform_key.lower() or \
+           from_release.get("package", {}).get("url", "").lower().endswith(".apk") or \
+           to_release.get("package", {}).get("url", "").lower().endswith(".apk"):
+            print(f"  [Delta Worker] Omitiendo {app_slug} ({platform_key}): Los paquetes APK de Android están completamente excluidos de deltas.")
+            return None
+
         tag = format_delta_tag(app_slug, from_release["version"], to_release["version"])
         asset_name = format_delta_asset_name(app_slug, platform_key)
         expected_url = f"https://github.com/{self.deltas_repo}/releases/download/{tag}/{asset_name}"

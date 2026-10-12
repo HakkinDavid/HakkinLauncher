@@ -1,6 +1,6 @@
 {
   "version": "2.0.0",
-  "catalog_timestamp": "2026-10-11T09:42:51.203871+00:00",
+  "catalog_timestamp": "2026-10-12T03:53:27.011113+00:00",
   "launcher_meta": {
     "latest_version": "26.10.11-09",
     "min_required_launcher_version": "1.0.0",
@@ -72,12 +72,28 @@
           "https://raw.githubusercontent.com/Bonsanbec/tecate-simulator/master/godot_project/branding/icon.png"
         ]
       },
-      "latest_version": "26.10.08-13",
+      "latest_version": "26.10.11-20",
       "platforms": {
         "windows-x64": {
-          "latest_version": "26.10.08-13",
+          "latest_version": "26.10.11-20",
           "protected_user_paths": [],
           "versions": [
+            {
+              "version": "26.10.11-20",
+              "release_date": "2026-10-12T03:21:40Z",
+              "changelog": "Lanzamiento de Tecate Simulator versión 26.10.11-20 con mejoras y correcciones.",
+              "entry_point": "tecate.exe",
+              "package": {
+                "url": "https://github.com/Bonsanbec/tecate-simulator/releases/download/26.10.11-20/tecate-windows.zip",
+                "size_bytes": 1084854906,
+                "sha256": "c97a2d95b77e3d4c7e972fc93cad94fed167f9f18a0d844a29e4206b24bb48b8"
+              },
+              "delta_patches": [],
+              "scripts": {
+                "pre_install": null,
+                "post_install": null
+              }
+            },
             {
               "version": "26.10.08-13",
               "release_date": "2026-10-08T20:22:34.508643+00:00",
@@ -123,9 +139,25 @@
           ]
         },
         "macos-arm64": {
-          "latest_version": "26.10.08-13",
+          "latest_version": "26.10.11-20",
           "protected_user_paths": [],
           "versions": [
+            {
+              "version": "26.10.11-20",
+              "release_date": "2026-10-12T03:21:40Z",
+              "changelog": "Lanzamiento de Tecate Simulator versión 26.10.11-20 con mejoras y correcciones.",
+              "entry_point": "tecate.app",
+              "package": {
+                "url": "https://github.com/Bonsanbec/tecate-simulator/releases/download/26.10.11-20/tecate-macos.zip",
+                "size_bytes": 1111748180,
+                "sha256": "20237eb47a74feac2671bed57e44e4620d3b428d1506618340271c5cbe39b728"
+              },
+              "delta_patches": [],
+              "scripts": {
+                "pre_install": null,
+                "post_install": null
+              }
+            },
             {
               "version": "26.10.08-13",
               "release_date": "2026-10-08T20:22:34.508643+00:00",
@@ -336,17 +368,7 @@
                 "size_bytes": 54644848,
                 "sha256": "6127a04ccb69209720508e69be9355e37a1af4db5d1b2fea67c19ed9d5caa8b0"
               },
-              "delta_patches": [
-                {
-                  "from_version": "2.2",
-                  "to_version": "3.0",
-                  "patch_format": "hdiff",
-                  "url": "https://github.com/HakkinDavid/hakkin-launcher-deltas/releases/download/migrant-aid-map.2.2-to-3.0/migrant-aid-map_android.hdiff",
-                  "size_bytes": 425739,
-                  "patch_sha256": "1b42f37258a0b3278516b0fa5fd0548d7bdafbad00177f898bf83db5298e1a08",
-                  "target_sha256": "6127a04ccb69209720508e69be9355e37a1af4db5d1b2fea67c19ed9d5caa8b0"
-                }
-              ],
+              "delta_patches": [],
               "scripts": {
                 "pre_install": null,
                 "post_install": null
@@ -544,17 +566,7 @@
                 "size_bytes": 65859605,
                 "sha256": "45c81794d8779d4bb52068523cadce07b7663795006a127039b8460da7c677fa"
               },
-              "delta_patches": [
-                {
-                  "from_version": "26.06.02",
-                  "to_version": "26.08.04",
-                  "patch_format": "hdiff",
-                  "url": "https://github.com/HakkinDavid/hakkin-launcher-deltas/releases/download/firefighter-form.26.06.02-to-26.08.04/firefighter-form_android.hdiff",
-                  "size_bytes": 32885518,
-                  "patch_sha256": "ee340a97f024ec25a951467048b4cc8f3740ce939cf6080a0ba7b9486d1bbcb6",
-                  "target_sha256": "45c81794d8779d4bb52068523cadce07b7663795006a127039b8460da7c677fa"
-                }
-              ],
+              "delta_patches": [],
               "scripts": {
                 "pre_install": null,
                 "post_install": null
@@ -813,17 +825,7 @@
                 "size_bytes": 90255671,
                 "sha256": "77b915fbf6fa4ad40a361432bb7b8d5eeffd3fe5ea50949350be83a26e14cd4b"
               },
-              "delta_patches": [
-                {
-                  "from_version": "26.09.08",
-                  "to_version": "26.09.11",
-                  "patch_format": "hdiff",
-                  "url": "https://github.com/HakkinDavid/hakkin-launcher-deltas/releases/download/platinum-world-management.26.09.08-to-26.09.11/platinum-world-management_android.hdiff",
-                  "size_bytes": 33740490,
-                  "patch_sha256": "9b7dbc396906d1551884db405f226696d10b24bd369812200df75407e786ff10",
-                  "target_sha256": "77b915fbf6fa4ad40a361432bb7b8d5eeffd3fe5ea50949350be83a26e14cd4b"
-                }
-              ],
+              "delta_patches": [],
               "scripts": {
                 "pre_install": null,
                 "post_install": null
@@ -1152,17 +1154,7 @@
                 "size_bytes": 6176525,
                 "sha256": "f902bed32da91038f6d2dd4f3ad56f468f823c320fc4cd8f7a7de724583012c4"
               },
-              "delta_patches": [
-                {
-                  "from_version": "1.1",
-                  "to_version": "1.2",
-                  "patch_format": "hdiff",
-                  "url": "https://github.com/HakkinDavid/hakkin-launcher-deltas/releases/download/cathelper.1.1-to-1.2/cathelper_android.hdiff",
-                  "size_bytes": 298999,
-                  "patch_sha256": "ba98fc9645f02ff03d60ac8dcf756bf71d8d46daf59ccfe887e7867bcbdccf0c",
-                  "target_sha256": "f902bed32da91038f6d2dd4f3ad56f468f823c320fc4cd8f7a7de724583012c4"
-                }
-              ],
+              "delta_patches": [],
               "scripts": {
                 "pre_install": null,
                 "post_install": null

@@ -25,7 +25,8 @@ from catalog_generator import (
     format_description_markdown,
     format_changelog,
     KNOWN_ASSET_CACHE,
-    ManifestAdapter
+    ManifestAdapter,
+    verify_catalog_deltas
 )
 
 
@@ -377,6 +378,84 @@ class TestCatalogGenerator(unittest.TestCase):
         self.assertEqual(adapted["macos-arm64"]["version"], "26.10.11-19")
         # El binario preservado mantiene su origin_release y no suplanta versiones previas
         self.assertEqual(adapted["windows-x64"]["version"], "26.10.08-13")
+
+    def test_android_apk_deltas_completely_excluded(self):
+        mock_manifest = {
+            "version": "2.0.0",
+            "catalog_timestamp": "2026-10-12T00:00:00Z",
+            "launcher_meta": None,
+            "apps": [
+                {
+                    "id": "com.test.androidapp",
+                    "slug": "android-app",
+                    "title": "Android App",
+                    "category": "app",
+                    "developer": "TestDev",
+                    "summary": "Resumen de prueba.",
+                    "description_markdown": "# Android App\n\nDescripción de prueba.",
+                    "tags": ["Prueba"],
+                    "assets": {},
+                    "latest_version": "2.0.0",
+                    "platforms": {
+                        "android": {
+                            "latest_version": "2.0.0",
+                            "protected_user_paths": [],
+                            "versions": [
+                                {
+                                    "version": "2.0.0",
+                                    "package": {
+                                        "url": "https://github.com/test/app/releases/download/v2.0.0/app.apk",
+                                        "size_bytes": 1000,
+                                        "sha256": "a" * 64
+                                    },
+                                    "delta_patches": [
+                                        {
+                                            "from_version": "1.0.0",
+                                            "url": "https://github.com/test/app/releases/download/v2.0.0/patch.hdiff",
+                                            "size_bytes": 200,
+                                            "patch_sha256": "b" * 64,
+                                            "target_sha256": "a" * 64
+                                        }
+                                    ]
+                                },
+                                {
+                                    "version": "1.0.0",
+                                    "package": {
+                                        "url": "https://github.com/test/app/releases/download/v1.0.0/app.apk",
+                                        "size_bytes": 900,
+                                        "sha256": "c" * 64
+                                    },
+                                    "delta_patches": []
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+
+        purged = purge_orphaned_and_nonexistent_versions(mock_manifest)
+        android_plat = purged["apps"][0]["platforms"]["android"]
+        # Ninguna versión de Android debe tener delta_patches
+        for v in android_plat["versions"]:
+            self.assertEqual(len(v["delta_patches"]), 0, f"Versión v{v['version']} no debe contener deltas")
+
+        # verify_catalog_deltas debe registrar la plataforma como excluida
+        audit = verify_catalog_deltas(purged, strict=False)
+        self.assertEqual(len(audit["errors"]), 0)
+        self.assertTrue(any("android-app (android)" in item for item in audit["excluded_android"]))
+
+    def test_verify_catalog_deltas_audits_correctly(self):
+        workspace_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        catalog_path = os.path.join(workspace_root, "docs", "catalog.json")
+        with open(catalog_path, "r", encoding="utf-8") as f:
+            manifest = json.load(f)
+
+        purged = purge_orphaned_and_nonexistent_versions(manifest)
+        audit = verify_catalog_deltas(purged, strict=False)
+        self.assertEqual(len(audit["errors"]), 0)
+        self.assertGreater(len(audit["verified"]), 0)
+        self.assertGreater(len(audit["excluded_android"]), 0)
 
 
 if __name__ == "__main__":
