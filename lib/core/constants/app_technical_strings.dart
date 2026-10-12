@@ -48,6 +48,7 @@ class AppTechnicalStrings {
   static const prefAutoCheckUpdatesKey = 'hakkin_auto_check_updates';
   static const prefCachedCatalogJson = 'hakkin_cached_catalog_json';
   static const prefInstalledAppsJson = 'hakkin_installed_apps_json';
+  static const prefPostUpdateHiddenKey = 'hakkin_post_update_hidden';
 
   // ---------------------------------------------------------------------------
   // Asset Paths
@@ -425,7 +426,15 @@ class AppTechnicalStrings {
     required String targetAppPath,
     required String zipFilePath,
     required String logFilePath,
+    bool startHidden = false,
   }) {
+    final envSetup = startHidden
+        ? 'export $envHakkinStartup="$valStartupActive"'
+        : 'unset $envHakkinStartup';
+    final launchCmd = startHidden
+        ? 'open -g -n "\$TARGET_APP" --args $argStartup'
+        : 'open -n "\$TARGET_APP"';
+
     return '''#!/bin/bash
 set -e
 
@@ -435,6 +444,7 @@ TARGET_APP="$targetAppPath"
 ZIP_FILE="$zipFilePath"
 BACKUP_APP="\${TARGET_APP}.update_backup"
 LOG_FILE="$logFilePath"
+$envSetup
 
 mkdir -p "\$(dirname "\$LOG_FILE")"
 exec > >(tee -a "\$LOG_FILE") 2>&1
@@ -462,7 +472,7 @@ rollback() {
         cp -R "\$BACKUP_APP" "\$TARGET_APP" 2>/dev/null || mv "\$BACKUP_APP" "\$TARGET_APP"
         echo "Copia original restaurada desde backup."
     fi
-    open -n "\$TARGET_APP" 2>/dev/null || true
+    $launchCmd 2>/dev/null || true
     rm -rf "\$STAGING_DIR" 2>/dev/null || true
     echo "Rollback completado. Versión anterior reactivada."
     exit 1
@@ -502,7 +512,7 @@ else
 fi
 
 echo "Iniciando nueva versión..."
-if ! open -n "\$TARGET_APP"; then
+if ! $launchCmd; then
     echo "Fallo al iniciar nueva versión. Ejecutando rollback..."
     rollback
 fi
@@ -523,7 +533,15 @@ rm -f "\$0" 2>/dev/null || true
     required String appDir,
     required String zipFilePath,
     required String logFilePath,
+    bool startHidden = false,
   }) {
+    final envSetup = startHidden
+        ? 'set $envHakkinStartup=$valStartupActive'
+        : 'set $envHakkinStartup=';
+    final launchCmd = startHidden
+        ? 'start "" "%CURRENT_EXE%" $argStartup'
+        : 'start "" "%CURRENT_EXE%"';
+
     return '''@echo off
 setlocal enabledelayedexpansion
 set CURRENT_PID=$currentPid
@@ -533,6 +551,7 @@ set ZIP_FILE=$zipFilePath
 set BACKUP_DIR=%APP_DIR%_backup
 set STAGING_DIR=%TEMP%\\hakkin_staging_%RANDOM%
 set LOG_FILE=$logFilePath
+$envSetup
 
 echo === HakkinLauncher Windows Auto-Update: %date% %time% === > "%LOG_FILE%"
 
@@ -573,7 +592,7 @@ xcopy "%STAGING_CONTENT%" "%APP_DIR%\\" /E /I /H /Y /Q >> "%LOG_FILE%" 2>&1
 if errorlevel 1 goto rollback
 
 echo Iniciando nueva versión de HakkinLauncher... >> "%LOG_FILE%"
-start "" "%CURRENT_EXE%"
+$launchCmd
 if errorlevel 1 goto rollback
 
 timeout /t 3 /nobreak >NUL
@@ -589,7 +608,7 @@ echo ERROR: Fallo durante la actualización. Restaurando desde backup... >> "%LO
 if exist "%BACKUP_DIR%" (
     xcopy "%BACKUP_DIR%" "%APP_DIR%\\" /E /I /H /Y /Q >> "%LOG_FILE%" 2>&1
 )
-start "" "%CURRENT_EXE%"
+$launchCmd
 rmdir /s /q "%STAGING_DIR%" 2>NUL
 exit /b 1
 ''';
@@ -601,7 +620,15 @@ exit /b 1
     required String appDir,
     required String zipFilePath,
     required String logFilePath,
+    bool startHidden = false,
   }) {
+    final envSetup = startHidden
+        ? 'export $envHakkinStartup="$valStartupActive"'
+        : 'unset $envHakkinStartup';
+    final launchCmd = startHidden
+        ? '"\$CURRENT_EXE" $argStartup &'
+        : '"\$CURRENT_EXE" &';
+
     return '''#!/bin/bash
 set -e
 
@@ -611,6 +638,7 @@ APP_DIR="$appDir"
 ZIP_FILE="$zipFilePath"
 BACKUP_DIR="\${APP_DIR}.update_backup"
 LOG_FILE="$logFilePath"
+$envSetup
 
 mkdir -p "\$(dirname "\$LOG_FILE")"
 exec > >(tee -a "\$LOG_FILE") 2>&1
@@ -635,7 +663,7 @@ rollback() {
         rm -rf "\$APP_DIR" 2>/dev/null || true
         cp -a "\$BACKUP_DIR" "\$APP_DIR" 2>/dev/null || mv "\$BACKUP_DIR" "\$APP_DIR"
     fi
-    "\$CURRENT_EXE" &
+    $launchCmd
     rm -rf "\$STAGING_DIR" 2>/dev/null || true
     exit 1
 }
@@ -670,7 +698,7 @@ else
 fi
 
 echo "Iniciando nueva versión..."
-"\$CURRENT_EXE" &
+$launchCmd
 
 sleep 2
 rm -rf "\$BACKUP_DIR" 2>/dev/null || true

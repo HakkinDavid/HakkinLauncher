@@ -1,10 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hakkin_launcher/core/constants/app_constants.dart';
+import 'package:hakkin_launcher/core/constants/app_technical_strings.dart';
 import 'package:hakkin_launcher/core/platform/background_check_service.dart';
 import 'package:hakkin_launcher/core/platform/process_launcher.dart';
+import 'package:hakkin_launcher/core/platform/startup_service.dart';
 import 'package:hakkin_launcher/core/platform/window_service.dart';
 import 'package:hakkin_launcher/features/catalog/data/models/app_entry.dart';
 import 'package:hakkin_launcher/features/self_update/services/self_update_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   group('SelfUpdateService - Version Comparison & Detection', () {
@@ -282,6 +285,118 @@ void main() {
       await Future<void>.delayed(const Duration(milliseconds: 20));
 
       expect(triggered, ['999.0.0']);
+    });
+  });
+
+  group('SelfUpdateService - Persistence of Execution Mode (Hidden vs Foreground)', () {
+    setUp(() {
+      SharedPreferences.setMockInitialValues({});
+      WindowService.instance.setHiddenForTesting(false);
+    });
+
+    tearDown(() {
+      WindowService.instance.setHiddenForTesting(false);
+    });
+
+    test('Update scripts preserve hidden mode when startHidden is true across macOS, Windows, and Linux', () {
+      final macHidden = SelfUpdateService.generateMacOSUpdateScript(
+        currentPid: 111,
+        currentExePath: '/Applications/HakkinLauncher.app/Contents/MacOS/HakkinLauncher',
+        targetAppPath: '/Applications/HakkinLauncher.app',
+        zipFilePath: '/tmp/update.zip',
+        logFilePath: '/tmp/update.log',
+        startHidden: true,
+      );
+      expect(macHidden, contains('export HAKKIN_STARTUP="1"'));
+      expect(macHidden, contains(r'open -g -n "$TARGET_APP" --args --startup'));
+
+      final winHidden = SelfUpdateService.generateWindowsUpdateScript(
+        currentPid: 222,
+        currentExePath: r'C:\Hakkin\HakkinLauncher.exe',
+        appDir: r'C:\Hakkin',
+        zipFilePath: r'C:\Hakkin\update.zip',
+        logFilePath: r'C:\Hakkin\update.log',
+        startHidden: true,
+      );
+      expect(winHidden, contains('set HAKKIN_STARTUP=1'));
+      expect(winHidden, contains('start "" "%CURRENT_EXE%" --startup'));
+
+      final linuxHidden = SelfUpdateService.generateLinuxUpdateScript(
+        currentPid: 333,
+        currentExePath: '/opt/hakkin/HakkinLauncher',
+        appDir: '/opt/hakkin',
+        zipFilePath: '/tmp/update.zip',
+        logFilePath: '/tmp/update.log',
+        startHidden: true,
+      );
+      expect(linuxHidden, contains('export HAKKIN_STARTUP="1"'));
+      expect(linuxHidden, contains(r'"$CURRENT_EXE" --startup &'));
+    });
+
+    test('Update scripts preserve foreground mode and clear HAKKIN_STARTUP when startHidden is false', () {
+      final macFg = SelfUpdateService.generateMacOSUpdateScript(
+        currentPid: 111,
+        currentExePath: '/Applications/HakkinLauncher.app/Contents/MacOS/HakkinLauncher',
+        targetAppPath: '/Applications/HakkinLauncher.app',
+        zipFilePath: '/tmp/update.zip',
+        logFilePath: '/tmp/update.log',
+        startHidden: false,
+      );
+      expect(macFg, contains('unset HAKKIN_STARTUP'));
+      expect(macFg, contains(r'if ! open -n "$TARGET_APP"; then'));
+      expect(macFg, isNot(contains('--startup')));
+
+      final winFg = SelfUpdateService.generateWindowsUpdateScript(
+        currentPid: 222,
+        currentExePath: r'C:\Hakkin\HakkinLauncher.exe',
+        appDir: r'C:\Hakkin',
+        zipFilePath: r'C:\Hakkin\update.zip',
+        logFilePath: r'C:\Hakkin\update.log',
+        startHidden: false,
+      );
+      expect(winFg, contains('set HAKKIN_STARTUP='));
+      expect(winFg, isNot(contains('--startup')));
+
+      final linuxFg = SelfUpdateService.generateLinuxUpdateScript(
+        currentPid: 333,
+        currentExePath: '/opt/hakkin/HakkinLauncher',
+        appDir: '/opt/hakkin',
+        zipFilePath: '/tmp/update.zip',
+        logFilePath: '/tmp/update.log',
+        startHidden: false,
+      );
+      expect(linuxFg, contains('unset HAKKIN_STARTUP'));
+      expect(linuxFg, isNot(contains('--startup')));
+    });
+
+    test('Persists hidden mode across self-update and consumes the one-shot flag on restart', () async {
+      WindowService.instance.setHiddenForTesting(true);
+      await StartupService.savePostUpdateHiddenState(WindowService.instance.isHidden);
+
+      // Al reiniciar tras actualizar, permanece escondido aunque no tenga --startup en args
+      final resolvedOnUpdateRestart = await StartupService.resolveStartHidden([]);
+      expect(resolvedOnUpdateRestart, isTrue);
+
+      // En un inicio manual posterior, el estado temporal ya fue consumido y abre en primer plano
+      final resolvedOnNextNormalLaunch = await StartupService.resolveStartHidden([]);
+      expect(resolvedOnNextNormalLaunch, isFalse);
+    });
+
+    test('Persists foreground mode across self-update even if session originally had --startup', () async {
+      WindowService.instance.setHiddenForTesting(false);
+      await StartupService.savePostUpdateHiddenState(WindowService.instance.isHidden);
+
+      // Al reiniciar tras actualizar estando en primer plano, aparece en primer plano
+      final resolvedOnUpdateRestart = await StartupService.resolveStartHidden([
+        AppTechnicalStrings.argStartup,
+      ]);
+      expect(resolvedOnUpdateRestart, isFalse);
+
+      // En el siguiente arranque del sistema, vuelve a respetar --startup
+      final resolvedOnNextSystemBoot = await StartupService.resolveStartHidden([
+        AppTechnicalStrings.argStartup,
+      ]);
+      expect(resolvedOnNextSystemBoot, isTrue);
     });
   });
 }

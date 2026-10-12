@@ -25,6 +25,33 @@ class StartupService {
     return false;
   }
 
+  /// Persiste el estado de visibilidad previo a una autoactualización para restaurarlo tras el reinicio.
+  static Future<void> savePostUpdateHiddenState(bool isHidden) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(AppConstants.prefPostUpdateHiddenKey, isHidden);
+    } catch (e) {
+      debugPrint(AppStrings.logStartupServiceError(e));
+    }
+  }
+
+  /// Resuelve si el lanzador debe iniciar oculto o en primer plano, consumiendo el estado
+  /// persistido previo a una autoactualización si existe o recurriendo a la detección de arranque del sistema.
+  static Future<bool> resolveStartHidden([List<String> args = const []]) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (prefs.containsKey(AppConstants.prefPostUpdateHiddenKey)) {
+        final postUpdateHidden =
+            prefs.getBool(AppConstants.prefPostUpdateHiddenKey) ?? false;
+        await prefs.remove(AppConstants.prefPostUpdateHiddenKey);
+        return postUpdateHidden;
+      }
+    } catch (e) {
+      debugPrint(AppStrings.logStartupServiceError(e));
+    }
+    return isLaunchedFromStartup(args);
+  }
+
   /// Inicializa el estado de arranque del sistema, activándolo por defecto si no se ha configurado.
   static Future<void> initialize() async {
     if (!Platform.isWindows && !Platform.isMacOS && !Platform.isLinux) {

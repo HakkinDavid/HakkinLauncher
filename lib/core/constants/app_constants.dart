@@ -31,6 +31,8 @@ class AppConstants {
       AppTechnicalStrings.prefCachedCatalogJson;
   static const String prefInstalledAppsJson =
       AppTechnicalStrings.prefInstalledAppsJson;
+  static const String prefPostUpdateHiddenKey =
+      AppTechnicalStrings.prefPostUpdateHiddenKey;
 
   static const Duration backgroundCheckInterval =
       AppTechnicalStrings.backgroundCheckInterval;

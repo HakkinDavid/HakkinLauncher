@@ -18,7 +18,7 @@ void main(List<String> args) async {
   // Inicialización de servicios de escritorio
   if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
     try {
-      final startHidden = StartupService.isLaunchedFromStartup(args);
+      final startHidden = await StartupService.resolveStartHidden(args);
       await NotificationService.initialize();
       await WindowService.initialize(startHidden: startHidden);
       await StartupService.initialize();

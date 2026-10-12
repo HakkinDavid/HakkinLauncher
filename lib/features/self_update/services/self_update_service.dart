@@ -7,6 +7,8 @@ import '../../../core/constants/app_technical_strings.dart';
 import '../../../core/crypto/hash_validator.dart';
 import '../../../core/platform/notification_service.dart';
 import '../../../core/platform/os_paths.dart';
+import '../../../core/platform/startup_service.dart';
+import '../../../core/platform/window_service.dart';
 import '../../catalog/data/models/app_entry.dart';
 import '../../updater/services/downloader_service.dart';
 
@@ -120,6 +122,7 @@ class SelfUpdateService {
     required String targetAppPath,
     required String zipFilePath,
     required String logFilePath,
+    bool startHidden = false,
   }) {
     return AppTechnicalStrings.generateMacOSUpdateScript(
       currentPid: currentPid,
@@ -127,6 +130,7 @@ class SelfUpdateService {
       targetAppPath: targetAppPath,
       zipFilePath: zipFilePath,
       logFilePath: logFilePath,
+      startHidden: startHidden,
     );
   }
 
@@ -137,6 +141,7 @@ class SelfUpdateService {
     required String appDir,
     required String zipFilePath,
     required String logFilePath,
+    bool startHidden = false,
   }) {
     return AppTechnicalStrings.generateWindowsUpdateScript(
       currentPid: currentPid,
@@ -144,6 +149,7 @@ class SelfUpdateService {
       appDir: appDir,
       zipFilePath: zipFilePath,
       logFilePath: logFilePath,
+      startHidden: startHidden,
     );
   }
 
@@ -154,6 +160,7 @@ class SelfUpdateService {
     required String appDir,
     required String zipFilePath,
     required String logFilePath,
+    bool startHidden = false,
   }) {
     return AppTechnicalStrings.generateLinuxUpdateScript(
       currentPid: currentPid,
@@ -161,6 +168,7 @@ class SelfUpdateService {
       appDir: appDir,
       zipFilePath: zipFilePath,
       logFilePath: logFilePath,
+      startHidden: startHidden,
     );
   }
 
@@ -308,6 +316,8 @@ class SelfUpdateService {
     final downloadsDir = zipFile.parent.path;
     final logFile =
         p.join(downloadsDir, AppTechnicalStrings.selfUpdateLogFileName);
+    final startHidden = WindowService.instance.isHidden;
+    await StartupService.savePostUpdateHiddenState(startHidden);
 
     if (Platform.isMacOS) {
       String targetAppPath = currentExePath;
@@ -322,6 +332,7 @@ class SelfUpdateService {
         targetAppPath: targetAppPath,
         zipFilePath: zipFile.path,
         logFilePath: logFile,
+        startHidden: startHidden,
       );
 
       final scriptFile =
@@ -346,6 +357,7 @@ class SelfUpdateService {
         appDir: appDir,
         zipFilePath: zipFile.path,
         logFilePath: logFile,
+        startHidden: startHidden,
       );
 
       final scriptFile =
@@ -365,6 +377,7 @@ class SelfUpdateService {
         appDir: appDir,
         zipFilePath: zipFile.path,
         logFilePath: logFile,
+        startHidden: startHidden,
       );
 
       final scriptFile =
