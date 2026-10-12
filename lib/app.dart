@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'core/constants/app_strings.dart';
 import 'core/constants/app_technical_strings.dart';
+import 'core/platform/background_check_service.dart';
 import 'core/theme/app_theme.dart';
 import 'features/app_detail/presentation/screens/app_detail_screen.dart';
 import 'features/catalog/presentation/screens/store_screen.dart';
@@ -48,16 +49,55 @@ final appRouter = GoRouter(
   ],
 );
 
-class HakkinLauncherApp extends StatelessWidget {
+class HakkinLauncherApp extends StatefulWidget {
   const HakkinLauncherApp({super.key});
 
   @override
+  State<HakkinLauncherApp> createState() => _HakkinLauncherAppState();
+}
+
+class _HakkinLauncherAppState extends State<HakkinLauncherApp> {
+  void _onRouteChanged() {
+    BackgroundCheckService.instance.recordUserNavigation();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    appRouter.routerDelegate.addListener(_onRouteChanged);
+  }
+
+  @override
+  void dispose() {
+    appRouter.routerDelegate.removeListener(_onRouteChanged);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: AppStrings.appName,
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
-      routerConfig: appRouter,
+    return Listener(
+      behavior: HitTestBehavior.translucent,
+      onPointerDown: (_) =>
+          BackgroundCheckService.instance.recordUserNavigation(),
+      onPointerMove: (_) =>
+          BackgroundCheckService.instance.recordUserNavigation(),
+      onPointerHover: (_) =>
+          BackgroundCheckService.instance.recordUserNavigation(),
+      onPointerSignal: (_) =>
+          BackgroundCheckService.instance.recordUserNavigation(),
+      child: Focus(
+        canRequestFocus: false,
+        onKeyEvent: (_, __) {
+          BackgroundCheckService.instance.recordUserNavigation();
+          return KeyEventResult.ignored;
+        },
+        child: MaterialApp.router(
+          title: AppStrings.appName,
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.darkTheme,
+          routerConfig: appRouter,
+        ),
+      ),
     );
   }
 }

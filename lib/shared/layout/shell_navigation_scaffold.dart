@@ -44,6 +44,10 @@ class _ShellNavigationScaffoldState
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
+        final initialMeta = ref.read(catalogManifestProvider).value?.launcherMeta;
+        if (initialMeta != null) {
+          BackgroundCheckService.instance.updateKnownLauncherMeta(initialMeta);
+        }
         MacOsRelocationService.checkAndRelocateIfNecessary(context);
       }
     });
@@ -51,6 +55,13 @@ class _ShellNavigationScaffoldState
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(catalogManifestProvider, (_, next) {
+      final meta = next.value?.launcherMeta;
+      if (meta != null) {
+        BackgroundCheckService.instance.updateKnownLauncherMeta(meta);
+      }
+    });
+
     final location = GoRouterState.of(context).uri.toString();
     final manifestAsync = ref.watch(catalogManifestProvider);
     final launcherMeta = manifestAsync.value?.launcherMeta;

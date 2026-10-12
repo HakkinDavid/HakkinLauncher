@@ -1,5 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hakkin_launcher/core/constants/app_constants.dart';
+import 'package:hakkin_launcher/core/platform/background_check_service.dart';
+import 'package:hakkin_launcher/core/platform/process_launcher.dart';
+import 'package:hakkin_launcher/core/platform/window_service.dart';
 import 'package:hakkin_launcher/features/catalog/data/models/app_entry.dart';
 import 'package:hakkin_launcher/features/self_update/services/self_update_service.dart';
 
@@ -170,6 +173,115 @@ void main() {
       expect(script, contains(r'"$CURRENT_EXE" &'));
       // Elevation fallback
       expect(script, contains('pkexec'));
+    });
+  });
+
+  group('Automatic Self-Update Conditions (Hidden or 1-Minute Navigation Debounce)', () {
+    const newerMeta = LauncherMeta(
+      latestVersion: '999.0.0',
+      releases: {},
+    );
+
+    setUp(() {
+      ProcessLauncher.clearRunningAppsForTesting();
+      WindowService.instance.setHiddenForTesting(false);
+      BackgroundCheckService.instance.resetStateForTesting();
+    });
+
+    tearDown(() {
+      ProcessLauncher.clearRunningAppsForTesting();
+      WindowService.instance.setHiddenForTesting(false);
+      BackgroundCheckService.instance.resetStateForTesting();
+    });
+
+    test('Default navigation debounce constant is 1 minute', () {
+      expect(AppConstants.selfUpdateNavigationDebounce, const Duration(minutes: 1));
+    });
+
+    test('Does not auto-update when visible and actively being navigated', () async {
+      final triggered = <String>[];
+      BackgroundCheckService.instance.registerAutoSelfUpdateHandler((meta) async {
+        triggered.add(meta.latestVersion);
+      });
+
+      BackgroundCheckService.instance.recordUserNavigation(
+        debounce: const Duration(minutes: 1),
+      );
+
+      final result = await BackgroundCheckService.instance.evaluateAutoSelfUpdate(
+        launcherMeta: newerMeta,
+      );
+
+      expect(result, isFalse);
+      expect(triggered, isEmpty);
+    });
+
+    test('Condition a) Executes auto-update immediately when launcher is hidden and no apps are running', () async {
+      final triggered = <String>[];
+      BackgroundCheckService.instance.registerAutoSelfUpdateHandler((meta) async {
+        triggered.add(meta.latestVersion);
+      });
+
+      BackgroundCheckService.instance.updateKnownLauncherMeta(newerMeta);
+      expect(triggered, isEmpty);
+
+      // Al pasar a estado hidden (system tray / taskbar / background), se ejecuta en automático
+      WindowService.instance.setHiddenForTesting(true);
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+
+      expect(triggered, ['999.0.0']);
+    });
+
+    test('Condition b) Executes auto-update after navigation debounce elapses and resets on user navigation', () async {
+      final triggered = <String>[];
+      BackgroundCheckService.instance.registerAutoSelfUpdateHandler((meta) async {
+        triggered.add(meta.latestVersion);
+      });
+
+      BackgroundCheckService.instance.updateKnownLauncherMeta(newerMeta);
+      BackgroundCheckService.instance.recordUserNavigation(
+        debounce: const Duration(milliseconds: 80),
+      );
+
+      // Navegación intermedia antes de que se cumpla el debounce reinicia el contador
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(triggered, isEmpty);
+      BackgroundCheckService.instance.recordUserNavigation(
+        debounce: const Duration(milliseconds: 80),
+      );
+
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(triggered, isEmpty);
+
+      // Al cumplirse el periodo completo sin navegación, se autoactualiza
+      await Future<void>.delayed(const Duration(milliseconds: 60));
+      expect(triggered, ['999.0.0']);
+    });
+
+    test('Does NOT auto-update while any program is running, and triggers once program finishes', () async {
+      final triggered = <String>[];
+      BackgroundCheckService.instance.registerAutoSelfUpdateHandler((meta) async {
+        triggered.add(meta.latestVersion);
+      });
+
+      // Simular un programa del catálogo en ejecución
+      ProcessLauncher.setRunningPidForTesting('dev.bonsanbec.tecate', 42424);
+      expect(ProcessLauncher.hasRunningApps, isTrue);
+
+      // Aunque esté hidden y haya actualización disponible, no debe interrumpir
+      WindowService.instance.setHiddenForTesting(true);
+      final whileRunning = await BackgroundCheckService.instance.evaluateAutoSelfUpdate(
+        launcherMeta: newerMeta,
+      );
+      expect(whileRunning, isFalse);
+      expect(triggered, isEmpty);
+
+      // Al finalizar el programa en ejecución, dispara la autoactualización pendiente
+      ProcessLauncher.setRunningPidForTesting('dev.bonsanbec.tecate', null);
+      expect(ProcessLauncher.hasRunningApps, isFalse);
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+
+      expect(triggered, ['999.0.0']);
     });
   });
 }

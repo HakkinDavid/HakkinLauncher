@@ -465,6 +465,8 @@ class AppStrings {
       'Aviso al configurar el inicio automático del sistema: $error.';
   static String logAutoUpdateStarting(String title, String version) =>
       'Iniciando actualización automática de $title a v$version.';
+  static String logAutoSelfUpdateStarting(String version) =>
+      'Iniciando actualización automática de HakkinLauncher a v$version.';
   static String logAutoUpdateError(Object error) =>
       'Error en actualización automática: $error.';
 

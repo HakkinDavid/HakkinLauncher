@@ -36,6 +36,7 @@ class AppTechnicalStrings {
 
   static const backgroundCheckInterval = Duration(minutes: 15);
   static const startupAutoUpdateDelay = Duration(minutes: 5);
+  static const selfUpdateNavigationDebounce = Duration(minutes: 1);
 
   // ---------------------------------------------------------------------------
   // SharedPreferences Keys

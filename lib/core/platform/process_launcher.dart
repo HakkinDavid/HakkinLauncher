@@ -17,6 +17,9 @@ class ProcessLauncher {
   static Stream<Map<String, bool>> get runningStateStream =>
       _runningStateController.stream;
 
+  /// Indica si el lanzador tiene actualmente algún programa en ejecución.
+  static bool get hasRunningApps => _runningPids.isNotEmpty;
+
   /// Indica si una aplicación específica está actualmente en ejecución.
   static bool isAppRunning(String appId) {
     return _runningPids.containsKey(appId);
@@ -25,6 +28,24 @@ class ProcessLauncher {
   /// Retorna el PID de una aplicación en ejecución si está disponible.
   static int? getAppPid(String appId) {
     return _runningPids[appId];
+  }
+
+  /// Establece o elimina un PID simulado en ejecución para pruebas unitarias.
+  @visibleForTesting
+  static void setRunningPidForTesting(String appId, int? pid) {
+    if (pid == null) {
+      _runningPids.remove(appId);
+    } else {
+      _runningPids[appId] = pid;
+    }
+    _notifyStateChange();
+  }
+
+  /// Limpia todos los procesos en ejecución registrados para pruebas unitarias.
+  @visibleForTesting
+  static void clearRunningAppsForTesting() {
+    _runningPids.clear();
+    _notifyStateChange();
   }
 
   /// Resuelve la ruta al ejecutable real.

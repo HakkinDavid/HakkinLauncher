@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hakkin_launcher/core/constants/app_constants.dart';
@@ -31,11 +32,28 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _isCheckingUpdates = false;
   String? _selfUpdateStatusMessage;
   bool _isSelfUpdating = false;
+  StreamSubscription<SelfUpdateStatus>? _selfUpdateSub;
 
   @override
   void initState() {
     super.initState();
+    _isSelfUpdating = BackgroundCheckService.instance.isRunningSelfUpdate;
+    _selfUpdateSub =
+        BackgroundCheckService.instance.selfUpdateStatusStream.listen((status) {
+      if (!mounted) return;
+      setState(() {
+        _isSelfUpdating = status.stage != SelfUpdateStage.error &&
+            status.stage != SelfUpdateStage.idle;
+        _selfUpdateStatusMessage = status.message;
+      });
+    });
     _loadSettings();
+  }
+
+  @override
+  void dispose() {
+    _selfUpdateSub?.cancel();
+    super.dispose();
   }
 
   Future<void> _loadSettings() async {
@@ -173,14 +191,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       _selfUpdateStatusMessage = AppStrings.selfUpdateStarting;
     });
 
-    final selfUpdateService = SelfUpdateService();
-    await for (final status in selfUpdateService.performSelfUpdate(manifest.launcherMeta!)) {
-      if (mounted) {
-        setState(() {
-          _selfUpdateStatusMessage = status.message;
-        });
-      }
-    }
+    await BackgroundCheckService.instance
+        .triggerSelfUpdate(manifest.launcherMeta!);
   }
 
   Future<void> _runHousekeeping() async {

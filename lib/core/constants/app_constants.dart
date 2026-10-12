@@ -36,6 +36,8 @@ class AppConstants {
       AppTechnicalStrings.backgroundCheckInterval;
   static const Duration startupAutoUpdateDelay =
       AppTechnicalStrings.startupAutoUpdateDelay;
+  static const Duration selfUpdateNavigationDebounce =
+      AppTechnicalStrings.selfUpdateNavigationDebounce;
 
   static const double windowMinWidth = 1080;
   static const double windowMinHeight = 680;
