@@ -133,7 +133,10 @@ class AppTechnicalStrings {
 
   static const updateHelperSh = 'update_helper.sh';
   static const updateHelperBat = 'update_helper.bat';
+  static const updateLauncherVbs = 'update_launcher.vbs';
   static const selfUpdateZipFileName = 'HakkinLauncher_update.zip';
+  static const selfUpdateApplyingZipFileName =
+      'HakkinLauncher_update_applying.zip';
   static const selfUpdateLogFileName = 'HakkinLauncher_self_update.log';
   static const appContentsMacOs = '.app/Contents/MacOS';
   static const appleQuarantineAttr = 'com.apple.quarantine';
@@ -155,6 +158,7 @@ class AppTechnicalStrings {
   static const cmdTaskkill = 'taskkill';
   static const cmdPowershell = 'powershell';
   static const cmdCmd = 'cmd';
+  static const cmdWscript = 'wscript';
   static const cmdOpen = 'open';
   static const cmdExplorer = 'explorer';
   static const cmdXdgOpen = 'xdg-open';
@@ -198,6 +202,8 @@ class AppTechnicalStrings {
   static const argSlashF = '/F';
   static const argSlashPid = '/PID';
   static const argSlashC = '/c';
+  static const argSlashB = '//B';
+  static const argSlashNologo = '//Nologo';
   static const argAdd = 'add';
   static const argDelete = 'delete';
   static const argQuery = 'query';
@@ -214,9 +220,9 @@ class AppTechnicalStrings {
   static const argHidden = 'Hidden';
   static const argMinusCommand = '-Command';
 
-  static String powershellStartHiddenCmd(String scriptPath) {
-    final escaped = scriptPath.replaceAll("'", "''");
-    return "Start-Process -FilePath '$cmdCmd' -ArgumentList '$argSlashC \"\"$escaped\"\"' -WindowStyle $argHidden";
+  static String generateWindowsVbsLauncher(String scriptPath) {
+    final escaped = scriptPath.replaceAll('"', '""');
+    return 'CreateObject("WScript.Shell").Run "$cmdCmd $argSlashC ""$escaped""", 0, False\r\n';
   }
 
   // ---------------------------------------------------------------------------
@@ -552,6 +558,7 @@ rm -f "\$0" 2>/dev/null || true
 
     final script = '''@echo off
 setlocal enabledelayedexpansion
+cd /d "%TEMP%" 2>NUL
 set CURRENT_PID=$currentPid
 set CURRENT_EXE=$currentExePath
 set APP_DIR=$appDir
@@ -564,15 +571,10 @@ $envSetup
 echo === HakkinLauncher Windows Auto-Update: %date% %time% === > "%LOG_FILE%"
 
 echo Esperando a que el proceso anterior finalice... >> "%LOG_FILE%"
-set PID_FILE=%TEMP%\\hakkin_pid_%CURRENT_PID%_%RANDOM%.tmp
 set /a COUNT=0
 :wait_loop
-set PID_ALIVE=0
-tasklist /fi "PID eq %CURRENT_PID%" /fo csv /nh > "%PID_FILE%" 2>NUL
-for /f "usebackq tokens=2 delims=," %%A in ("%PID_FILE%") do (
-    if "%%~A"=="%CURRENT_PID%" set PID_ALIVE=1
-)
-if "!PID_ALIVE!"=="1" (
+tasklist /fi "PID eq %CURRENT_PID%" 2>NUL | find /i "%CURRENT_PID%" >NUL
+if not errorlevel 1 (
     ping 127.0.0.1 -n 2 >NUL 2>&1
     set /a COUNT+=1
     if !COUNT! geq 35 (
@@ -582,7 +584,6 @@ if "!PID_ALIVE!"=="1" (
     goto wait_loop
 )
 :proceed
-del /f /q "%PID_FILE%" 2>NUL
 ping 127.0.0.1 -n 2 >NUL 2>&1
 
 echo Creando staging en %STAGING_DIR%... >> "%LOG_FILE%"
@@ -591,7 +592,7 @@ mkdir "%STAGING_DIR%" 2>NUL
 echo Descomprimiendo actualización... >> "%LOG_FILE%"
 tar -xf "%ZIP_FILE%" -C "%STAGING_DIR%" >> "%LOG_FILE%" 2>&1
 if errorlevel 1 (
-    powershell -NoProfile -NonInteractive -WindowStyle Hidden -Command "Expand-Archive -LiteralPath '%ZIP_FILE%' -DestinationPath '%STAGING_DIR%' -Force" >> "%LOG_FILE%" 2>&1
+    powershell -NoProfile -NonInteractive -Command "Expand-Archive -LiteralPath '%ZIP_FILE%' -DestinationPath '%STAGING_DIR%' -Force" >> "%LOG_FILE%" 2>&1
     if errorlevel 1 goto rollback
 )
 
@@ -611,7 +612,7 @@ set /a COPY_TRY=0
 xcopy "%STAGING_CONTENT%" "%APP_DIR%\\" /E /I /H /R /Y /Q >> "%LOG_FILE%" 2>&1
 if errorlevel 1 (
     set /a COPY_TRY+=1
-    if !COPY_TRY! lss 5 (
+    if !COPY_TRY! lss 10 (
         ping 127.0.0.1 -n 2 >NUL 2>&1
         goto copy_loop
     )
@@ -626,6 +627,7 @@ ping 127.0.0.1 -n 4 >NUL 2>&1
 rmdir /s /q "%BACKUP_DIR%" 2>NUL
 rmdir /s /q "%STAGING_DIR%" 2>NUL
 del /f /q "%ZIP_FILE%" 2>NUL
+del /f /q "%~dp0$updateLauncherVbs" 2>NUL
 echo === Auto-Update Windows Exitoso === >> "%LOG_FILE%"
 (goto) 2>nul & del "%~f0"
 exit /b 0
@@ -636,6 +638,7 @@ if exist "%BACKUP_DIR%" (
     xcopy "%BACKUP_DIR%" "%APP_DIR%\\" /E /I /H /R /Y /Q >> "%LOG_FILE%" 2>&1
 )
 del /f /q "%ZIP_FILE%" 2>NUL
+del /f /q "%~dp0$updateLauncherVbs" 2>NUL
 $launchCmd
 rmdir /s /q "%STAGING_DIR%" 2>NUL
 exit /b 1

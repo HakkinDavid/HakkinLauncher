@@ -209,25 +209,23 @@ class SelfUpdateService {
     final downloadsDir = await OsPaths.getDownloadsDirectory();
     final updateZipPath =
         p.join(downloadsDir.path, AppTechnicalStrings.selfUpdateZipFileName);
+    final applyingZipPath = p.join(
+      downloadsDir.path,
+      AppTechnicalStrings.selfUpdateApplyingZipFileName,
+    );
     final zipFile = File(updateZipPath);
+    final applyingZipFile = File(applyingZipPath);
 
-    // Si ya existe un archivo previo, verificar si ya corresponde al paquete completo válido
-    bool alreadyVerified = false;
+    // Limpiar cualquier archivo residual previo para evitar bucles de reinicio con paquetes fallidos
+    if (await applyingZipFile.exists()) {
+      try {
+        await applyingZipFile.delete();
+      } catch (_) {}
+    }
     if (await zipFile.exists()) {
-      if (expectedSha256.isNotEmpty) {
-        final matches = await HashValidator.verifySha256(zipFile, expectedSha256);
-        if (matches) {
-          alreadyVerified = true;
-        } else {
-          try {
-            await zipFile.delete();
-          } catch (_) {}
-        }
-      } else {
-        try {
-          await zipFile.delete();
-        } catch (_) {}
-      }
+      try {
+        await zipFile.delete();
+      } catch (_) {}
     }
 
     yield SelfUpdateStatus(
@@ -238,22 +236,21 @@ class SelfUpdateService {
     );
 
     try {
-      if (!alreadyVerified) {
-        await for (final dl in _downloader.downloadFileStream(
-          url: downloadUrl,
-          destinationPath: updateZipPath,
-        )) {
-          final mappedProgress = 0.05 + (dl.progress * 0.65);
-          final speedStr = dl.speedFormatted.isNotEmpty
-              ? AppStrings.speedSeparator(dl.speedFormatted)
-              : AppTechnicalStrings.empty;
-          yield SelfUpdateStatus(
-            stage: SelfUpdateStage.downloading,
-            message: AppStrings.selfUpdateDownloading(dl.statusText, speedStr),
-            progress: mappedProgress,
-            newVersion: launcherMeta.latestVersion,
-          );
-        }
+      await for (final dl in _downloader.downloadFileStream(
+        url: downloadUrl,
+        destinationPath: updateZipPath,
+        allowResume: false,
+      )) {
+        final mappedProgress = 0.05 + (dl.progress * 0.65);
+        final speedStr = dl.speedFormatted.isNotEmpty
+            ? AppStrings.speedSeparator(dl.speedFormatted)
+            : AppTechnicalStrings.empty;
+        yield SelfUpdateStatus(
+          stage: SelfUpdateStage.downloading,
+          message: AppStrings.selfUpdateDownloading(dl.statusText, speedStr),
+          progress: mappedProgress,
+          newVersion: launcherMeta.latestVersion,
+        );
       }
 
       yield const SelfUpdateStatus(
@@ -262,7 +259,7 @@ class SelfUpdateService {
         progress: 0.6,
       );
 
-      if (expectedSha256.isNotEmpty && !alreadyVerified) {
+      if (expectedSha256.isNotEmpty) {
         final isValid = await HashValidator.verifySha256(zipFile, expectedSha256);
         if (!isValid) {
           try {
@@ -330,6 +327,21 @@ class SelfUpdateService {
     final startHidden = WindowService.instance.isHidden;
     await StartupService.savePostUpdateHiddenState(startHidden);
 
+    // Mover el paquete descargado a un nombre transitorio de aplicación para evitar
+    // cualquier bucle infinito si el script externo es interrumpido
+    File targetZipFile = zipFile;
+    final applyingZipPath =
+        p.join(downloadsDir, AppTechnicalStrings.selfUpdateApplyingZipFileName);
+    try {
+      final existingApplying = File(applyingZipPath);
+      if (await existingApplying.exists()) {
+        await existingApplying.delete();
+      }
+      targetZipFile = await zipFile.rename(applyingZipPath);
+    } catch (_) {
+      targetZipFile = zipFile;
+    }
+
     if (Platform.isMacOS) {
       String targetAppPath = currentExePath;
       if (currentExePath.contains(AppTechnicalStrings.appContentsMacOs)) {
@@ -341,7 +353,7 @@ class SelfUpdateService {
         currentPid: currentPid,
         currentExePath: currentExePath,
         targetAppPath: targetAppPath,
-        zipFilePath: zipFile.path,
+        zipFilePath: targetZipFile.path,
         logFilePath: logFile,
         startHidden: startHidden,
       );
@@ -366,7 +378,7 @@ class SelfUpdateService {
         currentPid: currentPid,
         currentExePath: currentExePath,
         appDir: appDir,
-        zipFilePath: zipFile.path,
+        zipFilePath: targetZipFile.path,
         logFilePath: logFile,
         startHidden: startHidden,
       );
@@ -375,25 +387,41 @@ class SelfUpdateService {
           File(p.join(downloadsDir, AppTechnicalStrings.updateHelperBat));
       await scriptFile.writeAsString(scriptContent);
 
-      await Process.start(
-        AppTechnicalStrings.cmdPowershell,
-        [
-          AppTechnicalStrings.argNoProfile,
-          AppTechnicalStrings.argNonInteractive,
-          AppTechnicalStrings.argWindowStyle,
-          AppTechnicalStrings.argHidden,
-          AppTechnicalStrings.argMinusCommand,
-          AppTechnicalStrings.powershellStartHiddenCmd(scriptFile.path),
-        ],
-        mode: ProcessStartMode.detached,
+      final vbsFile =
+          File(p.join(downloadsDir, AppTechnicalStrings.updateLauncherVbs));
+      await vbsFile.writeAsString(
+        AppTechnicalStrings.generateWindowsVbsLauncher(scriptFile.path),
       );
+
+      bool launched = false;
+      try {
+        final vbsResult = await Process.run(
+          AppTechnicalStrings.cmdWscript,
+          [
+            AppTechnicalStrings.argSlashB,
+            AppTechnicalStrings.argSlashNologo,
+            vbsFile.path,
+          ],
+        );
+        launched = vbsResult.exitCode == 0;
+      } catch (_) {
+        launched = false;
+      }
+
+      if (!launched) {
+        await Process.start(
+          AppTechnicalStrings.cmdCmd,
+          [AppTechnicalStrings.argSlashC, scriptFile.path],
+          mode: ProcessStartMode.detached,
+        );
+      }
       exit(0);
     } else if (Platform.isLinux) {
       final scriptContent = generateLinuxUpdateScript(
         currentPid: currentPid,
         currentExePath: currentExePath,
         appDir: appDir,
-        zipFilePath: zipFile.path,
+        zipFilePath: targetZipFile.path,
         logFilePath: logFile,
         startHidden: startHidden,
       );

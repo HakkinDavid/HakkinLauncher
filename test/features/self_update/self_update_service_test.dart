@@ -151,6 +151,7 @@ void main() {
         logFilePath: r'C:\Hakkin\Downloads\update.log',
       );
 
+      expect(script, contains('cd /d "%TEMP%" 2>NUL'));
       expect(script, contains('CURRENT_PID=54321'));
       expect(script, contains(r'APP_DIR=C:\Hakkin'));
       expect(script, contains('BACKUP_DIR=%APP_DIR%_backup'));
@@ -160,15 +161,15 @@ void main() {
       expect(script, contains(r'xcopy "%BACKUP_DIR%" "%APP_DIR%\"'));
       // Launch app
       expect(script, contains('start "" "%CURRENT_EXE%"'));
-      // Consoleless-safe wait loop (no find /i pipe or timeout command)
-      expect(script, isNot(contains('find /i')));
-      expect(script, isNot(contains('timeout /t')));
-      expect(script, contains('tasklist /fi "PID eq %CURRENT_PID%" /fo csv /nh > "%PID_FILE%"'));
+      // Wait loop and retry copy loop
+      expect(script, contains('tasklist /fi "PID eq %CURRENT_PID%" 2>NUL | find /i "%CURRENT_PID%" >NUL'));
       expect(script, contains('ping 127.0.0.1 -n 2 >NUL 2>&1'));
+      expect(script, contains('if !COPY_TRY! lss 10'));
 
-      final psCmd = AppTechnicalStrings.powershellStartHiddenCmd(r'C:\Hakkin\Downloads\update_helper.bat');
-      expect(psCmd, contains("Start-Process -FilePath 'cmd'"));
-      expect(psCmd, contains('-WindowStyle Hidden'));
+      final vbsCmd = AppTechnicalStrings.generateWindowsVbsLauncher(r'C:\Hakkin\Downloads\update_helper.bat');
+      expect(vbsCmd, contains('CreateObject("WScript.Shell").Run'));
+      expect(vbsCmd, contains(r'cmd /c ""C:\Hakkin\Downloads\update_helper.bat""'));
+      expect(vbsCmd, contains(', 0, False'));
     });
 
     test('generateLinuxUpdateScript contains staging, backup, and rollback', () {
