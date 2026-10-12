@@ -1,6 +1,6 @@
 {
   "version": "2.0.0",
-  "catalog_timestamp": "2026-10-12T03:53:27.011113+00:00",
+  "catalog_timestamp": "2026-10-12T04:41:11.814758+00:00",
   "launcher_meta": {
     "latest_version": "26.10.11-09",
     "min_required_launcher_version": "1.0.0",
@@ -88,7 +88,17 @@
                 "size_bytes": 1084854906,
                 "sha256": "c97a2d95b77e3d4c7e972fc93cad94fed167f9f18a0d844a29e4206b24bb48b8"
               },
-              "delta_patches": [],
+              "delta_patches": [
+                {
+                  "from_version": "26.10.08-13",
+                  "to_version": "26.10.11-20",
+                  "patch_format": "hdiff",
+                  "url": "https://github.com/HakkinDavid/hakkin-launcher-deltas/releases/download/tecate-simulator.26.10.08-13-to-26.10.11-20/tecate-simulator_windows-x64.hdiff",
+                  "size_bytes": 326351,
+                  "patch_sha256": "b96b3ea255e588414fbad2ad6d5e77045b9f5c165ebca934a6bbbecf21523d31",
+                  "target_sha256": "b959316c65f097d413b7bb855ae8e299f7ebe1c6f57fc4acee653a21c6a84165"
+                }
+              ],
               "scripts": {
                 "pre_install": null,
                 "post_install": null
@@ -152,7 +162,17 @@
                 "size_bytes": 1111748180,
                 "sha256": "20237eb47a74feac2671bed57e44e4620d3b428d1506618340271c5cbe39b728"
               },
-              "delta_patches": [],
+              "delta_patches": [
+                {
+                  "from_version": "26.10.08-13",
+                  "to_version": "26.10.11-20",
+                  "patch_format": "hdiff",
+                  "url": "https://github.com/HakkinDavid/hakkin-launcher-deltas/releases/download/tecate-simulator.26.10.08-13-to-26.10.11-20/tecate-simulator_macos-arm64.hdiff",
+                  "size_bytes": 305878,
+                  "patch_sha256": "cf460eac8cb39271647dc30384c9eb838fe352be6c94d51aaac4432e36d49677",
+                  "target_sha256": "6aaaa50e1f7942f8a3c31816f65bd514a1ce286206825344c570fcbd175471a8"
+                }
+              ],
               "scripts": {
                 "pre_install": null,
                 "post_install": null
