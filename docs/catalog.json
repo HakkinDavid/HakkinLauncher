@@ -1,6 +1,6 @@
 {
   "version": "2.0.0",
-  "catalog_timestamp": "2026-10-12T09:53:48.495481+00:00",
+  "catalog_timestamp": "2026-10-24T03:58:37.057270+00:00",
   "launcher_meta": {
     "latest_version": "26.10.12-10",
     "min_required_launcher_version": "1.0.0",
@@ -72,12 +72,38 @@
           "https://raw.githubusercontent.com/Bonsanbec/tecate-simulator/master/godot_project/branding/icon.png"
         ]
       },
-      "latest_version": "26.10.11-23",
+      "latest_version": "26.10.20-17",
       "platforms": {
         "windows-x64": {
-          "latest_version": "26.10.11-23",
+          "latest_version": "26.10.20-17",
           "protected_user_paths": [],
           "versions": [
+            {
+              "version": "26.10.20-17",
+              "release_date": "2026-10-21T00:14:50.812457+00:00",
+              "changelog": "Lanzamiento de Tecate Simulator versión 26.10.20-17.",
+              "entry_point": "tecate.exe",
+              "package": {
+                "url": "https://github.com/Bonsanbec/tecate-simulator/releases/download/26.10.20-17/tecate-windows.zip",
+                "size_bytes": 1084971565,
+                "sha256": "42a77707f3b60d35cb77108016b0181f241f99376e93b7f14eabdae02660d5ca"
+              },
+              "delta_patches": [
+                {
+                  "from_version": "26.10.11-23",
+                  "to_version": "26.10.20-17",
+                  "patch_format": "hdiff",
+                  "url": "https://github.com/HakkinDavid/hakkin-launcher-deltas/releases/download/tecate-simulator.26.10.11-23-to-26.10.20-17/tecate-simulator_windows-x64.hdiff",
+                  "size_bytes": 378803,
+                  "patch_sha256": "ea836a5115ccf0cef10bd7a8f194a2f881ab256f83bcfce28a063f27cc21ac0e",
+                  "target_sha256": "b959316c65f097d413b7bb855ae8e299f7ebe1c6f57fc4acee653a21c6a84165"
+                }
+              ],
+              "scripts": {
+                "pre_install": null,
+                "post_install": null
+              }
+            },
             {
               "version": "26.10.11-23",
               "release_date": "2026-10-12T06:02:40.970660+00:00",
@@ -88,7 +114,17 @@
                 "size_bytes": 1084918984,
                 "sha256": "7601668b5bae56755249de9e2feae4991e1db0cabb4e7a46f96cf9d8f18a7b19"
               },
-              "delta_patches": [],
+              "delta_patches": [
+                {
+                  "from_version": "26.10.11-20",
+                  "to_version": "26.10.11-23",
+                  "patch_format": "hdiff",
+                  "url": "https://github.com/HakkinDavid/hakkin-launcher-deltas/releases/download/tecate-simulator.26.10.11-20-to-26.10.11-23/tecate-simulator_windows-x64.hdiff",
+                  "size_bytes": 304205,
+                  "patch_sha256": "57c54f2250355a9383c7b7d2027e30ce825eb08c408bbef56ef527175b778a81",
+                  "target_sha256": "b959316c65f097d413b7bb855ae8e299f7ebe1c6f57fc4acee653a21c6a84165"
+                }
+              ],
               "scripts": {
                 "pre_install": null,
                 "post_install": null
@@ -165,9 +201,35 @@
           ]
         },
         "macos-arm64": {
-          "latest_version": "26.10.11-23",
+          "latest_version": "26.10.20-17",
           "protected_user_paths": [],
           "versions": [
+            {
+              "version": "26.10.20-17",
+              "release_date": "2026-10-21T00:14:50.812457+00:00",
+              "changelog": "Lanzamiento de Tecate Simulator versión 26.10.20-17.",
+              "entry_point": "tecate.app",
+              "package": {
+                "url": "https://github.com/Bonsanbec/tecate-simulator/releases/download/26.10.20-17/tecate-macos.zip",
+                "size_bytes": 1111865233,
+                "sha256": "bedadbe71440a5a12beeaa28b2f0241f626338dc9941b429d05ae42506b595ff"
+              },
+              "delta_patches": [
+                {
+                  "from_version": "26.10.11-23",
+                  "to_version": "26.10.20-17",
+                  "patch_format": "hdiff",
+                  "url": "https://github.com/HakkinDavid/hakkin-launcher-deltas/releases/download/tecate-simulator.26.10.11-23-to-26.10.20-17/tecate-simulator_macos-arm64.hdiff",
+                  "size_bytes": 385216,
+                  "patch_sha256": "91620516925ee3c7074b52ecefff3e4e316520b08687af39ae8bb8c62b7ed64d",
+                  "target_sha256": "09256796e56085ac07e3c90474490f8e42a00ac4f3433d36c8de821746992abc"
+                }
+              ],
+              "scripts": {
+                "pre_install": null,
+                "post_install": null
+              }
+            },
             {
               "version": "26.10.11-23",
               "release_date": "2026-10-12T06:02:40.970660+00:00",
@@ -178,7 +240,17 @@
                 "size_bytes": 1111812261,
                 "sha256": "8522e729da6e75bc25d01d3c277e6818aa70b661265f65b8cf8edd07282ebb8b"
               },
-              "delta_patches": [],
+              "delta_patches": [
+                {
+                  "from_version": "26.10.11-20",
+                  "to_version": "26.10.11-23",
+                  "patch_format": "hdiff",
+                  "url": "https://github.com/HakkinDavid/hakkin-launcher-deltas/releases/download/tecate-simulator.26.10.11-20-to-26.10.11-23/tecate-simulator_macos-arm64.hdiff",
+                  "size_bytes": 314609,
+                  "patch_sha256": "f9420d9e1f7f0c6ac9435bf6a2d608c0fa1514b7795520317b901717313802c9",
+                  "target_sha256": "ac826aa8439daea418092206082ae95281dd02f61add51a5969b6b8f9519ece2"
+                }
+              ],
               "scripts": {
                 "pre_install": null,
                 "post_install": null
