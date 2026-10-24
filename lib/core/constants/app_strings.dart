@@ -449,6 +449,8 @@ class AppStrings {
       'Aviso: La suma de verificación tras aplicar el parche no coincide. Descartando parche diferencial.';
   static String logDeltaPatchError(Object error) =>
       'Fallo al aplicar el parche diferencial: $error. Activando alternativa de respaldo con descarga completa.';
+  static String logDeltaChainFound(int count, int totalBytes, int fullPackageBytes) =>
+      'Estrategia de actualización incremental: $count parche(s) encadenado(s) totalizando $totalBytes bytes frente a $fullPackageBytes bytes del paquete completo.';
   static String logActivatingFullPackageFallback() =>
       'Activando descarga limpia de paquete completo como alternativa.';
   static String logHpatchzNotAvailable() =>

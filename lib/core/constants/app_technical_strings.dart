@@ -376,6 +376,7 @@ class AppTechnicalStrings {
   static const errorHashMismatch = 'hash_mismatch';
   static const errorEmptyUrl = 'empty_url';
   static const errorUnsupportedPlatform = 'unsupported_platform';
+  static const errorPatchApplyFailed = 'patch_apply_failed';
   static const appleScriptCancelCode = '-128';
 
   // ---------------------------------------------------------------------------
@@ -429,6 +430,9 @@ class AppTechnicalStrings {
       '${slug}_v${version}_full.zip';
 
   static String updatePatchFileName(String slug) => '${slug}_update.hdiff';
+  static String chainedPatchFileName(
+          String slug, String fromVersion, String toVersion) =>
+      '${slug}_${fromVersion}_to_${toVersion}.hdiff';
   static String versionWithV(String version) => 'v$version';
 
   // ---------------------------------------------------------------------------

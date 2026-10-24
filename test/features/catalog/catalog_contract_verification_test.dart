@@ -117,25 +117,27 @@ void main() {
       final tecate = manifest.apps.firstWhere((a) => a.id == 'dev.bonsanbec.tecate');
       expect(tecate.title, 'Tecate Simulator');
       expect(tecate.category, 'game');
-      expect(tecate.latestVersion, '26.10.08-13');
+      expect(tecate.latestVersion, '26.10.20-17');
       expect(tecate.supportsPlatform('windows-x64'), isTrue);
       expect(tecate.supportsPlatform('macos-arm64'), isTrue);
 
       final tecateWin = tecate.getPlatformRelease('windows-x64')!;
-      expect(tecateWin.latestRelease.version, '26.10.08-13');
+      expect(tecateWin.latestRelease.version, '26.10.20-17');
       expect(tecateWin.latestRelease.entryPoint, 'tecate.exe');
-      expect(tecateWin.latestRelease.package.sizeBytes, 1084841300);
-      expect(tecateWin.latestRelease.package.sha256, 'b38a07970facf3ef41569bac85aef707254c80e4251a0c401c6c207cfa671f29');
+      expect(tecateWin.latestRelease.package.sizeBytes, 1084971565);
+      expect(tecateWin.latestRelease.package.sha256, '42a77707f3b60d35cb77108016b0181f241f99376e93b7f14eabdae02660d5ca');
       // Versión histórica preservada en el catálogo v2.0
+      expect(tecateWin.getRelease('26.10.08-13'), isNotNull);
       expect(tecateWin.getRelease('0.0.1'), isNotNull);
       expect(tecateWin.getRelease('0.0.1')!.package.sizeBytes, 771167643);
 
       final tecateMac = tecate.getPlatformRelease('macos-arm64')!;
-      expect(tecateMac.latestRelease.version, '26.10.08-13');
+      expect(tecateMac.latestRelease.version, '26.10.20-17');
       expect(tecateMac.latestRelease.entryPoint, 'tecate.app');
-      expect(tecateMac.latestRelease.package.sizeBytes, 1111734578);
-      expect(tecateMac.latestRelease.package.sha256, 'a5ff201a1cfc14bce9fe53bfb1f1e02acb349deaef0ae3a34392fa2a34faa98d');
+      expect(tecateMac.latestRelease.package.sizeBytes, 1111865233);
+      expect(tecateMac.latestRelease.package.sha256, 'bedadbe71440a5a12beeaa28b2f0241f626338dc9941b429d05ae42506b595ff');
       // Versión histórica preservada en el catálogo v2.0
+      expect(tecateMac.getRelease('26.10.08-13'), isNotNull);
       expect(tecateMac.getRelease('0.0.1'), isNotNull);
       expect(tecateMac.getRelease('0.0.1')!.package.sizeBytes, 798030827);
 

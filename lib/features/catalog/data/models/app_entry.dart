@@ -317,6 +317,130 @@ class PlatformRelease {
     }
     return null;
   }
+
+  /// Encuentra la secuencia óptima de parches delta (cadena de parches) desde [fromVersion]
+  /// hasta [toVersion] que minimice el tamaño total de transferencia en bytes.
+  ///
+  /// Si se especifica [maxTransferBytes] (por ejemplo, el tamaño del paquete completo),
+  /// la estrategia sólo es seleccionada si el tamaño total de la cadena es estrictamente
+  /// menor que dicho límite. Si no existe camino o el costo total es mayor o igual que
+  /// [maxTransferBytes], retorna `null`.
+  List<DeltaUpdate>? findOptimalDeltaChain(
+    String fromVersion,
+    String toVersion, {
+    int? maxTransferBytes,
+  }) {
+    if (fromVersion == toVersion) {
+      return const [];
+    }
+
+    if (!hasVersion(fromVersion) || !hasVersion(toVersion)) {
+      return null;
+    }
+
+    final allDeltas = <DeltaUpdate>[];
+    for (final v in versions) {
+      allDeltas.addAll(v.deltaPatches);
+    }
+
+    if (allDeltas.isEmpty) {
+      return null;
+    }
+
+    final adjacency = <String, List<DeltaUpdate>>{};
+    for (final delta in allDeltas) {
+      if (delta.fromVersion.isEmpty || delta.toVersion.isEmpty) continue;
+      adjacency.putIfAbsent(delta.fromVersion, () => []).add(delta);
+    }
+
+    if (!adjacency.containsKey(fromVersion)) {
+      return null;
+    }
+
+    // Algoritmo de Dijkstra para encontrar el camino de menor costo de transferencia (sizeBytes)
+    final minCost = <String, int>{fromVersion: 0};
+    final minHops = <String, int>{fromVersion: 0};
+    final previousEdge = <String, DeltaUpdate>{};
+    final previousNode = <String, String>{};
+    final visited = <String>{};
+
+    final queue = <String>{fromVersion};
+
+    while (queue.isNotEmpty) {
+      String? current;
+      int bestCost = 1 << 62;
+      int bestHops = 1 << 30;
+
+      for (final node in queue) {
+        final c = minCost[node] ?? (1 << 62);
+        final h = minHops[node] ?? (1 << 30);
+        if (c < bestCost || (c == bestCost && h < bestHops)) {
+          bestCost = c;
+          bestHops = h;
+          current = node;
+        }
+      }
+
+      if (current == null) break;
+      queue.remove(current);
+      visited.add(current);
+
+      if (current == toVersion) {
+        break;
+      }
+
+      final edges = adjacency[current] ?? const [];
+      for (final edge in edges) {
+        final neighbor = edge.toVersion;
+        if (visited.contains(neighbor)) continue;
+
+        final newCost = bestCost + edge.sizeBytes;
+        final newHops = bestHops + 1;
+
+        final currentNeighborCost = minCost[neighbor];
+        final currentNeighborHops = minHops[neighbor];
+
+        if (currentNeighborCost == null ||
+            newCost < currentNeighborCost ||
+            (newCost == currentNeighborCost && newHops < currentNeighborHops!)) {
+          minCost[neighbor] = newCost;
+          minHops[neighbor] = newHops;
+          previousEdge[neighbor] = edge;
+          previousNode[neighbor] = current;
+          queue.add(neighbor);
+        }
+      }
+    }
+
+    if (!minCost.containsKey(toVersion) || !previousEdge.containsKey(toVersion)) {
+      return null;
+    }
+
+    final totalBytes = minCost[toVersion]!;
+
+    // Si se especificó un límite superior, el costo total de la cadena debe ser estrictamente menor
+    if (maxTransferBytes != null && maxTransferBytes > 0 && totalBytes >= maxTransferBytes) {
+      return null;
+    }
+
+    // Reconstruir la cadena de parches desde toVersion hacia fromVersion
+    final chain = <DeltaUpdate>[];
+    String? curr = toVersion;
+    while (curr != null && curr != fromVersion) {
+      final edge = previousEdge[curr];
+      if (edge == null) break;
+      chain.insert(0, edge);
+      curr = previousNode[curr];
+    }
+
+    if (chain.isEmpty ||
+        chain.first.fromVersion != fromVersion ||
+        chain.last.toVersion != toVersion) {
+      return null;
+    }
+
+    return chain;
+  }
 }
 
 class AppVersionRelease {

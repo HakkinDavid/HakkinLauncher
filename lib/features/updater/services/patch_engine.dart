@@ -49,12 +49,23 @@ class UpdateStatus {
 class PatchEngine {
   final DownloaderService _downloader;
   final LibraryRepository _libraryRepository;
+  final Future<bool> Function({
+    required File patchFile,
+    required Directory targetDirectory,
+    required String entryPoint,
+  })? _patchApplier;
 
   PatchEngine({
     DownloaderService? downloader,
     LibraryRepository? libraryRepository,
+    Future<bool> Function({
+      required File patchFile,
+      required Directory targetDirectory,
+      required String entryPoint,
+    })? patchApplier,
   })  : _downloader = downloader ?? DownloaderService(),
-        _libraryRepository = libraryRepository ?? LibraryRepository();
+        _libraryRepository = libraryRepository ?? LibraryRepository(),
+        _patchApplier = patchApplier;
 
   /// Prepara el archivo de destino antes de iniciar una descarga:
   /// retorna true si el archivo ya existe íntegro con el hash esperado;
@@ -307,136 +318,208 @@ class PatchEngine {
       }
     }
 
-    bool shouldAttemptDelta = false;
-    DeltaUpdate? matchedDelta;
+    List<DeltaUpdate>? deltaChain;
 
     // Si la versión instalada es anómala o huérfana, jamás se debe intentar parchear;
-    // se debe actualizar de manera completa.
+    // se debe actualizar de manera completa con instalación limpia.
     if (installed != null &&
         installed.installedVersion != targetVersionStr &&
-        !isAnomalousInstalled) {
-      matchedDelta = platformRelease.findDeltaFor(
+        !isAnomalousInstalled &&
+        !requiresCleanInstall) {
+      final maxTransfer = targetRelease.package.sizeBytes > 0
+          ? targetRelease.package.sizeBytes
+          : null;
+      deltaChain = platformRelease.findOptimalDeltaChain(
         installed.installedVersion,
         targetVersionStr,
+        maxTransferBytes: maxTransfer,
       );
-      if (matchedDelta != null) {
-        shouldAttemptDelta = true;
+      if (deltaChain != null && deltaChain.isNotEmpty) {
+        final totalBytes = deltaChain.fold<int>(0, (s, d) => s + d.sizeBytes);
+        debugPrint(AppStrings.logDeltaChainFound(
+          deltaChain.length,
+          totalBytes,
+          targetRelease.package.sizeBytes,
+        ));
       }
     }
 
-    if (shouldAttemptDelta && matchedDelta != null) {
+    if (deltaChain != null && deltaChain.isNotEmpty) {
+      final totalChainSizeBytes = deltaChain.fold<int>(0, (s, d) => s + d.sizeBytes);
       yield UpdateStatus(
         stage: UpdateStage.downloading,
         message: AppStrings.startingDeltaDownloadMessage(
-          (matchedDelta.sizeBytes / 1048576).toStringAsFixed(1),
+          (totalChainSizeBytes / 1048576).toStringAsFixed(1),
         ),
         progress: 0.05,
       );
 
-      final patchFilePath = p.join(
-        downloadsDir.path,
-        AppTechnicalStrings.updatePatchFileName(app.slug),
-      );
-      final patchFile = File(patchFilePath);
-      bool deltaSuccess = false;
+      final patchFiles = <File>[];
+      final verifiedPatchMap = <String, bool>{};
+      bool deltaSuccess = true;
 
       try {
-        final alreadyVerifiedPatch = await _prepareDownloadDestination(
-          patchFile,
-          matchedDelta.patchSha256,
-          matchedDelta.sizeBytes,
-        );
-        if (!alreadyVerifiedPatch) {
-          await for (final dl in _downloader.downloadFileStream(
-            url: matchedDelta.url,
-            destinationPath: patchFilePath,
-          )) {
-            final mappedProgress = 0.05 + (dl.progress * 0.45);
-            final speedStr = dl.speedFormatted.isNotEmpty
-                ? AppStrings.speedSeparator(dl.speedFormatted)
-                : AppTechnicalStrings.empty;
-            yield UpdateStatus(
-              stage: UpdateStage.downloading,
-              message: AppStrings.downloadingPatchMessage(
-                dl.statusText,
-                speedStr,
-              ),
-              progress: mappedProgress,
-            );
+        var bytesDownloadedSoFar = 0;
+
+        for (var step = 0; step < deltaChain.length; step++) {
+          final delta = deltaChain[step];
+          final patchFileName = AppTechnicalStrings.chainedPatchFileName(
+            app.slug,
+            delta.fromVersion,
+            delta.toVersion,
+          );
+          final patchFilePath = p.join(downloadsDir.path, patchFileName);
+          final patchFile = File(patchFilePath);
+          patchFiles.add(patchFile);
+
+          final alreadyVerifiedPatch = await _prepareDownloadDestination(
+            patchFile,
+            delta.patchSha256,
+            delta.sizeBytes,
+          );
+          verifiedPatchMap[patchFilePath] = alreadyVerifiedPatch;
+
+          if (!alreadyVerifiedPatch) {
+            await for (final dl in _downloader.downloadFileStream(
+              url: delta.url,
+              destinationPath: patchFilePath,
+            )) {
+              final double currentStepProgress;
+              if (totalChainSizeBytes > 0 && delta.sizeBytes > 0) {
+                final currentBytes = (dl.progress * delta.sizeBytes).toInt();
+                currentStepProgress = (bytesDownloadedSoFar + currentBytes) / totalChainSizeBytes;
+              } else {
+                currentStepProgress = (step + dl.progress) / deltaChain.length;
+              }
+
+              final mappedProgress = 0.05 + (currentStepProgress.clamp(0.0, 1.0) * 0.45);
+              final speedStr = dl.speedFormatted.isNotEmpty
+                  ? AppStrings.speedSeparator(dl.speedFormatted)
+                  : AppTechnicalStrings.empty;
+
+              yield UpdateStatus(
+                stage: UpdateStage.downloading,
+                message: AppStrings.downloadingPatchMessage(
+                  dl.statusText,
+                  speedStr,
+                ),
+                progress: mappedProgress,
+              );
+            }
           }
+          bytesDownloadedSoFar += delta.sizeBytes;
         }
 
+        // Verificación de integridad de todos los archivos de parche descargados
         yield const UpdateStatus(
           stage: UpdateStage.verifyingChecksum,
           message: AppStrings.verifyingPatchSecurity,
           progress: 0.55,
         );
 
-        final patchValid = alreadyVerifiedPatch ||
-            matchedDelta.patchSha256.isEmpty ||
-            await HashValidator.verifySha256(patchFile, matchedDelta.patchSha256);
+        for (var step = 0; step < deltaChain.length; step++) {
+          final delta = deltaChain[step];
+          final patchFile = patchFiles[step];
+          final wasVerified = verifiedPatchMap[patchFile.path] ?? false;
 
-        if (patchValid) {
-          if (targetRelease.scripts.preInstall != null && await targetInstallDir.exists()) {
-            yield const UpdateStatus(
-              stage: UpdateStage.runningPreScripts,
-              message: AppStrings.runningPreScripts,
-              progress: 0.65,
-            );
-            final preScriptPath = p.join(targetInstallDir.path, targetRelease.scripts.preInstall);
-            await ProcessLauncher.runScript(
-              scriptPath: preScriptPath,
-              workingDirectory: targetInstallDir.path,
-            );
+          final patchValid = wasVerified ||
+              delta.patchSha256.isEmpty ||
+              await HashValidator.verifySha256(patchFile, delta.patchSha256);
+
+          if (!patchValid) {
+            debugPrint(AppStrings.logPatchHashMismatch());
+            deltaSuccess = false;
+            break;
           }
+        }
 
-          yield const UpdateStatus(
-            stage: UpdateStage.applyingDelta,
-            message: AppStrings.applyingDeltaPatch,
-            progress: 0.75,
-          );
+        // Aplicación secuencial y encadenada de los parches
+        if (deltaSuccess) {
+          final applyStepWeight = 0.20 / deltaChain.length;
 
-          deltaSuccess = await _applyHDiffPatch(
-            patchFile: patchFile,
-            targetDirectory: targetInstallDir,
-            entryPoint: targetRelease.entryPoint,
-          );
+          for (var step = 0; step < deltaChain.length; step++) {
+            final delta = deltaChain[step];
+            final patchFile = patchFiles[step];
+            final stepTargetRelease = platformRelease.getRelease(delta.toVersion) ?? targetRelease;
 
-          if (deltaSuccess && matchedDelta.targetSha256.isNotEmpty) {
-            var targetExePath = p.join(targetInstallDir.path, targetRelease.entryPoint);
-            if (Platform.isMacOS) {
-              final autoResolved = ProcessLauncher.resolveExecutablePath(targetExePath, targetInstallDir.path);
-              if (autoResolved != null) {
-                targetExePath = autoResolved;
+            // Script pre-instalación del paso si existe
+            if (stepTargetRelease.scripts.preInstall != null && await targetInstallDir.exists()) {
+              yield const UpdateStatus(
+                stage: UpdateStage.runningPreScripts,
+                message: AppStrings.runningPreScripts,
+                progress: 0.60,
+              );
+              final preScriptPath = p.join(targetInstallDir.path, stepTargetRelease.scripts.preInstall);
+              await ProcessLauncher.runScript(
+                scriptPath: preScriptPath,
+                workingDirectory: targetInstallDir.path,
+              );
+            }
+
+            final currentApplyProgress = 0.60 + ((step + 1) * applyStepWeight);
+            yield UpdateStatus(
+              stage: UpdateStage.applyingDelta,
+              message: AppStrings.applyingDeltaPatch,
+              progress: currentApplyProgress,
+            );
+
+            final applied = await _applyHDiffPatch(
+              patchFile: patchFile,
+              targetDirectory: targetInstallDir,
+              entryPoint: stepTargetRelease.entryPoint,
+            );
+
+            if (!applied) {
+              debugPrint(AppStrings.logDeltaPatchError(AppTechnicalStrings.errorPatchApplyFailed));
+              deltaSuccess = false;
+              break;
+            }
+
+            // Verificación del ejecutable tras aplicar el parche
+            if (delta.targetSha256.isNotEmpty) {
+              var targetExePath = p.join(targetInstallDir.path, stepTargetRelease.entryPoint);
+              if (Platform.isMacOS) {
+                final autoResolved = ProcessLauncher.resolveExecutablePath(targetExePath, targetInstallDir.path);
+                if (autoResolved != null) {
+                  targetExePath = autoResolved;
+                }
+              }
+
+              final exeFile = File(targetExePath);
+              final isZipPackage = stepTargetRelease.package.url.toLowerCase().endsWith(AppTechnicalStrings.extZip);
+
+              final isContainerPackageHash = isZipPackage &&
+                  delta.targetSha256.toLowerCase() == stepTargetRelease.package.sha256.toLowerCase();
+
+              if (!isContainerPackageHash) {
+                if (await exeFile.exists()) {
+                  final hashMatch = await HashValidator.verifySha256(exeFile, delta.targetSha256);
+                  if (!hashMatch) {
+                    debugPrint(AppStrings.logPatchHashMismatch());
+                    deltaSuccess = false;
+                    break;
+                  }
+                } else {
+                  debugPrint(AppStrings.logExecutableNotFound(targetExePath));
+                  deltaSuccess = false;
+                  break;
+                }
+              } else {
+                if (!await exeFile.exists()) {
+                  debugPrint(AppStrings.logExecutableNotFound(targetExePath));
+                  deltaSuccess = false;
+                  break;
+                }
               }
             }
 
-            final exeFile = File(targetExePath);
-            final isZipPackage = targetRelease.package.url.toLowerCase().endsWith(AppTechnicalStrings.extZip);
-
-            // Si targetSha256 coincide con el hash del paquete ZIP, se trata del checksum del contenedor
-            // comprimido (fallback del catálogo), no del binario desempaquetado. En parches de directorio/ZIP,
-            // la integridad ya ha sido garantizada criptográficamente por hpatchz (-C-new-copy) y patchSha256.
-            final isContainerPackageHash = isZipPackage &&
-                matchedDelta.targetSha256.toLowerCase() == targetRelease.package.sha256.toLowerCase();
-
-            if (!isContainerPackageHash) {
-              if (await exeFile.exists()) {
-                final hashMatch = await HashValidator.verifySha256(exeFile, matchedDelta.targetSha256);
-                if (!hashMatch) {
-                  debugPrint(AppStrings.logPatchHashMismatch());
-                  deltaSuccess = false;
-                }
-              } else {
-                debugPrint(AppStrings.logExecutableNotFound(targetExePath));
-                deltaSuccess = false;
-              }
-            } else {
-              // Validar que el ejecutable objetivo exista tras la aplicación del parche
-              if (!await exeFile.exists()) {
-                debugPrint(AppStrings.logExecutableNotFound(targetExePath));
-                deltaSuccess = false;
-              }
+            // Script post-instalación del paso si existe
+            if (stepTargetRelease.scripts.postInstall != null && await targetInstallDir.exists()) {
+              final postScriptPath = p.join(targetInstallDir.path, stepTargetRelease.scripts.postInstall);
+              await ProcessLauncher.runScript(
+                scriptPath: postScriptPath,
+                workingDirectory: targetInstallDir.path,
+              );
             }
           }
         }
@@ -446,14 +529,6 @@ class PatchEngine {
       }
 
       if (deltaSuccess) {
-        if (targetRelease.scripts.postInstall != null && await targetInstallDir.exists()) {
-          final postScriptPath = p.join(targetInstallDir.path, targetRelease.scripts.postInstall);
-          await ProcessLauncher.runScript(
-            scriptPath: postScriptPath,
-            workingDirectory: targetInstallDir.path,
-          );
-        }
-
         await _finalizeInstallation(
           app: app,
           versionRelease: targetRelease,
@@ -647,6 +722,14 @@ class PatchEngine {
     required Directory targetDirectory,
     required String entryPoint,
   }) async {
+    if (_patchApplier != null) {
+      return _patchApplier!(
+        patchFile: patchFile,
+        targetDirectory: targetDirectory,
+        entryPoint: entryPoint,
+      );
+    }
+
     try {
       if (!await targetDirectory.exists()) return false;
 
